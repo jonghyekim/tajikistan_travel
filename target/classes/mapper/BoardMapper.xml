@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.example.board.mapper.BoardMapper">
+
+    <select id="selectBoardById"
+            parameterType="int"
+            resultType="egovframework.example.board.vo.BoardVO">
+        SELECT
+            board_id   AS boardId,
+            writer_id  AS writerId,
+            use_yn     AS useYn,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM board
+        WHERE board_id = #{boardId}
+          AND use_yn = 'Y'
+    </select>
+
+    <insert id="insertBoard"
+            parameterType="egovframework.example.board.vo.BoardVO"
+            useGeneratedKeys="true"
+            keyProperty="boardId">
+        INSERT INTO board (
+            writer_id, use_yn, created_at
+        ) VALUES (
+            #{writerId}, 'Y', NOW()
+        )
+    </insert>
+
+</mapper>

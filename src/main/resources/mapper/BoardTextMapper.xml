@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.example.boardtext.mapper.BoardTextMapper">
+
+    <select id="selectByBoardIdAndLang"
+            resultType="egovframework.example.boardtext.vo.BoardTextVO">
+        SELECT
+            board_text_id AS boardTextId,
+            board_id      AS boardId,
+            lang_code     AS langCode,
+            title,
+            content,
+            created_at    AS createdAt,
+            updated_at    AS updatedAt
+        FROM board_text
+        WHERE board_id = #{boardId}
+          AND lang_code = #{langCode}
+    </select>
+
+    <insert id="insertBoardText"
+            parameterType="egovframework.example.boardtext.vo.BoardTextVO">
+        INSERT INTO board_text (
+            board_id, lang_code, title, content, created_at
+        ) VALUES (
+            #{boardId}, #{langCode}, #{title}, #{content}, NOW()
+        )
+    </insert>
+
+</mapper>
