@@ -1,0 +1,58 @@
+package egovframework.example.domain;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "CATEGORY_CODE")
+public class CategoryCode {
+
+    @Id
+    @Column(name = "code", length = 50)
+    private String code;
+
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
+    @Column(name = "sort_order", nullable = false)
+    private Integer sortOrder = 0;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "categoryCode", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CategoryCodeI18n> i18ns = new ArrayList<>();
+
+    @PrePersist
+    void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void addI18n(CategoryCodeI18n i18n) {
+        i18ns.add(i18n);
+        i18n.setCategoryCode(this);
+    }
+
+    // getters/setters ...
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean active) { isActive = active; }
+    public Integer getSortOrder() { return sortOrder; }
+    public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public List<CategoryCodeI18n> getI18ns() { return i18ns; }
+}

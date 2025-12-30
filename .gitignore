@@ -1,0 +1,26 @@
+# Application secrets
+src/main/resources/application-keys.yaml
+src/main/resources/yaml/application-keys.yaml
+
+# Compiled class files
+target/
+
+# IDE files
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+.factorypath
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
