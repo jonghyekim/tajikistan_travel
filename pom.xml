@@ -76,6 +76,12 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+		 	<groupId>com.mysql</groupId>
+  			<artifactId>mysql-connector-j</artifactId>
+  			<version>8.0.33</version>
+  			<scope>runtime</scope>
+		</dependency>
 
 		<!-- 표준프레임워크 실행환경 -->
         <dependency>
@@ -113,14 +119,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.34</version>
-			<optional>true</optional>
+	  		<artifactId>lombok</artifactId>
+  			<version>1.18.34</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
+  			<groupId>org.springframework.boot</groupId>
+  			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<!-- <groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>5.6.15.Final</version>
+			<version>5.6.15.Final</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
