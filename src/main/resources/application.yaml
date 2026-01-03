@@ -1,22 +1,6 @@
-server:
-  port: 8080
-
 spring:
-  config:
-    import: 
-      - classpath:/yaml/application-keys.yaml
-
-  main:
-    allow-bean-definition-overriding: true
-
-  jpa:
-    open-in-view: false
-    show-sql: true           
-    hibernate:
-      ddl-auto: update       
-    properties:
-      hibernate:
-        format_sql: true
-        default_batch_fetch_size: 100
-        jdbc:
-          time_zone: Asia/Seoul
+  datasource:
+    url: jdbc:mysql://13.124.47.153:3306/tajikistan_travel
+    username: root
+    password: ivill0080@
+    driver-class-name: com.mysql.cj.jdbc.Driver

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Search & Filter</title></head>
+<body>
+    <h1>Search Result & Filters</h1>
+
+    <form action="/filter" method="get">
+        <input type="text" name="query" th:value="${lastQuery}" placeholder="Where do you want to go?">
+        
+        <select name="category">
+            <option value="">All Categories</option>
+            <option th:each="c : ${categories}" th:value="${c.code}" th:text="${c.code}" 
+                    th:selected="${c.code == lastCategory}"></option>
+        </select>
+
+        <select name="region">
+            <option value="">All Regions</option>
+            <option th:each="r : ${regions}" th:value="${r.code}" th:text="${r.code}" 
+                    th:selected="${r.code == lastRegion}"></option>
+        </select>
+
+        <button type="submit">Search</button>
+    </form>
+
+    <hr>
+
+    <div id="results">
+        <table border="1" th:if="${results != null && !results.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Region</th>
+                    <th>Category</th>
+                    <th>Title</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="place : ${results}">
+                    <td th:text="${place.placeId}"></td>
+                    <td th:text="${place.region.code}"></td>
+                    <td th:text="${place.category.code}"></td>
+                    <td th:text="${!place.i18ns.isEmpty() ? place.i18ns[0].title : 'No Title'}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p th:if="${results != null && results.isEmpty()}">No matches found.</p>
+    </div>
+</body>
+</html>
