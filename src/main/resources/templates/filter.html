@@ -9,18 +9,48 @@
         
         <select name="category">
             <option value="">All Categories</option>
-            <option th:each="c : ${categories}" th:value="${c.code}" th:text="${c.code}" 
-                    th:selected="${c.code == lastCategory}"></option>
+            <option th:each="c : ${categories}" th:value="${c.code}" th:text="${c.displayName}"
+        		th:selected="${c.code == lastCategory}"></option>
+
         </select>
 
         <select name="region">
             <option value="">All Regions</option>
-            <option th:each="r : ${regions}" th:value="${r.code}" th:text="${r.code}" 
-                    th:selected="${r.code == lastRegion}"></option>
+            <option th:each="r : ${regions}" th:value="${r.code}" th:text="${r.displayName}"
+        		th:selected="${r.code == lastRegion}"></option>
+
         </select>
+        
+        <input type="hidden" name="lang" th:value="${lang}">
 
         <button type="submit">Search</button>
     </form>
+    
+    <div>
+	  <form action="/filter" method="get" style="display:inline;">
+	    <input type="hidden" name="query" th:value="${lastQuery}">
+	    <input type="hidden" name="category" th:value="${lastCategory}">
+	    <input type="hidden" name="region" th:value="${lastRegion}">
+	    <input type="hidden" name="lang" value="en">
+	    <button type="submit" th:disabled="${lang == 'en'}">EN</button>
+	  </form>
+	
+	  <form action="/filter" method="get" style="display:inline;">
+	    <input type="hidden" name="query" th:value="${lastQuery}">
+	    <input type="hidden" name="category" th:value="${lastCategory}">
+	    <input type="hidden" name="region" th:value="${lastRegion}">
+	    <input type="hidden" name="lang" value="ru">
+	    <button type="submit" th:disabled="${lang == 'ru'}">RU</button>
+	  </form>
+	
+	  <form action="/filter" method="get" style="display:inline;">
+	    <input type="hidden" name="query" th:value="${lastQuery}">
+	    <input type="hidden" name="category" th:value="${lastCategory}">
+	    <input type="hidden" name="region" th:value="${lastRegion}">
+	    <input type="hidden" name="lang" value="tg">
+	    <button type="submit" th:disabled="${lang == 'tg'}">TG</button>
+	  </form>
+	</div>
 
     <hr>
 
@@ -37,9 +67,9 @@
             <tbody>
                 <tr th:each="place : ${results}">
                     <td th:text="${place.placeId}"></td>
-                    <td th:text="${place.region.code}"></td>
-                    <td th:text="${place.category.code}"></td>
-                    <td th:text="${!place.i18ns.isEmpty() ? place.i18ns[0].title : 'No Title'}"></td>
+                    <td th:text="${place.region.displayName != null ? place.region.displayName : place.region.code}"></td>
+					<td th:text="${place.category.displayName != null ? place.category.displayName : place.category.code}"></td>
+                    <td th:text="${place.displayI18n != null ? place.displayI18n.title : 'No Title'}"></td>
                 </tr>
             </tbody>
         </table>

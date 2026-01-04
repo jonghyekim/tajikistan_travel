@@ -44,6 +44,9 @@ public class CategoryCode {
         i18ns.add(i18n);
         i18n.setCategoryCode(this);
     }
+    
+    @Transient
+    private String displayName;
 
     // getters/setters ...
     public String getCode() { return code; }
@@ -55,4 +58,6 @@ public class CategoryCode {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public List<CategoryCodeI18n> getI18ns() { return i18ns; }
+    public String getDisplayName() { return displayName; }
+    public void setDisplayName(String displayName) { this.displayName = displayName; }
 }

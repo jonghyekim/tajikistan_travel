@@ -65,6 +65,9 @@ public class TourPlace {
         images.add(image);
         image.setPlace(this);
     }
+    
+    @Transient
+	private TourPlaceI18n displayI18n;
 
     // getters/setters ...
     public Long getPlaceId() { return placeId; }
@@ -78,4 +81,6 @@ public class TourPlace {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public List<TourPlaceI18n> getI18ns() { return i18ns; }
     public List<Image> getImages() { return images; }
+	public TourPlaceI18n getDisplayI18n() { return displayI18n; }
+	public void setDisplayI18n(TourPlaceI18n displayI18n) { this.displayI18n = displayI18n; }
 }

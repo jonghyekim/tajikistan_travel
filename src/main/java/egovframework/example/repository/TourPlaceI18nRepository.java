@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Collection;
 
 public interface TourPlaceI18nRepository extends JpaRepository<TourPlaceI18n, Long> {
 
@@ -15,4 +16,6 @@ public interface TourPlaceI18nRepository extends JpaRepository<TourPlaceI18n, Lo
     boolean existsByPlace_PlaceIdAndLocale(Long placeId, String locale);
 
     void deleteAllByPlace_PlaceId(Long placeId);
+    
+    List<TourPlaceI18n> findByPlace_PlaceIdInAndLocale(Collection<Long> placeIds, String locale);
 }

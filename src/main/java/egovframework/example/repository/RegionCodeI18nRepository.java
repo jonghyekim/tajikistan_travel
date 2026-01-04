@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Collection;
 
 public interface RegionCodeI18nRepository extends JpaRepository<RegionCodeI18n, Long> {
 
@@ -15,4 +16,6 @@ public interface RegionCodeI18nRepository extends JpaRepository<RegionCodeI18n, 
     boolean existsByRegionCode_CodeAndLocale(String code, String locale);
 
     void deleteAllByRegionCode_Code(String code);
+    
+    List<RegionCodeI18n> findByRegionCode_CodeInAndLocale(Collection<String> codes, String locale);
 }

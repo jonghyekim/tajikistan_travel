@@ -23,15 +23,23 @@ public interface TourPlaceRepository extends JpaRepository<TourPlace, Long> {
     List<TourPlace> findAllByIsActiveTrue();
     
     // 관광지명(title) 또는 지역코드(regionCode)로 검색하는 쿼리
-    @Query(value = "SELECT DISTINCT p.* FROM tour_place p " +
-            "JOIN tour_place_i18n i ON p.place_id = i.place_id " +
-            "WHERE (LOWER(i.title) LIKE LOWER(CONCAT('%', :query, '%')) " + // 이름 검색
-            "   OR LOWER(p.region_code) LIKE LOWER(CONCAT('%', :query, '%')) " + // 지역 검색
-            "   OR :query IS NULL OR :query = '') " +
-            "AND (p.category_code = :category OR :category = '' OR :category IS NULL) " + // 카테고리 필터
-            "AND (p.region_code = :region OR :region = '' OR :region IS NULL)", // 지역 필터
-    nativeQuery = true)
-    List<TourPlace> searchWithFilters(@Param("query") String query, 
-                               @Param("category") String category, 
-                               @Param("region") String region);
+    @Query("""
+    		select distinct p
+    		from TourPlace p
+    		join fetch p.region r
+    		join fetch p.category c
+    		left join fetch p.i18ns i
+    		where p.isActive = true
+    		  and (:category is null or :category = '' or c.code = :category)
+    		  and (:region   is null or :region   = '' or r.code = :region)
+    		  and (
+    		        :query is null or :query = '' or
+    		        lower(i.title) like lower(concat('%', :query, '%')) or
+    		        lower(r.code)  like lower(concat('%', :query, '%')) or
+    		        lower(c.code)  like lower(concat('%', :query, '%'))
+    		      )
+    		""")
+    List<TourPlace> searchWithFilters(@Param("query") String query,
+						            @Param("category") String category,
+						            @Param("region") String region);
 }
