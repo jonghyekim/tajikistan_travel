@@ -87,6 +87,9 @@ public class HomeController {
             model.addAttribute("lastQuery", query);
             model.addAttribute("lastCategory", category);
             model.addAttribute("lastRegion", region);
+            
+            // for navigation in header.html 
+            model.addAttribute("currentPage", "filter");
 
 //        }
 
@@ -117,6 +120,9 @@ public class HomeController {
         
         model.addAttribute("placeId", id);
         
+        // for navigation in header.html 
+        model.addAttribute("currentPage", "filter");
+        
         return "detail";
     }
 
@@ -124,10 +130,12 @@ public class HomeController {
     
     // emergency_contacts page added
     @GetMapping("/emergency_contacts")
-    public String emergency_contacts() {
-        return "emergency_contacts"; 
+    public String emergency_contacts(Model model) {
+
+        model.addAttribute("currentPage", "emergency_contacts");
+
+        return "emergency_contacts";
     }
-    
     
 }
 
