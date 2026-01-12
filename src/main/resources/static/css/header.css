@@ -67,6 +67,12 @@ body {
     font-weight: 400;
 }
 
+.nav a.nav-active {
+    font-weight: 800;
+    color: #000000;  
+    position: relative;
+}
+
 .language-container img {
     height: 24px;
     width: auto;

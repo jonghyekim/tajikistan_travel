@@ -9,12 +9,22 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="nav">
-            <ul>
-                <li><a th:href="@{/filter(lang=${lang})}">Travel Information</a></li>
-                <li><a th:href="@{/emergency_contacts(lang=${lang})}">Emergency Contacts</a></li>
-            </ul>
-        </nav>
+		<nav class="nav">
+		    <ul>
+		        <li>
+		            <a th:href="@{/filter(lang=${lang})}"
+		               th:classappend="${currentPage == 'filter'} ? 'nav-active' : ''">
+		                Travel Information
+		            </a>
+		        </li>
+		        <li>
+		            <a th:href="@{/emergency_contacts(lang=${lang})}"
+		               th:classappend="${currentPage == 'emergency_contacts'} ? 'nav-active' : ''">
+		                Emergency Contacts
+		            </a>
+		        </li>
+		    </ul>
+		</nav>
 
         <!-- Language -->
         <div class="language-container">
