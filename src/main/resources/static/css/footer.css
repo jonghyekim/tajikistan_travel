@@ -115,24 +115,3 @@ body {
     font-size: 14px;
     color: #727272;
 }
-
-@media (max-width: 1024px) {
-    .footer {
-        padding: 64px 32px;
-    }
-
-    .footer-top {
-        gap: 64px;
-    }
-}
-
-@media (max-width: 768px) {
-    .footer-top {
-        flex-direction: column;
-        gap: 40px;
-    }
-
-    .footer-logo img {
-        height: 72px;
-    }
-}

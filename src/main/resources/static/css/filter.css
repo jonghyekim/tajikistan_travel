@@ -177,7 +177,7 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
-    align-items: stretch; /* ✅ 카드 높이 동일하게 */
+    align-items: stretch; 
 }
 
 /* card */
@@ -187,7 +187,6 @@ body {
     overflow: hidden;
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
 
-    /* ✅ 카드 높이 통일 핵심 */
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -232,9 +231,7 @@ body {
 }
 
 .place-body {
-    padding: 18px 18px 16px;
-
-    /* ✅ 내용 영역을 세로로 쌓고, 하단 태그를 아래로 밀기 */
+    padding: 18px 18px 16px; 
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -247,7 +244,6 @@ body {
     letter-spacing: -0.01em;
 }
 
-/* ✅ description: 3줄까지만 보이게(넘치면 ... 처리) */
 .place-desc {
     margin: 8px 0 12px;
     font-size: 13.5px;
@@ -265,8 +261,6 @@ body {
 .place-tags {
     display: flex;
     gap: 10px;
-
-    /* ✅ 항상 카드 하단으로 */
     margin-top: auto;
 }
 

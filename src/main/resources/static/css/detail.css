@@ -37,10 +37,6 @@ body {
     margin: 0 auto;
 }
 
-/* =========================
-   Meta chips (Region / Category)
-========================= */
-
 .detail-meta {
     display: flex;
     gap: 10px;
@@ -65,15 +61,10 @@ body {
     border: 1px solid rgba(19, 73, 40, 0.12);
 }
 
-/* =========================
-   Title row (Figma-like)
-   - back icon not boxed
-   - icon size feels like title
-========================= */
 
 .detail-title-row {
     display: flex;
-    align-items: baseline; /* 아이콘/텍스트 기준선 맞추기 */
+    align-items: baseline; 
     gap: 14px;
     margin-bottom: 18px;
 }
@@ -86,65 +77,55 @@ body {
     line-height: 1.05;
 }
 
-/* 뒤로가기: 박스 제거 */
+
 .back-btn {
     display: inline-flex;
     align-items: baseline;
     justify-content: center;
     text-decoration: none;
     color: inherit;
-    padding: 0;     /* 박스감 제거 */
-    border: none;   /* 박스감 제거 */
+    padding: 0;     
+    border: none;   
     background: transparent;
     cursor: pointer;
 }
 
 .back-icon {
-    /* 제목과 동일한 “덩치” 느낌 */
     font-size: 44px;
     line-height: 1;
-    transform: translateY(2px); /* baseline 미세 보정 */
+    transform: translateY(2px);
 }
 
 /* =========================
-   Hero image (FULL WIDTH, NO RADIUS)
+   Hero image 
 ========================= */
 
 .detail-hero {
     width: 100%;
-    /* 피그마처럼 꽉 차게 */
     margin: 0;
-    border-radius: 0; /* 둥글기 제거 */
     overflow: hidden;
 }
 
 .detail-hero-img {
     width: 100%;
-    /* 피그마처럼 더 길게: viewport 기반 + 최소/최대 */
     height: clamp(420px, 56vh, 720px);
     object-fit: cover;
     display: block;
-    border-radius: 0; /* 혹시 남을까봐 한번 더 */
 }
 
 /* =========================
-   Content (NO BOX)
+   Content 
 ========================= */
 
 .detail-content {
     margin-top: 26px;
-    padding: 0;        /* 박스 패딩 제거 */
-    background: none;  /* 박스 배경 제거 */
-    border-radius: 0;  /* 둥글기 제거 */
-    box-shadow: none;  /* 그림자 제거 */
+    padding: 0;        
 }
 
 .detail-text {
     font-size: 16px;
     line-height: 1.8;
-    color: #3a3a3a;
-
-    /* 피그마처럼 본문이 중앙에 가지런히 보이게 */
+    color: #1b1b1b;
     max-width: 860px;
     margin: 0 auto;
 }
