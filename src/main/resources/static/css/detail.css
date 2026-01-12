@@ -1,0 +1,138 @@
+/* detail.css */
+
+* {
+    box-sizing: border-box;
+}
+
+.header {
+    background-color: #FFFFFF;
+}
+
+@font-face {
+    font-family: 'Pretendard';
+    src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
+    font-weight: 45 920;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Pretendard', sans-serif;
+    color: #1b1b1b;
+    background: #f6f6fb;
+}
+
+/* =========================
+   Layout
+========================= */
+
+.detail-page {
+    padding: 120px 0 120px;
+}
+
+.detail-container {
+    width: min(1180px, 92%);
+    margin: 0 auto;
+}
+
+.detail-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    border-radius: 12px;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+
+    background: #e9ffeb;
+    color: #134928;
+    border: 1px solid rgba(19, 73, 40, 0.12);
+}
+
+
+.detail-title-row {
+    display: flex;
+    align-items: baseline; 
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.detail-title {
+    margin: 0;
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+}
+
+
+.back-btn {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 0;     
+    border: none;   
+    background: transparent;
+    cursor: pointer;
+}
+
+.back-icon {
+    font-size: 44px;
+    line-height: 1;
+    transform: translateY(2px);
+}
+
+/* =========================
+   Hero image 
+========================= */
+
+.detail-hero {
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+.detail-hero-img {
+    width: 100%;
+    height: clamp(420px, 56vh, 720px);
+    object-fit: cover;
+    display: block;
+}
+
+/* =========================
+   Content 
+========================= */
+
+.detail-content {
+    margin-top: 26px;
+    padding: 0;        
+}
+
+.detail-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #1b1b1b;
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.detail-empty {
+    margin: 0 auto;
+    max-width: 860px;
+    font-size: 15px;
+    color: #8f8f8f;
+}

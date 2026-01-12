@@ -1,0 +1,212 @@
+/* emergency_contacts.css */
+
+* {
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'Pretendard';
+    src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
+    font-weight: 45 920;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Pretendard', sans-serif;
+    color: #1b1b1b;
+    background: #f6f6fb;
+}
+
+.header {
+    background-color: #FFFFFF;
+}
+
+/* =========================
+   Layout
+========================= */
+
+.emergency-page {
+    padding: 120px 0 120px;
+}
+
+.emergency-container {
+    width: min(1280px, 92%);
+    margin: 0 auto;
+}
+
+.emergency-header {
+    margin-bottom: 28px;
+}
+
+.emergency-title {
+    margin: 0;
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* =========================
+   Filter Panel
+========================= */
+
+.filter-panel {
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 22px 22px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    margin-bottom: 28px;
+}
+
+.filter-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: center;
+}
+
+.filter-select-wrap {
+    position: relative;
+    height: 56px;
+}
+
+.filter-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    width: 100%;
+    height: 56px;
+    padding: 0 44px 0 16px;
+
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 18px;
+    background: #fff;
+
+    font-family: 'Pretendard', sans-serif;
+    font-size: 16px;
+    color: #8f8f8f;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: rgba(0, 142, 255, 0.45);
+    box-shadow: 0 0 0 4px rgba(0, 142, 255, 0.12);
+}
+
+.select-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: #b8b8b8;
+    pointer-events: none;
+}
+
+/* =========================
+   Results
+========================= */
+
+.results-meta {
+    margin: 18px 0 16px;
+}
+
+.results-count {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* =========================
+   Contact List
+========================= */
+
+.contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contact-card {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 24px;
+
+    background: #fff;
+    border-radius: 18px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contact-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1b1b1b;
+}
+
+.contact-desc {
+    margin: 0;
+    font-size: 14px;
+    color: #a3a3a3;
+}
+
+.contact-badge {
+    display: flex;
+    align-items: center;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+
+    background: #ffe9e9;
+    color: #d32f2f;
+}
+
+.contact-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 12px 20px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    background: #fff;
+
+    font-family: 'Pretendard', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1b1b1b;
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+.contact-phone .material-icons {
+    font-size: 20px;
+    color: #1b1b1b;
+}
+
+.contact-phone:hover {
+    background: #f6f6fb;
+}
