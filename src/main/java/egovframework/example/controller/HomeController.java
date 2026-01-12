@@ -33,7 +33,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "home"; // 홈은 검색창만 있는 단순한 페이지
+        return "index"; // 홈은 검색창만 있는 단순한 페이지
     }
     
     // add new annotation (Transactional) for image loading

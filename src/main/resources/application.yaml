@@ -24,4 +24,3 @@ spring:
 deepl:
   base-url: https://api-free.deepl.com
   api-key: ${deepl.api-key}
-          
