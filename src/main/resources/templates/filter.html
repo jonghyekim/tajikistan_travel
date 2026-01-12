@@ -1,80 +1,153 @@
+<!--  filter.html  -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><title>Search & Filter</title></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Explore Tajikistan</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../css/header.css" />
+    <link rel="stylesheet" href="../css/filter.css" />
+    <link rel="stylesheet" href="../css/footer.css" />
+
+    <script src="../js/include.js" defer></script>
+</head>
+
 <body>
-    <h1>Search Result & Filters</h1>
+    <!-- header -->
+    <div th:replace="components/header :: header"></div>
 
-    <form action="/filter" method="get">
-        <input type="text" name="query" th:value="${lastQuery}" placeholder="Where do you want to go?">
-        
-        <select name="category">
-            <option value="">All Categories</option>
-            <option th:each="c : ${categories}" th:value="${c.code}" th:text="${c.displayName}"
-        		th:selected="${c.code == lastCategory}"></option>
+    <main class="list-page">
+        <div class="list-container">
+            <header class="list-header">
+                <h1 class="list-title">Explore Tajikistan</h1>
+            </header>
 
-        </select>
+            <section class="filter-panel" aria-label="Search filters">
+                <form class="filter-form" action="/filter" method="get">
+                    <div class="filter-input">
+                        <span class="material-icons" aria-hidden="true">search</span>
+                        <input
+                            type="text"
+                            name="query"
+                            placeholder="Where do you want to go?"
+                            aria-label="Search keyword"
+                            th:value="${lastQuery}" />
+                    </div>
 
-        <select name="region">
-            <option value="">All Regions</option>
-            <option th:each="r : ${regions}" th:value="${r.code}" th:text="${r.displayName}"
-        		th:selected="${r.code == lastRegion}"></option>
+                    <div class="filter-select-wrap" aria-label="Select category">
+                        <select class="filter-select" name="category">
+                            <option value=""
+                                th:selected="${lastCategory == null or #strings.isEmpty(lastCategory)}">
+                                All Categories
+                            </option>
 
-        </select>
-        
-        <input type="hidden" name="lang" th:value="${lang}">
+                            <option
+                                th:each="c : ${categories}"
+                                th:value="${c.code}"
+                                th:text="${c.displayName}"
+                                th:selected="${lastCategory != null and #strings.equalsIgnoreCase(c.code, lastCategory)}">
+                            </option>
+                        </select>
+                        <span class="material-icons select-icon" aria-hidden="true">expand_more</span>
+                    </div>
 
-        <button type="submit">Search</button>
-    </form>
-    
-    <div>
-	  <form action="/filter" method="get" style="display:inline;">
-	    <input type="hidden" name="query" th:value="${lastQuery}">
-	    <input type="hidden" name="category" th:value="${lastCategory}">
-	    <input type="hidden" name="region" th:value="${lastRegion}">
-	    <input type="hidden" name="lang" value="en">
-	    <button type="submit" th:disabled="${lang == 'en'}">EN</button>
-	  </form>
-	
-	  <form action="/filter" method="get" style="display:inline;">
-	    <input type="hidden" name="query" th:value="${lastQuery}">
-	    <input type="hidden" name="category" th:value="${lastCategory}">
-	    <input type="hidden" name="region" th:value="${lastRegion}">
-	    <input type="hidden" name="lang" value="ru">
-	    <button type="submit" th:disabled="${lang == 'ru'}">RU</button>
-	  </form>
-	
-	  <form action="/filter" method="get" style="display:inline;">
-	    <input type="hidden" name="query" th:value="${lastQuery}">
-	    <input type="hidden" name="category" th:value="${lastCategory}">
-	    <input type="hidden" name="region" th:value="${lastRegion}">
-	    <input type="hidden" name="lang" value="tg">
-	    <button type="submit" th:disabled="${lang == 'tg'}">TG</button>
-	  </form>
-	</div>
+                    <div class="filter-select-wrap" aria-label="Select region">
+                        <select class="filter-select" name="region">
+                            <option value=""
+                                th:selected="${lastRegion == null or #strings.isEmpty(lastRegion)}">
+                                All Regions
+                            </option>
 
-    <hr>
+                            <option
+                                th:each="r : ${regions}"
+                                th:value="${r.code}"
+                                th:text="${r.displayName}"
+                                th:selected="${lastRegion != null and #strings.equalsIgnoreCase(r.code, lastRegion)}">
+                            </option>
+                        </select>
+                        <span class="material-icons select-icon" aria-hidden="true">expand_more</span>
+                    </div>
 
-    <div id="results">
-        <table border="1" th:if="${results != null && !results.isEmpty()}">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Region</th>
-                    <th>Category</th>
-                    <th>Title</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="place : ${results}">
-                    <td th:text="${place.placeId}"></td>
-                    <td th:text="${place.region.displayName != null ? place.region.displayName : place.region.code}"></td>
-					<td th:text="${place.category.displayName != null ? place.category.displayName : place.category.code}"></td>
-                    <td th:text="${place.displayI18n != null ? place.displayI18n.title : 'No Title'}"></td>
-                </tr>
-            </tbody>
-        </table>
+                    <input type="hidden" name="lang" th:value="${lang}" />
 
-        <p th:if="${results != null && results.isEmpty()}">No matches found.</p>
-    </div>
+                    <button type="submit" class="filter-submit">Search</button>
+                </form>
+            </section>
+
+            <section class="results" aria-label="Search results">
+                <div class="results-meta">
+                    <h2 class="results-count"
+                        th:text="${results != null ? #lists.size(results) : 0} + ' Results'">
+                        0 Results
+                    </h2>
+                </div>
+
+                <div class="card-grid">
+                    <a class="place-card-link"
+                       th:if="${results != null && !results.isEmpty()}"
+                       th:each="place : ${results}"
+                       th:href="@{/detail/{id}(id=${place.placeId}, lang=${lang})}"
+                       th:with="thumbUrl=${(place.images != null and place.images.size() > 0 and place.images[0] != null) ? place.images[0].fileUrl : null}"
+                       style="text-decoration:none; color:inherit;">
+
+                        <article class="place-card">
+                            <div class="place-thumb">
+                                <img
+                                    th:src="${thumbUrl != null ? thumbUrl : '../assets/images/home_reg_2.png'}"
+                                    alt="Place image" />
+
+                                <span class="badge badge-top"
+                                      th:text="${place.category.displayName != null ? place.category.displayName : place.category.code}">
+                                    Category
+                                </span>
+                            </div>
+
+                            <div class="place-body">
+                                <h3 class="place-title"
+                                    th:text="${place.displayI18n != null && place.displayI18n.title != null ? place.displayI18n.title : 'No Title'}">
+                                    Place Title
+                                </h3>
+
+                                <p class="place-desc"
+                                   th:if="${place.displayI18n != null and place.displayI18n.content != null}"
+                                   th:text="${place.displayI18n.content}">
+                                </p>
+
+                                <div class="place-tags">
+                                    <span class="badge badge-bottom">
+                                        <span class="material-icons" aria-hidden="true">location_on</span>
+                                        <span
+                                            th:text="${place.region.displayName != null ? place.region.displayName : place.region.code}">
+                                            Region
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+
+                    <!-- No Results -->
+                    <div th:if="${results != null && results.isEmpty()}"
+                         style="padding: 24px; text-align: center; opacity: 0.8;">
+                        No matches found.
+                    </div>
+
+					<!-- Before Searching -->
+                    <div th:if="${results == null}"
+                         style="padding: 24px; text-align: center; opacity: 0.8;">
+                        Search to explore places.
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- footer -->
+    <div th:replace="components/footer :: footer"></div>
 </body>
+
 </html>

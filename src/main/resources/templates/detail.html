@@ -1,0 +1,81 @@
+<!--  detail.html  -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${place != null && place.displayI18n != null && place.displayI18n.title != null ? place.displayI18n.title + ' | Welcome Tajikistan' : 'Detail | Welcome Tajikistan'}">
+        Detail | Welcome Tajikistan
+    </title>
+
+    <!-- for google material icon -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../css/header.css" />
+    <link rel="stylesheet" href="../css/detail.css" />
+    <link rel="stylesheet" href="../css/footer.css" />
+</head>
+
+<body>
+    <!-- header -->
+    <div th:replace="components/header :: header"></div>
+
+    <main class="detail-page">
+        <div class="detail-container">
+
+            <div class="detail-meta" th:if="${place != null}">
+                <span class="chip chip-region"
+                      th:text="${place.region != null && place.region.displayName != null ? place.region.displayName : (place.region != null ? place.region.code : 'Region')}">
+                    Region
+                </span>
+
+                <span class="chip chip-category"
+                      th:text="${place.category != null && place.category.displayName != null ? place.category.displayName : (place.category != null ? place.category.code : 'Category')}">
+                    Category
+                </span>
+            </div>
+
+            <!-- title row -->
+            <div class="detail-title-row">
+                <a class="back-btn" href="javascript:history.back()" aria-label="Go back">
+                    <span class="material-icons back-icon" aria-hidden="true">arrow_back</span>
+                </a>
+
+                <h1 class="detail-title"
+                    th:text="${place != null && place.displayI18n != null && place.displayI18n.title != null ? place.displayI18n.title : 'No Title'}">
+                    Place Title
+                </h1>
+            </div>
+
+        </div>
+
+        <!-- hero image -->
+        <section class="detail-hero" aria-label="Place image" th:if="${place != null}"
+                 th:with="heroUrl=${(place.images != null and place.images.size() > 0 and place.images[0] != null) ? place.images[0].fileUrl : null}">
+            <img class="detail-hero-img"
+                 th:src="${heroUrl != null ? heroUrl : '../assets/images/home_reg_2.png'}"
+                 alt="Place image" />
+        </section>
+
+        <div class="detail-container">
+            <!-- content -->
+            <section class="detail-content" aria-label="Place description">
+                <div class="detail-text"
+                     th:if="${place != null and place.displayI18n != null and place.displayI18n.content != null}"
+                     th:utext="${#strings.replace(place.displayI18n.content, '\n', '<br><br>')}">
+                </div>
+
+                <p class="detail-empty"
+                   th:if="${place == null or place.displayI18n == null or place.displayI18n.content == null}">
+                    No description available.
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <!-- footer -->
+    <div th:replace="components/footer :: footer"></div>
+</body>
+
+</html>
