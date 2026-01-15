@@ -16,7 +16,7 @@
 		</license>
 	</licenses>
 
-	<!-- eGovFramework Boot Parent 설정 -->
+	<!-- Set eGovFramework Boot parent -->
 	<parent>
 		<groupId>org.egovframe.boot</groupId>
 		<artifactId>org.egovframe.boot.starter.parent</artifactId>
@@ -83,7 +83,7 @@
   			<scope>runtime</scope>
 		</dependency>
 
-		<!-- 표준프레임워크 실행환경 -->
+		<!-- eGovFramework runtime environment -->
         <dependency>
 		    <groupId>org.egovframe.rte</groupId>
 		    <artifactId>org.egovframe.rte.ptl.mvc</artifactId>

@@ -4,7 +4,8 @@
         <!-- Logo -->
         <div class="header-logo">
             <a th:href="@{/}" class="logo">
-                <img src="../assets/logo/header_logo.png" alt="Welcome Tajikistan" />
+                <img src="../assets/logo/header_logo.png" alt="Welcome Tajikistan"
+                     th:attr="alt=#{site.title}" />
             </a>
         </div>
 
@@ -13,13 +14,15 @@
 		    <ul>
 		        <li>
 		            <a th:href="@{/filter(lang=${lang})}"
-		               th:classappend="${currentPage == 'filter'} ? 'nav-active' : ''">
+		               th:classappend="${currentPage == 'filter'} ? 'nav-active' : ''"
+                       th:text="#{header.nav.travel}">
 		                Travel Information
 		            </a>
 		        </li>
 		        <li>
 		            <a th:href="@{/emergency_contacts(lang=${lang})}"
-		               th:classappend="${currentPage == 'emergency_contacts'} ? 'nav-active' : ''">
+		               th:classappend="${currentPage == 'emergency_contacts'} ? 'nav-active' : ''"
+                       th:text="#{header.nav.emergency}">
 		                Emergency Contacts
 		            </a>
 		        </li>
@@ -33,6 +36,7 @@
             <div th:if="${placeId != null}">
                 <!-- EN -->
                 <form th:action="@{/detail/{id}(id=${placeId})}" method="get" style="display:inline;">
+                    <input type="hidden" name="back" th:if="${backUrl != null}" th:value="${backUrl}">
                     <input type="hidden" name="lang" value="en">
                     <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
                         <img src="../assets/icons/lang_en_icon.png" alt="EN">
@@ -41,6 +45,7 @@
 
                 <!-- TJ -->
                 <form th:action="@{/detail/{id}(id=${placeId})}" method="get" style="display:inline;">
+                    <input type="hidden" name="back" th:if="${backUrl != null}" th:value="${backUrl}">
                     <input type="hidden" name="lang" value="tg">
                     <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
                         <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
@@ -49,6 +54,7 @@
 
                 <!-- RU -->
                 <form th:action="@{/detail/{id}(id=${placeId})}" method="get" style="display:inline;">
+                    <input type="hidden" name="back" th:if="${backUrl != null}" th:value="${backUrl}">
                     <input type="hidden" name="lang" value="ru">
                     <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
                         <img src="../assets/icons/lang_ru_icon.png" alt="RU">
@@ -58,38 +64,92 @@
 
             <!-- Except DETAIL PAGE -->
             <div th:if="${placeId == null}">
-                <!-- EN -->
-                <form th:action="@{/filter}" method="get" style="display:inline;">
-                    <input type="hidden" name="query" th:value="${lastQuery}">
-                    <input type="hidden" name="category" th:value="${lastCategory}">
-                    <input type="hidden" name="region" th:value="${lastRegion}">
-                    <input type="hidden" name="lang" value="en">
-                    <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
-                        <img src="../assets/icons/lang_en_icon.png" alt="EN">
-                    </button>
-                </form>
+                <div th:if="${currentPage == 'filter'}">
+                    <!-- EN -->
+                    <form th:action="@{/filter}" method="get" style="display:inline;">
+                        <input type="hidden" name="query" th:value="${lastQuery}">
+                        <input type="hidden" name="category" th:value="${lastCategory}">
+                        <input type="hidden" name="region" th:value="${lastRegion}">
+                        <input type="hidden" name="lang" value="en">
+                        <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
+                            <img src="../assets/icons/lang_en_icon.png" alt="EN">
+                        </button>
+                    </form>
 
-                <!-- TJ -->
-                <form th:action="@{/filter}" method="get" style="display:inline;">
-                    <input type="hidden" name="query" th:value="${lastQuery}">
-                    <input type="hidden" name="category" th:value="${lastCategory}">
-                    <input type="hidden" name="region" th:value="${lastRegion}">
-                    <input type="hidden" name="lang" value="tg">
-                    <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
-                        <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
-                    </button>
-                </form>
+                    <!-- TJ -->
+                    <form th:action="@{/filter}" method="get" style="display:inline;">
+                        <input type="hidden" name="query" th:value="${lastQuery}">
+                        <input type="hidden" name="category" th:value="${lastCategory}">
+                        <input type="hidden" name="region" th:value="${lastRegion}">
+                        <input type="hidden" name="lang" value="tg">
+                        <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
+                            <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
+                        </button>
+                    </form>
 
-                <!-- RU -->
-                <form th:action="@{/filter}" method="get" style="display:inline;">
-                    <input type="hidden" name="query" th:value="${lastQuery}">
-                    <input type="hidden" name="category" th:value="${lastCategory}">
-                    <input type="hidden" name="region" th:value="${lastRegion}">
-                    <input type="hidden" name="lang" value="ru">
-                    <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
-                        <img src="../assets/icons/lang_ru_icon.png" alt="RU">
-                    </button>
-                </form>
+                    <!-- RU -->
+                    <form th:action="@{/filter}" method="get" style="display:inline;">
+                        <input type="hidden" name="query" th:value="${lastQuery}">
+                        <input type="hidden" name="category" th:value="${lastCategory}">
+                        <input type="hidden" name="region" th:value="${lastRegion}">
+                        <input type="hidden" name="lang" value="ru">
+                        <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
+                            <img src="../assets/icons/lang_ru_icon.png" alt="RU">
+                        </button>
+                    </form>
+                </div>
+
+                <div th:if="${currentPage == 'emergency_contacts'}">
+                    <!-- EN -->
+                    <form th:action="@{/emergency_contacts}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="en">
+                        <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
+                            <img src="../assets/icons/lang_en_icon.png" alt="EN">
+                        </button>
+                    </form>
+
+                    <!-- TJ -->
+                    <form th:action="@{/emergency_contacts}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="tg">
+                        <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
+                            <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
+                        </button>
+                    </form>
+
+                    <!-- RU -->
+                    <form th:action="@{/emergency_contacts}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="ru">
+                        <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
+                            <img src="../assets/icons/lang_ru_icon.png" alt="RU">
+                        </button>
+                    </form>
+                </div>
+
+                <div th:if="${currentPage == 'home' or currentPage == null}">
+                    <!-- EN -->
+                    <form th:action="@{/}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="en">
+                        <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
+                            <img src="../assets/icons/lang_en_icon.png" alt="EN">
+                        </button>
+                    </form>
+
+                    <!-- TJ -->
+                    <form th:action="@{/}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="tg">
+                        <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
+                            <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
+                        </button>
+                    </form>
+
+                    <!-- RU -->
+                    <form th:action="@{/}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="ru">
+                        <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
+                            <img src="../assets/icons/lang_ru_icon.png" alt="RU">
+                        </button>
+                    </form>
+                </div>
             </div>
 
         </div>

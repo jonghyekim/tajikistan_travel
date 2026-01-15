@@ -1,11 +1,11 @@
 <!--  emergency_contacts.html  -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" th:lang="${lang}" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Contacts</title>
+    <title th:text="#{emergency.page.title}">Emergency Contacts</title>
 
     <!-- for google material icon -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -25,7 +25,7 @@
         <div class="emergency-container">
             <!-- Title -->
             <header class="emergency-header">
-                <h1 class="emergency-title">Emergency Contacts</h1>
+                <h1 class="emergency-title" th:text="#{emergency.page.title}">Emergency Contacts</h1>
             </header>
 
 
@@ -38,11 +38,13 @@
                     <!-- Emergency -->
                     <article class="contact-card">
                         <div class="contact-info">
-                            <h3 class="contact-title">General Emergency</h3>
-                            <p class="contact-desc">Universal emergency line (Police / Ambulance / Fire)</p>
+                            <h3 class="contact-title" th:text="#{emergency.general.title}">General Emergency</h3>
+                            <p class="contact-desc" th:text="#{emergency.general.desc}">
+                                Universal emergency line (Police / Ambulance / Fire)
+                            </p>
                         </div>
                         <div class="contact-badge">
-                            <span class="badge badge-emergency">Emergency</span>
+                            <span class="badge badge-emergency" th:text="#{emergency.badge.emergency}">Emergency</span>
                         </div>
                         <a href="tel:112" class="contact-phone">
                             <span class="material-icons" aria-hidden="true">call</span>
@@ -52,11 +54,11 @@
 
                     <article class="contact-card">
                         <div class="contact-info">
-                            <h3 class="contact-title">Police</h3>
-                            <p class="contact-desc">Emergency police assistance</p>
+                            <h3 class="contact-title" th:text="#{emergency.police.title}">Police</h3>
+                            <p class="contact-desc" th:text="#{emergency.police.desc}">Emergency police assistance</p>
                         </div>
                         <div class="contact-badge">
-                            <span class="badge badge-police">Police</span>
+                            <span class="badge badge-police" th:text="#{emergency.badge.police}">Police</span>
                         </div>
                         <a href="tel:102" class="contact-phone">
                             <span class="material-icons" aria-hidden="true">call</span>
@@ -66,11 +68,13 @@
 
                     <article class="contact-card">
                         <div class="contact-info">
-                            <h3 class="contact-title">Ambulance</h3>
-                            <p class="contact-desc">Medical emergency / ambulance dispatch</p>
+                            <h3 class="contact-title" th:text="#{emergency.ambulance.title}">Ambulance</h3>
+                            <p class="contact-desc" th:text="#{emergency.ambulance.desc}">
+                                Medical emergency / ambulance dispatch
+                            </p>
                         </div>
                         <div class="contact-badge">
-                            <span class="badge badge-medical">Medical</span>
+                            <span class="badge badge-medical" th:text="#{emergency.badge.medical}">Medical</span>
                         </div>
                         <a href="tel:103" class="contact-phone">
                             <span class="material-icons" aria-hidden="true">call</span>
@@ -80,11 +84,11 @@
 
                     <article class="contact-card">
                         <div class="contact-info">
-                            <h3 class="contact-title">Fire Service</h3>
-                            <p class="contact-desc">Fire emergency / rescue</p>
+                            <h3 class="contact-title" th:text="#{emergency.fire.title}">Fire Service</h3>
+                            <p class="contact-desc" th:text="#{emergency.fire.desc}">Fire emergency / rescue</p>
                         </div>
                         <div class="contact-badge">
-                            <span class="badge badge-fire">Fire</span>
+                            <span class="badge badge-fire" th:text="#{emergency.badge.fire}">Fire</span>
                         </div>
                         <a href="tel:101" class="contact-phone">
                             <span class="material-icons" aria-hidden="true">call</span>
@@ -95,11 +99,15 @@
                     <!-- Medical (Hospitals) -->
                     <article class="contact-card">
                         <div class="contact-info">
-                            <h3 class="contact-title">Prospekt Clinic (Dushanbe)</h3>
-                            <p class="contact-desc">Hospital / clinic in Dushanbe</p>
+                            <h3 class="contact-title" th:text="#{emergency.clinic.title}">
+                                Prospekt Clinic (Dushanbe)
+                            </h3>
+                            <p class="contact-desc" th:text="#{emergency.clinic.desc}">
+                                Hospital / clinic in Dushanbe
+                            </p>
                         </div>
                         <div class="contact-badge">
-                            <span class="badge badge-medical">Medical</span>
+                            <span class="badge badge-medical" th:text="#{emergency.badge.medical}">Medical</span>
                         </div>
                         <a href="tel:+992487024400" class="contact-phone">
                             <span class="material-icons" aria-hidden="true">call</span>
@@ -110,11 +118,15 @@
                     <!-- Embassy (Optional but useful) -->
                     <article class="contact-card">
                         <div class="contact-info">
-                            <h3 class="contact-title">U.S. Embassy (Dushanbe)</h3>
-                            <p class="contact-desc">Embassy contact (consular assistance)</p>
+                            <h3 class="contact-title" th:text="#{emergency.embassy.title}">
+                                U.S. Embassy (Dushanbe)
+                            </h3>
+                            <p class="contact-desc" th:text="#{emergency.embassy.desc}">
+                                Embassy contact (consular assistance)
+                            </p>
                         </div>
                         <div class="contact-badge">
-                            <span class="badge badge-embassy">Embassy</span>
+                            <span class="badge badge-embassy" th:text="#{emergency.badge.embassy}">Embassy</span>
                         </div>
                         <a href="tel:+992372292000" class="contact-phone">
                             <span class="material-icons" aria-hidden="true">call</span>

@@ -35,14 +35,14 @@ public class DeepLClient {
         body.add("source_lang", sourceLang);  // "EN"
         body.add("target_lang", targetLang);  // "RU" or "TG"
         if (enableBeta) {
-            body.add("enable_beta_languages", "1"); // TG 같은 베타 언어용
+            body.add("enable_beta_languages", "1"); // For beta languages like TG
         }
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
-        // 실제로는 JSON 파싱해서 translations[0].text를 꺼내야 함
-        // 최소 동작용으로는 ObjectMapper로 파싱하는 코드를 아래 서비스에서 같이 넣는 걸 추천
+        // In practice, parse JSON and extract translations[0].text
+        // For a minimal implementation, consider parsing with ObjectMapper in the service
         return response.getBody();
     }
     
@@ -58,7 +58,7 @@ public class DeepLClient {
                 return t != null ? t.asText() : null;
             }
         } catch (Exception e) {
-            // 파싱 실패하면 null로 두고 fallback 하게
+            // If parsing fails, leave null for fallback
         }
         return null;
     }

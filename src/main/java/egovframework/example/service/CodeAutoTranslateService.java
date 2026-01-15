@@ -35,7 +35,7 @@ public class CodeAutoTranslateService {
         if (categories == null || categories.isEmpty()) return;
         String locale = normalize(requestedLocale);
 
-        // EN이면 그냥 EN을 붙이거나, 그냥 code를 써도 되지만 name을 보여주려면 EN i18n을 붙이는게 좋음
+        // For EN, you can just use EN or the code, but attach EN i18n to show names
         List<String> codes = categories.stream().map(CategoryCode::getCode).collect(Collectors.toList());
 
         Map<String, String> targetMap = catI18nRepo.findByCategoryCode_CodeInAndLocale(codes, locale)
@@ -88,7 +88,7 @@ public class CodeAutoTranslateService {
         if (places == null || places.isEmpty()) return;
         String locale = normalize(requestedLocale);
 
-        // places에서 code 목록 뽑기
+        // Collect code lists from places
         List<String> categoryCodes = places.stream()
                 .map(p -> p.getCategory().getCode())
                 .distinct()
@@ -99,8 +99,8 @@ public class CodeAutoTranslateService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        // 드롭다운용 메서드 재사용하려면 엔티티 리스트가 필요하니
-        // place에 붙은 category/region 엔티티들을 모아서 그대로 넘기면 됨
+        // To reuse the dropdown method, you need entity lists
+        // Collect category/region entities from places and pass them through
         List<CategoryCode> categories = places.stream()
                 .map(egovframework.example.domain.TourPlace::getCategory)
                 .distinct()
@@ -111,12 +111,12 @@ public class CodeAutoTranslateService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        // 이 호출이 region/category displayName을 세팅해줌
+        // This call sets region/category displayName
         ensureAndAttachCategoryNames(categories, locale);
         ensureAndAttachRegionNames(regions, locale);
 
-        // 혹시라도 동일 코드가 여러 객체로 들어온 경우 대비해서,
-        // code->displayName 맵을 다시 만들어 place에 확실히 세팅
+        // In case the same code appears on multiple objects,
+        // rebuild the code->displayName map to set on places
         Map<String, String> catNameMap = categories.stream()
                 .collect(Collectors.toMap(CategoryCode::getCode, CategoryCode::getDisplayName, (a,b)->a));
 

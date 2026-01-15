@@ -22,7 +22,7 @@ public interface TourPlaceRepository extends JpaRepository<TourPlace, Long> {
     @EntityGraph(attributePaths = {"i18ns", "images", "category", "region"})
     List<TourPlace> findAllByIsActiveTrue();
     
-    // 관광지명(title) 또는 지역코드(regionCode)로 검색하는 쿼리
+    // Query to search by tourist place title or region code
     @Query("""
     		select distinct p
     		from TourPlace p

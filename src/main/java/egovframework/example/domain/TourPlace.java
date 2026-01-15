@@ -55,7 +55,7 @@ public class TourPlace {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // --- 편의 메서드 (선택) ---
+    // --- Convenience methods (optional) ---
     public void addI18n(TourPlaceI18n i18n) {
         i18ns.add(i18n);
         i18n.setPlace(this);

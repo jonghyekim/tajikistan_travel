@@ -1,11 +1,11 @@
 <!--  filter.html  -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" th:lang="${lang}" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Explore Tajikistan</title>
+    <title th:text="#{filter.page.title}">Explore Tajikistan</title>
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
@@ -22,7 +22,7 @@
     <main class="list-page">
         <div class="list-container">
             <header class="list-header">
-                <h1 class="list-title">Explore Tajikistan</h1>
+                <h1 class="list-title" th:text="#{filter.page.title}">Explore Tajikistan</h1>
             </header>
 
             <section class="filter-panel" aria-label="Search filters">
@@ -33,14 +33,17 @@
                             type="text"
                             name="query"
                             placeholder="Where do you want to go?"
+                            th:placeholder="#{filter.search.placeholder}"
                             aria-label="Search keyword"
+                            th:attr="aria-label=#{filter.search.aria}"
                             th:value="${lastQuery}" />
                     </div>
 
                     <div class="filter-select-wrap" aria-label="Select category">
                         <select class="filter-select" name="category">
                             <option value=""
-                                th:selected="${lastCategory == null or #strings.isEmpty(lastCategory)}">
+                                th:selected="${lastCategory == null or #strings.isEmpty(lastCategory)}"
+                                th:text="#{filter.category.all}">
                                 All Categories
                             </option>
 
@@ -57,7 +60,8 @@
                     <div class="filter-select-wrap" aria-label="Select region">
                         <select class="filter-select" name="region">
                             <option value=""
-                                th:selected="${lastRegion == null or #strings.isEmpty(lastRegion)}">
+                                th:selected="${lastRegion == null or #strings.isEmpty(lastRegion)}"
+                                th:text="#{filter.region.all}">
                                 All Regions
                             </option>
 
@@ -73,14 +77,14 @@
 
                     <input type="hidden" name="lang" th:value="${lang}" />
 
-                    <button type="submit" class="filter-submit">Search</button>
+                    <button type="submit" class="filter-submit" th:text="#{filter.search.button}">Search</button>
                 </form>
             </section>
 
             <section class="results" aria-label="Search results">
                 <div class="results-meta">
                     <h2 class="results-count"
-                        th:text="${results != null ? #lists.size(results) : 0} + ' Results'">
+                        th:text="#{filter.results.count(${results != null ? #lists.size(results) : 0})}">
                         0 Results
                     </h2>
                 </div>
@@ -89,8 +93,9 @@
                     <a class="place-card-link"
                        th:if="${results != null && !results.isEmpty()}"
                        th:each="place : ${results}"
-                       th:href="@{/detail/{id}(id=${place.placeId}, lang=${lang})}"
-                       th:with="thumbUrl=${(place.images != null and place.images.size() > 0 and place.images[0] != null) ? place.images[0].fileUrl : null}"
+                       th:with="thumbUrl=${(place.images != null and place.images.size() > 0 and place.images[0] != null) ? place.images[0].fileUrl : null},
+                                backUrl=${#httpServletRequest.requestURI + (#httpServletRequest.queryString != null ? '?' + #httpServletRequest.queryString : '')}"
+                       th:href="@{/detail/{id}(id=${place.placeId}, lang=${lang}, back=${backUrl})}"
                        style="text-decoration:none; color:inherit;">
 
                         <article class="place-card">
@@ -107,7 +112,7 @@
 
                             <div class="place-body">
                                 <h3 class="place-title"
-                                    th:text="${place.displayI18n != null && place.displayI18n.title != null ? place.displayI18n.title : 'No Title'}">
+                                    th:text="${place.displayI18n != null && place.displayI18n.title != null ? place.displayI18n.title : #messages.msg('place.no_title')}">
                                     Place Title
                                 </h3>
 
@@ -132,13 +137,13 @@
                     <!-- No Results -->
                     <div th:if="${results != null && results.isEmpty()}"
                          style="padding: 24px; text-align: center; opacity: 0.8;">
-                        No matches found.
+                        <span th:text="#{filter.results.empty}">No matches found.</span>
                     </div>
 
 					<!-- Before Searching -->
                     <div th:if="${results == null}"
                          style="padding: 24px; text-align: center; opacity: 0.8;">
-                        Search to explore places.
+                        <span th:text="#{filter.results.before}">Search to explore places.</span>
                     </div>
                 </div>
             </section>
