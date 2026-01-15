@@ -32,8 +32,11 @@ public class HomeController {
     @Autowired private CodeAutoTranslateService codeAutoTranslateService;
 
     @GetMapping("/")
-    public String home() {
-        return "index"; // 홈은 검색창만 있는 단순한 페이지
+    public String home(@RequestParam(required = false, defaultValue = "en") String lang,
+                       Model model) {
+        model.addAttribute("lang", lang);
+        model.addAttribute("currentPage", "home");
+        return "index"; // Home is a simple page with only a search box
     }
     
     // add new annotation (Transactional) for image loading
@@ -51,19 +54,19 @@ public class HomeController {
     	codeAutoTranslateService.ensureAndAttachCategoryNames(categories, lang);
     	codeAutoTranslateService.ensureAndAttachRegionNames(regions, lang);
     	
-        // 드롭다운을 채울 목록 가져오기
+        // Load lists to populate dropdowns
         model.addAttribute("lang", lang);
         model.addAttribute("categories", categories);
     	model.addAttribute("regions", regions);
 
-        // 검색어가 하나라도 있으면 검색 수행
-        // 홈에서 query만 들고 와도 여기서 검색이 실행
-    	// 아무것도 입력하지 않은 기본 상태일 때, 데이터 전체를 보여주기 위해 if 삭제 (if 있으면 기본 상태 시 데이터 보여주지 않음)
+        // Run search if any query exists
+        // Searching runs here even when only query comes from home
+    	// Removed the if so the default empty state shows all data (with the if, default state shows none)
 //        if ((query != null && !query.trim().isEmpty()) || 
 //            (category != null && !category.isEmpty()) || 
 //            (region != null && !region.isEmpty())) {
     	
-    		// null/빈문자/공백 정리 (옵션 선택 표시 정확히)
+    		// Normalize null/empty/blank to keep option selection accurate
     		query = (query != null && !query.trim().isEmpty()) ? query.trim() : null;
     		category = (category != null && !category.trim().isEmpty()) ? category.trim() : null;
     		region = (region != null && !region.trim().isEmpty()) ? region.trim() : null;
@@ -94,7 +97,7 @@ public class HomeController {
 //        }
 
 
-        return "filter"; // src/main/resources/templates/filter.html로 이동
+        return "filter"; // Navigate to src/main/resources/templates/filter.html
     }
     
     // detail page added
@@ -102,21 +105,23 @@ public class HomeController {
     @Transactional(readOnly = true)
     public String detail(@PathVariable Long id,
                          @RequestParam(defaultValue="en") String lang,
+                         @RequestParam(required = false) String back,
                          Model model) {
 
         TourPlace place = tourPlaceRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("No place: " + id));
 
-        // 이미지 lazy 로딩이면 여기서 초기화
+        // Initialize lazy-loaded images here
         if (place.getImages() != null) place.getImages().size();
 
-        // i18n display 붙이기 (서비스가 List 받으면 List로 감싸서 호출)
+        // Attach i18n display (wrap in List since the service takes a List)
         List<TourPlace> one = List.of(place);
         tourPlaceAutoTranslateService.ensureLocaleAndAttachDisplay(one, lang);
         codeAutoTranslateService.attachDisplayNamesForPlaces(one, lang);
 
         model.addAttribute("place", place);
         model.addAttribute("lang", lang);
+        model.addAttribute("backUrl", normalizeBackUrl(back, lang));
         
         model.addAttribute("placeId", id);
         
@@ -130,12 +135,56 @@ public class HomeController {
     
     // emergency_contacts page added
     @GetMapping("/emergency_contacts")
-    public String emergency_contacts(Model model) {
+    public String emergency_contacts(@RequestParam(required = false, defaultValue = "en") String lang,
+                                      Model model) {
 
+        model.addAttribute("lang", lang);
         model.addAttribute("currentPage", "emergency_contacts");
 
         return "emergency_contacts";
     }
+
+    private String normalizeBackUrl(String back, String lang) {
+        if (back == null || back.isBlank()) return null;
+        if (!back.startsWith("/")) return null;
+        String fragment = "";
+        int hashIndex = back.indexOf('#');
+        if (hashIndex >= 0) {
+            fragment = back.substring(hashIndex);
+            back = back.substring(0, hashIndex);
+        }
+
+        String path = back;
+        String query = "";
+        int queryIndex = back.indexOf('?');
+        if (queryIndex >= 0) {
+            path = back.substring(0, queryIndex);
+            query = back.substring(queryIndex + 1);
+        }
+
+        StringBuilder rebuilt = new StringBuilder();
+        boolean hasLang = false;
+        if (!query.isBlank()) {
+            String[] parts = query.split("&");
+            for (String part : parts) {
+                if (part.isBlank()) continue;
+                if (part.startsWith("lang=")) {
+                    if (rebuilt.length() > 0) rebuilt.append("&");
+                    rebuilt.append("lang=").append(lang);
+                    hasLang = true;
+                } else {
+                    if (rebuilt.length() > 0) rebuilt.append("&");
+                    rebuilt.append(part);
+                }
+            }
+        }
+
+        if (!hasLang) {
+            if (rebuilt.length() > 0) rebuilt.append("&");
+            rebuilt.append("lang=").append(lang);
+        }
+
+        return path + "?" + rebuilt + fragment;
+    }
     
 }
-

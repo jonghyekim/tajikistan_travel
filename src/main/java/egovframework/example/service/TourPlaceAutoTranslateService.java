@@ -29,30 +29,30 @@ public class TourPlaceAutoTranslateService {
 
         String locale = normalizeLocale(requestedLocale); // "en","ru","tg"
 
-        // en 요청이면 굳이 생성할 필요 없음. 그래도 displayI18n은 세팅하자.
+        // No need to create for EN requests, but still set displayI18n.
         List<Long> placeIds = places.stream().map(TourPlace::getPlaceId).collect(Collectors.toList());
 
-        // 1) 요청 locale 번역들 한번에 로딩
+        // 1) Load translations for the requested locale in one go
         Map<Long, TourPlaceI18n> targetMap = i18nRepo.findByPlace_PlaceIdInAndLocale(placeIds, locale)
                 .stream().collect(Collectors.toMap(x -> x.getPlace().getPlaceId(), x -> x));
 
-        // 2) 없는 placeId 찾기
+        // 2) Find missing placeIds
         List<Long> missingIds = placeIds.stream()
                 .filter(id -> !targetMap.containsKey(id))
                 .collect(Collectors.toList());
 
         if (!missingIds.isEmpty() && !locale.equals("en")) {
-            // 3) EN 원문들을 한번에 로딩
+            // 3) Load EN originals in one go
             Map<Long, TourPlaceI18n> enMap = i18nRepo.findByPlace_PlaceIdInAndLocale(missingIds, "en")
                     .stream().collect(Collectors.toMap(x -> x.getPlace().getPlaceId(), x -> x));
 
-            // 4) missing에 대해 번역 생성 + 저장
+            // 4) Create and save translations for missing entries
             for (Long placeId : missingIds) {
                 TourPlaceI18n en = enMap.get(placeId);
-                if (en == null) continue; // EN 원문 없으면 스킵(또는 예외)
+                if (en == null) continue; // Skip if no EN source (or throw)
 
                 String targetLang = toDeepLTarget(locale); // "RU" or "TG"
-                boolean enableBeta = locale.equals("tg");  // TG는 베타 취급
+                boolean enableBeta = locale.equals("tg");  // Treat TG as beta
 
                 String title = extractTranslatedText(
                         deepLClient.translate(en.getTitle(), "EN", targetLang, enableBeta)
@@ -71,20 +71,20 @@ public class TourPlaceAutoTranslateService {
                 created.setContent(content);
                 created.setAddress(address);
 
-                // UNIQUE(place_id, locale) 때문에 동시에 들어오면 충돌날 수 있음.
-                // 최소 구현은 try-catch로 처리해도 됨.
+                // UNIQUE(place_id, locale) can conflict on concurrent requests.
+                // A minimal implementation can handle it with try-catch.
                 try {
                     TourPlaceI18n saved = i18nRepo.save(created);
                     targetMap.put(placeId, saved);
                 } catch (Exception ex) {
-                    // 다른 요청이 먼저 저장했을 수도 있으니 다시 조회해서 사용
+                    // Another request may have saved first; re-fetch and use
                     i18nRepo.findByPlace_PlaceIdAndLocale(placeId, locale)
                             .ifPresent(v -> targetMap.put(placeId, v));
                 }
             }
         }
 
-        // 5) displayI18n 세팅 (없으면 EN fallback)
+        // 5) Set displayI18n (fallback to EN if missing)
         Map<Long, TourPlaceI18n> enFallbackMap = i18nRepo.findByPlace_PlaceIdInAndLocale(placeIds, "en")
                 .stream().collect(Collectors.toMap(x -> x.getPlace().getPlaceId(), x -> x));
 
