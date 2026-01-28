@@ -12,6 +12,14 @@ target/
 .classpath
 .project
 .factorypath
+.vscode/
+*.code-workspace
+.metals/
+.bloop/
+.history/
+.vscode-test/
+.vscode-test-web/
+.devcontainer/
 
 # Maven
 .mvn/

@@ -60,6 +60,15 @@
                         <img src="../assets/icons/lang_ru_icon.png" alt="RU">
                     </button>
                 </form>
+
+                <!-- KO -->
+                <form th:action="@{/detail/{id}(id=${placeId})}" method="get" style="display:inline;">
+                    <input type="hidden" name="back" th:if="${backUrl != null}" th:value="${backUrl}">
+                    <input type="hidden" name="lang" value="ko">
+                    <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
+                        <img src="../assets/icons/lang_ko_icon.png" alt="KO">
+                    </button>
+                </form>
             </div>
 
             <!-- Except DETAIL PAGE -->
@@ -97,6 +106,17 @@
                             <img src="../assets/icons/lang_ru_icon.png" alt="RU">
                         </button>
                     </form>
+
+                    <!-- KO -->
+                    <form th:action="@{/filter}" method="get" style="display:inline;">
+                        <input type="hidden" name="query" th:value="${lastQuery}">
+                        <input type="hidden" name="category" th:value="${lastCategory}">
+                        <input type="hidden" name="region" th:value="${lastRegion}">
+                        <input type="hidden" name="lang" value="ko">
+                        <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
+                            <img src="../assets/icons/lang_ko_icon.png" alt="KO">
+                        </button>
+                    </form>
                 </div>
 
                 <div th:if="${currentPage == 'emergency_contacts'}">
@@ -123,6 +143,14 @@
                             <img src="../assets/icons/lang_ru_icon.png" alt="RU">
                         </button>
                     </form>
+
+                    <!-- KO -->
+                    <form th:action="@{/emergency_contacts}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="ko">
+                        <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
+                            <img src="../assets/icons/lang_ko_icon.png" alt="KO">
+                        </button>
+                    </form>
                 </div>
 
                 <div th:if="${currentPage == 'home' or currentPage == null}">
@@ -147,6 +175,14 @@
                         <input type="hidden" name="lang" value="ru">
                         <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
                             <img src="../assets/icons/lang_ru_icon.png" alt="RU">
+                        </button>
+                    </form>
+
+                    <!-- KO -->
+                    <form th:action="@{/}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="ko">
+                        <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
+                            <img src="../assets/icons/lang_ko_icon.png" alt="KO">
                         </button>
                     </form>
                 </div>

@@ -8,10 +8,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class DeepLClient {
 
+    private static final Logger log = LoggerFactory.getLogger(DeepLClient.class);
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -23,6 +26,10 @@ public class DeepLClient {
 
     public String translate(String text, String sourceLang, String targetLang, boolean enableBeta) {
         if (text == null || text.isBlank()) return text;
+        if (apiKey == null || apiKey.isBlank() || baseUrl == null || baseUrl.isBlank()) {
+            log.warn("DeepL disabled: missing apiKey/baseUrl");
+            return null;
+        }
 
         String url = baseUrl + "/v2/translate";
 
@@ -39,7 +46,23 @@ public class DeepLClient {
         }
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+        ResponseEntity<String> response;
+        try {
+            response = restTemplate.postForEntity(url, request, String.class);
+        } catch (Exception e) {
+            log.error("DeepL request failed: {}", e.getMessage());
+            return null;
+        }
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.warn("DeepL non-2xx response: status={}", response.getStatusCode());
+            return null;
+        }
+
+        if (response.getBody() == null || response.getBody().isBlank()) {
+            log.warn("DeepL empty response body");
+            return null;
+        }
 
         // In practice, parse JSON and extract translations[0].text
         // For a minimal implementation, consider parsing with ObjectMapper in the service
@@ -58,6 +81,7 @@ public class DeepLClient {
                 return t != null ? t.asText() : null;
             }
         } catch (Exception e) {
+            log.warn("DeepL parse failed: {}", e.getMessage());
             // If parsing fails, leave null for fallback
         }
         return null;

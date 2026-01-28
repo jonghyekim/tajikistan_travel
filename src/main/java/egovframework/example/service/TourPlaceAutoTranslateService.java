@@ -7,6 +7,10 @@ import egovframework.example.domain.TourPlaceI18n;
 import egovframework.example.repository.TourPlaceI18nRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,13 +18,19 @@ import java.util.stream.Collectors;
 @Service
 public class TourPlaceAutoTranslateService {
 
+    private static final Logger log = LoggerFactory.getLogger(TourPlaceAutoTranslateService.class);
     private final TourPlaceI18nRepository i18nRepo;
     private final DeepLClient deepLClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final TransactionTemplate txTemplate;
 
-    public TourPlaceAutoTranslateService(TourPlaceI18nRepository i18nRepo, DeepLClient deepLClient) {
+    public TourPlaceAutoTranslateService(TourPlaceI18nRepository i18nRepo,
+                                         DeepLClient deepLClient,
+                                         TransactionTemplate txTemplate) {
         this.i18nRepo = i18nRepo;
         this.deepLClient = deepLClient;
+        this.txTemplate = txTemplate;
+        this.txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @Transactional
@@ -28,6 +38,7 @@ public class TourPlaceAutoTranslateService {
         if (places == null || places.isEmpty()) return;
 
         String locale = normalizeLocale(requestedLocale); // "en","ru","tg"
+        log.info("TourPlace i18n ensure: locale={}, places={}", locale, places.size());
 
         // No need to create for EN requests, but still set displayI18n.
         List<Long> placeIds = places.stream().map(TourPlace::getPlaceId).collect(Collectors.toList());
@@ -37,9 +48,19 @@ public class TourPlaceAutoTranslateService {
                 .stream().collect(Collectors.toMap(x -> x.getPlace().getPlaceId(), x -> x));
 
         // 2) Find missing placeIds
-        List<Long> missingIds = placeIds.stream()
-                .filter(id -> !targetMap.containsKey(id))
-                .collect(Collectors.toList());
+        List<Long> missingIds = new ArrayList<>();
+        for (Long id : placeIds) {
+            TourPlaceI18n existing = targetMap.get(id);
+            boolean needsTranslation = existing == null
+                    || isBlank(existing.getTitle())
+                    || isBlank(existing.getContent())
+                    || isBlank(existing.getAddress());
+            if (needsTranslation) {
+                missingIds.add(id);
+                targetMap.remove(id); // prevent blank entries from being used as display
+            }
+        }
+        log.info("TourPlace i18n missing: locale={}, missing={}", locale, missingIds.size());
 
         if (!missingIds.isEmpty() && !locale.equals("en")) {
             // 3) Load EN originals in one go
@@ -50,6 +71,8 @@ public class TourPlaceAutoTranslateService {
             for (Long placeId : missingIds) {
                 TourPlaceI18n en = enMap.get(placeId);
                 if (en == null) continue; // Skip if no EN source (or throw)
+
+                TourPlaceI18n existing = i18nRepo.findByPlace_PlaceIdAndLocale(placeId, locale).orElse(null);
 
                 String targetLang = toDeepLTarget(locale); // "RU" or "TG"
                 boolean enableBeta = locale.equals("tg");  // Treat TG as beta
@@ -63,20 +86,31 @@ public class TourPlaceAutoTranslateService {
                 String address = extractTranslatedText(
                         deepLClient.translate(en.getAddress(), "EN", targetLang, enableBeta)
                 );
+                if (title == null && content == null && address == null) {
+                    log.warn("DeepL returned empty translations: placeId={}, locale={}", placeId, locale);
+                }
 
-                TourPlaceI18n created = new TourPlaceI18n();
-                created.setPlace(en.getPlace());
-                created.setLocale(locale);
-                created.setTitle(title != null ? title : en.getTitle());
-                created.setContent(content);
-                created.setAddress(address);
+                TourPlaceI18n upsert = existing != null ? existing : new TourPlaceI18n();
+                if (existing == null) {
+                    upsert.setPlace(en.getPlace());
+                    upsert.setLocale(locale);
+                }
+                upsert.setTitle(!isBlank(title) ? title
+                        : (!isBlank(upsert.getTitle()) ? upsert.getTitle() : en.getTitle()));
+                upsert.setContent(!isBlank(content) ? content
+                        : (!isBlank(upsert.getContent()) ? upsert.getContent() : en.getContent()));
+                upsert.setAddress(!isBlank(address) ? address
+                        : (!isBlank(upsert.getAddress()) ? upsert.getAddress() : en.getAddress()));
 
                 // UNIQUE(place_id, locale) can conflict on concurrent requests.
                 // A minimal implementation can handle it with try-catch.
                 try {
-                    TourPlaceI18n saved = i18nRepo.save(created);
-                    targetMap.put(placeId, saved);
+                    TourPlaceI18n saved = txTemplate.execute(status -> i18nRepo.save(upsert));
+                    if (saved != null) {
+                        targetMap.put(placeId, saved);
+                    }
                 } catch (Exception ex) {
+                    log.error("TourPlace i18n save failed: placeId={}, locale={}, err={}", placeId, locale, ex.getMessage());
                     // Another request may have saved first; re-fetch and use
                     i18nRepo.findByPlace_PlaceIdAndLocale(placeId, locale)
                             .ifPresent(v -> targetMap.put(placeId, v));
@@ -97,7 +131,7 @@ public class TourPlaceAutoTranslateService {
     private String normalizeLocale(String locale) {
         if (locale == null || locale.isBlank()) return "en";
         locale = locale.trim().toLowerCase();
-        if (locale.equals("ru") || locale.equals("tg") || locale.equals("en")) return locale;
+        if (locale.equals("ru") || locale.equals("tg") || locale.equals("en") || locale.equals("ko")) return locale;
         return "en";
     }
 
@@ -105,6 +139,7 @@ public class TourPlaceAutoTranslateService {
         switch (locale) {
             case "ru": return "RU";
             case "tg": return "TG";
+            case "ko": return "KO";
             default: return "EN";
         }
     }
@@ -120,5 +155,9 @@ public class TourPlaceAutoTranslateService {
             }
         } catch (Exception ignored) {}
         return null;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }
