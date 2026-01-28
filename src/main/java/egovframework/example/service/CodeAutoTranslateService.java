@@ -4,36 +4,46 @@ import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import egovframework.example.domain.CategoryCode;
 import egovframework.example.domain.CategoryCodeI18n;
 import egovframework.example.domain.RegionCode;
 import egovframework.example.domain.RegionCodeI18n;
+import egovframework.example.domain.TourPlace;
 import egovframework.example.repository.CategoryCodeI18nRepository;
 import egovframework.example.repository.RegionCodeI18nRepository;
 
 @Service
 public class CodeAutoTranslateService {
 
+    private static final Logger log = LoggerFactory.getLogger(CodeAutoTranslateService.class);
     private final CategoryCodeI18nRepository catI18nRepo;
     private final RegionCodeI18nRepository regI18nRepo;
     private final DeepLClient deepLClient;
+    private final TransactionTemplate txTemplate;
 
     public CodeAutoTranslateService(CategoryCodeI18nRepository catI18nRepo,
                                    RegionCodeI18nRepository regI18nRepo,
-                                   DeepLClient deepLClient) {
+                                   DeepLClient deepLClient,
+                                   TransactionTemplate txTemplate) {
         this.catI18nRepo = catI18nRepo;
         this.regI18nRepo = regI18nRepo;
         this.deepLClient = deepLClient;
+        this.txTemplate = txTemplate;
+        this.txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @Transactional
     public void ensureAndAttachCategoryNames(List<CategoryCode> categories, String requestedLocale) {
         if (categories == null || categories.isEmpty()) return;
         String locale = normalize(requestedLocale);
+        log.info("Category i18n ensure: locale={}, categories={}", locale, categories.size());
 
         // For EN, you can just use EN or the code, but attach EN i18n to show names
         List<String> codes = categories.stream().map(CategoryCode::getCode).collect(Collectors.toList());
@@ -41,7 +51,13 @@ public class CodeAutoTranslateService {
         Map<String, String> targetMap = catI18nRepo.findByCategoryCode_CodeInAndLocale(codes, locale)
                 .stream().collect(Collectors.toMap(x -> x.getCategoryCode().getCode(), CategoryCodeI18n::getName));
 
-        List<String> missing = codes.stream().filter(c -> !targetMap.containsKey(c)).collect(Collectors.toList());
+        List<String> missing = codes.stream()
+                .filter(c -> {
+                    String v = targetMap.get(c);
+                    return v == null || v.isBlank();
+                })
+                .collect(Collectors.toList());
+        log.info("Category i18n missing: locale={}, missing={}", locale, missing.size());
 
         if (!missing.isEmpty() && !locale.equals("en")) {
             Map<String, String> enMap = catI18nRepo.findByCategoryCode_CodeInAndLocale(missing, "en")
@@ -55,6 +71,9 @@ public class CodeAutoTranslateService {
                 boolean enableBeta = locale.equals("tg");
 
                 String translated = deepLClient.translateTextOnly(enName, "EN", targetLang, enableBeta);
+                if (translated == null) {
+                    log.warn("Category DeepL empty: code={}, locale={}", code, locale);
+                }
 
                 CategoryCodeI18n created = new CategoryCodeI18n();
                 CategoryCode cc = categories.stream().filter(x -> x.getCode().equals(code)).findFirst().orElse(null);
@@ -64,9 +83,17 @@ public class CodeAutoTranslateService {
                 created.setName(translated != null ? translated : enName);
 
                 try {
-                    catI18nRepo.save(created);
-                    targetMap.put(code, created.getName());
+                    CategoryCodeI18n existing = catI18nRepo.findByCategoryCode_CodeAndLocale(code, locale).orElse(null);
+                    CategoryCodeI18n upsert = existing != null ? existing : created;
+                    if (existing != null) {
+                        upsert.setName(created.getName());
+                    }
+                    CategoryCodeI18n saved = txTemplate.execute(status -> catI18nRepo.save(upsert));
+                    if (saved != null) {
+                        targetMap.put(code, saved.getName());
+                    }
                 } catch (Exception e) {
+                    log.error("Category i18n save failed: code={}, locale={}, err={}", code, locale, e.getMessage());
                     catI18nRepo.findByCategoryCode_CodeAndLocale(code, locale)
                             .ifPresent(v -> targetMap.put(code, v.getName()));
                 }
@@ -123,7 +150,7 @@ public class CodeAutoTranslateService {
         Map<String, String> regNameMap = regions.stream()
                 .collect(Collectors.toMap(RegionCode::getCode, RegionCode::getDisplayName, (a,b)->a));
 
-        for (var p : places) {
+        for (TourPlace p : places) {
             p.getCategory().setDisplayName(catNameMap.get(p.getCategory().getCode()));
             p.getRegion().setDisplayName(regNameMap.get(p.getRegion().getCode()));
         }
@@ -133,13 +160,20 @@ public class CodeAutoTranslateService {
     public void ensureAndAttachRegionNames(List<RegionCode> regions, String requestedLocale) {
         if (regions == null || regions.isEmpty()) return;
         String locale = normalize(requestedLocale);
+        log.info("Region i18n ensure: locale={}, regions={}", locale, regions.size());
 
         List<String> codes = regions.stream().map(RegionCode::getCode).collect(Collectors.toList());
 
         Map<String, String> targetMap = regI18nRepo.findByRegionCode_CodeInAndLocale(codes, locale)
                 .stream().collect(Collectors.toMap(x -> x.getRegionCode().getCode(), RegionCodeI18n::getName));
 
-        List<String> missing = codes.stream().filter(c -> !targetMap.containsKey(c)).collect(Collectors.toList());
+        List<String> missing = codes.stream()
+                .filter(c -> {
+                    String v = targetMap.get(c);
+                    return v == null || v.isBlank();
+                })
+                .collect(Collectors.toList());
+        log.info("Region i18n missing: locale={}, missing={}", locale, missing.size());
 
         if (!missing.isEmpty() && !locale.equals("en")) {
             Map<String, String> enMap = regI18nRepo.findByRegionCode_CodeInAndLocale(missing, "en")
@@ -153,6 +187,9 @@ public class CodeAutoTranslateService {
                 boolean enableBeta = locale.equals("tg");
 
                 String translated = deepLClient.translateTextOnly(enName, "EN", targetLang, enableBeta);
+                if (translated == null) {
+                    log.warn("Region DeepL empty: code={}, locale={}", code, locale);
+                }
 
                 RegionCodeI18n created = new RegionCodeI18n();
                 RegionCode rc = regions.stream().filter(x -> x.getCode().equals(code)).findFirst().orElse(null);
@@ -162,9 +199,17 @@ public class CodeAutoTranslateService {
                 created.setName(translated != null ? translated : enName);
 
                 try {
-                    regI18nRepo.save(created);
-                    targetMap.put(code, created.getName());
+                    RegionCodeI18n existing = regI18nRepo.findByRegionCode_CodeAndLocale(code, locale).orElse(null);
+                    RegionCodeI18n upsert = existing != null ? existing : created;
+                    if (existing != null) {
+                        upsert.setName(created.getName());
+                    }
+                    RegionCodeI18n saved = txTemplate.execute(status -> regI18nRepo.save(upsert));
+                    if (saved != null) {
+                        targetMap.put(code, saved.getName());
+                    }
                 } catch (Exception e) {
+                    log.error("Region i18n save failed: code={}, locale={}, err={}", code, locale, e.getMessage());
                     regI18nRepo.findByRegionCode_CodeAndLocale(code, locale)
                             .ifPresent(v -> targetMap.put(code, v.getName()));
                 }
@@ -183,10 +228,10 @@ public class CodeAutoTranslateService {
     private String normalize(String locale) {
         if (locale == null || locale.isBlank()) return "en";
         locale = locale.trim().toLowerCase();
-        return (locale.equals("ru") || locale.equals("tg") || locale.equals("en")) ? locale : "en";
+        return (locale.equals("ru") || locale.equals("tg") || locale.equals("en") || locale.equals("ko")) ? locale : "en";
     }
 
     private String toDeepL(String locale) {
-        return locale.toUpperCase(); // RU/TG
+        return locale.toUpperCase(); // RU/TG/KO
     }
 }

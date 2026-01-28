@@ -23,22 +23,22 @@ public interface TourPlaceRepository extends JpaRepository<TourPlace, Long> {
     List<TourPlace> findAllByIsActiveTrue();
     
     // Query to search by tourist place title or region code
-    @Query("""
-    		select distinct p
-    		from TourPlace p
-    		join fetch p.region r
-    		join fetch p.category c
-    		left join fetch p.i18ns i
-    		where p.isActive = true
-    		  and (:category is null or :category = '' or c.code = :category)
-    		  and (:region   is null or :region   = '' or r.code = :region)
-    		  and (
-    		        :query is null or :query = '' or
-    		        lower(i.title) like lower(concat('%', :query, '%')) or
-    		        lower(r.code)  like lower(concat('%', :query, '%')) or
-    		        lower(c.code)  like lower(concat('%', :query, '%'))
-    		      )
-    		""")
+    @Query(
+            "select distinct p\n" +
+            "from TourPlace p\n" +
+            "join fetch p.region r\n" +
+            "join fetch p.category c\n" +
+            "left join fetch p.i18ns i\n" +
+            "where p.isActive = true\n" +
+            "  and (:category is null or :category = '' or c.code = :category)\n" +
+            "  and (:region   is null or :region   = '' or r.code = :region)\n" +
+            "  and (\n" +
+            "        :query is null or :query = '' or\n" +
+            "        lower(i.title) like lower(concat('%', :query, '%')) or\n" +
+            "        lower(r.code)  like lower(concat('%', :query, '%')) or\n" +
+            "        lower(c.code)  like lower(concat('%', :query, '%'))\n" +
+            "      )\n"
+    )
     List<TourPlace> searchWithFilters(@Param("query") String query,
 						            @Param("category") String category,
 						            @Param("region") String region);

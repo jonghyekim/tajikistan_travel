@@ -22,5 +22,5 @@ spring:
           time_zone: Asia/Seoul
           
 deepl:
-  base-url: https://api-free.deepl.com
+  base-url: https://api.deepl.com
   api-key: ${deepl.api-key}
