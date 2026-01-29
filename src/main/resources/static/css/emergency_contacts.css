@@ -210,3 +210,52 @@ body {
 .contact-phone:hover {
     background: #f6f6fb;
 }
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1024px) {
+    .emergency-page {
+        padding: 100px 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .emergency-page {
+        padding: 88px 0;
+    }
+
+    .emergency-title {
+        font-size: 32px;
+    }
+
+    .contact-card {
+        grid-template-columns: 1fr;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .contact-phone {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .emergency-container {
+        width: min(1280px, 94%);
+    }
+
+    .contact-card {
+        padding: 16px;
+    }
+
+    .contact-title {
+        font-size: 16px;
+    }
+
+    .contact-desc {
+        font-size: 13px;
+    }
+}

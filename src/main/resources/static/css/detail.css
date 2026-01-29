@@ -136,3 +136,64 @@ body {
     font-size: 15px;
     color: #8f8f8f;
 }
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1024px) {
+    .detail-page {
+        padding: 100px 0;
+    }
+
+    .detail-title {
+        font-size: 36px;
+    }
+
+    .back-icon {
+        font-size: 36px;
+    }
+}
+
+@media (max-width: 768px) {
+    .detail-page {
+        padding: 88px 0;
+    }
+
+    .detail-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .detail-title {
+        font-size: 30px;
+    }
+
+    .back-icon {
+        font-size: 30px;
+    }
+
+    .detail-hero-img {
+        height: clamp(260px, 42vh, 420px);
+    }
+
+    .detail-text,
+    .detail-empty {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail-container {
+        width: min(1180px, 94%);
+    }
+
+    .detail-meta {
+        flex-wrap: wrap;
+    }
+
+    .chip {
+        font-size: 12px;
+    }
+}
