@@ -163,8 +163,8 @@
 /* Card */
 .region-card {
     position: relative;
-    flex: 0 0 420px;
-    height: 420px;
+    flex: 0 0 clamp(280px, 32vw, 420px);
+    height: clamp(280px, 32vw, 420px);
     border-radius: 28px;
     overflow: hidden;
     scroll-snap-align: start;
@@ -294,4 +294,120 @@
     font-size: 16px;
     font-weight: 300;
     color: #1B1B1B;
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1024px) {
+    .hero-search {
+        width: min(860px, 92%);
+    }
+
+    .regions,
+    .categories {
+        padding: 80px 0;
+    }
+
+    .region-card {
+        flex: 0 0 360px;
+        height: 360px;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        min-height: 80vh;
+        padding: 120px 0 80px;
+    }
+
+    .hero-search {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .search-box {
+        width: 100%;
+        padding-left: 8px;
+    }
+
+    .search-button {
+        width: 100%;
+        padding: 14px 18px;
+    }
+
+    .regions-header,
+    .categories-header {
+        margin-bottom: 32px;
+    }
+
+    .regions-title,
+    .categories-title {
+        font-size: 22px;
+    }
+
+    .regions-subtitle,
+    .categories-subtitle {
+        font-size: 16px;
+    }
+
+    .regions-scroll {
+        gap: 16px;
+    }
+
+    .region-card {
+        flex: 0 0 78vw;
+        height: 320px;
+    }
+
+    .region-overlay {
+        padding: 20px;
+    }
+
+    .region-name {
+        font-size: 20px;
+    }
+
+    .categories-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .category-text {
+        top: 24px;
+        left: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: clamp(30px, 9vw, 42px);
+    }
+
+    .hero-subtitle {
+        font-size: 14px;
+    }
+
+    .search-box input {
+        font-size: 16px;
+    }
+
+    .region-card {
+        flex: 0 0 86vw;
+        height: 260px;
+    }
+
+    .category-name {
+        font-size: 20px;
+    }
+
+    .category-desc {
+        font-size: 14px;
+    }
 }
