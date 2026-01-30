@@ -9,13 +9,128 @@
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
-    <link rel="stylesheet" href="../css/header.css" />
-    <link rel="stylesheet" href="../css/filter.css" />
-    <link rel="stylesheet" href="../css/footer.css" />
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+	<link rel="stylesheet" th:href="@{/css/filter.css}">
+	<link rel="stylesheet" th:href="@{/css/footer.css}">
+	<link rel="stylesheet" th:href="@{/css/skeleton.css}">
 
 </head>
 
 <body>
+<div id="loading-skeleton">
+  <div class="sk-header">
+    <div class="skeleton-box sk-logo"></div>
+    <div class="skeleton-box sk-nav"></div>
+    <div class="skeleton-box sk-lang-group"></div>
+  </div>
+
+<div class="sk-list-body">
+  <div class="sk-container" style="margin-top:120px;">
+    <div class="skeleton-box sk-title-sm"></div>
+
+    <div class="skeleton-box" style="height:100px; border-radius:28px; margin-top:18px;"></div>
+
+    <div class="skeleton-box" style="width:220px; height:26px; border-radius:8px; margin:22px 0 16px;"></div>
+
+    <div class="card-grid">
+    
+		<div style="border-radius:28px; overflow:hidden; background:#fff;">
+		  <div class="skeleton-box" style="aspect-ratio:16/9;"></div>
+		  <div style="padding:18px;">
+		    <div class="skeleton-box" style="height:20px; margin-bottom:10px;"></div>
+		    <div class="skeleton-box" style="height:14px; margin-bottom:8px;"></div>
+		    <div class="skeleton-box" style="height:14px; width:70%;"></div>
+		  </div>
+		</div>
+
+		<div style="border-radius:28px; overflow:hidden; background:#fff;">
+		  <div class="skeleton-box" style="aspect-ratio:16/9;"></div>
+		  <div style="padding:18px;">
+		    <div class="skeleton-box" style="height:20px; margin-bottom:10px;"></div>
+		    <div class="skeleton-box" style="height:14px; margin-bottom:8px;"></div>
+		    <div class="skeleton-box" style="height:14px; width:70%;"></div>
+		  </div>
+		</div>
+
+    
+ 		<div style="border-radius:28px; overflow:hidden; background:#fff;">
+		  <div class="skeleton-box" style="aspect-ratio:16/9;"></div>
+		  <div style="padding:18px;">
+		    <div class="skeleton-box" style="height:20px; margin-bottom:10px;"></div>
+		    <div class="skeleton-box" style="height:14px; margin-bottom:8px;"></div>
+		    <div class="skeleton-box" style="height:14px; width:70%;"></div>
+		  </div>
+		</div>
+    
+		<div style="border-radius:28px; overflow:hidden; background:#fff;">
+		  <div class="skeleton-box" style="aspect-ratio:16/9;"></div>
+		  <div style="padding:18px;">
+		    <div class="skeleton-box" style="height:20px; margin-bottom:10px;"></div>
+		    <div class="skeleton-box" style="height:14px; margin-bottom:8px;"></div>
+		    <div class="skeleton-box" style="height:14px; width:70%;"></div>
+		  </div>
+		</div>
+    
+   		<div style="border-radius:28px; overflow:hidden; background:#fff;">
+		  <div class="skeleton-box" style="aspect-ratio:16/9;"></div>
+		  <div style="padding:18px;">
+		    <div class="skeleton-box" style="height:20px; margin-bottom:10px;"></div>
+		    <div class="skeleton-box" style="height:14px; margin-bottom:8px;"></div>
+		    <div class="skeleton-box" style="height:14px; width:70%;"></div>
+		  </div>
+		</div>
+    
+		<div style="border-radius:28px; overflow:hidden; background:#fff;">
+		  <div class="skeleton-box" style="aspect-ratio:16/9;"></div>
+		  <div style="padding:18px;">
+		    <div class="skeleton-box" style="height:20px; margin-bottom:10px;"></div>
+		    <div class="skeleton-box" style="height:14px; margin-bottom:8px;"></div>
+		    <div class="skeleton-box" style="height:14px; width:70%;"></div>
+		  </div>
+		</div>
+    
+		<div style="border-radius:28px; overflow:hidden; background:#fff;">
+		  <div class="skeleton-box" style="aspect-ratio:16/9;"></div>
+		  <div style="padding:18px;">
+		    <div class="skeleton-box" style="height:20px; margin-bottom:10px;"></div>
+		    <div class="skeleton-box" style="height:14px; margin-bottom:8px;"></div>
+		    <div class="skeleton-box" style="height:14px; width:70%;"></div>
+		  </div>
+		</div>
+    
+		<div style="border-radius:28px; overflow:hidden; background:#fff;">
+		  <div class="skeleton-box" style="aspect-ratio:16/9;"></div>
+		  <div style="padding:18px;">
+		    <div class="skeleton-box" style="height:20px; margin-bottom:10px;"></div>
+		    <div class="skeleton-box" style="height:14px; margin-bottom:8px;"></div>
+		    <div class="skeleton-box" style="height:14px; width:70%;"></div>
+		  </div>
+		</div>
+    
+    	<div style="border-radius:28px; overflow:hidden; background:#fff;">
+		  <div class="skeleton-box" style="aspect-ratio:16/9;"></div>
+		  <div style="padding:18px;">
+		    <div class="skeleton-box" style="height:20px; margin-bottom:10px;"></div>
+		    <div class="skeleton-box" style="height:14px; margin-bottom:8px;"></div>
+		    <div class="skeleton-box" style="height:14px; width:70%;"></div>
+		  </div>
+		</div>
+  
+    </div>
+  </div>
+  </div>
+
+  <div class="sk-footer">
+    <div class="sk-footer-top">
+      <div class="skeleton-box sk-f-logo"></div>
+      <div class="skeleton-box sk-f-nav"></div>
+      <div class="skeleton-box sk-f-lang"></div>
+    </div>
+    <div class="skeleton-box sk-f-line"></div>
+  </div>
+</div>
+	
+<div id="main-content" style="visibility:hidden; opacity:0; transition: opacity 0.4s ease;">
     <!-- header -->
     <div th:replace="components/header :: header"></div>
 
@@ -100,9 +215,9 @@
 
                         <article class="place-card">
                             <div class="place-thumb">
-                                <img
-                                    th:src="${thumbUrl != null ? thumbUrl : '../assets/images/home_reg_2.png'}"
-                                    alt="Place image" />
+                                <img th:src="${thumbUrl} ?: @{/assets/images/home_reg_2.png}"
+     								alt="Place image" />
+
 
                                 <span class="badge badge-top"
                                       th:text="${place.category.displayName != null ? place.category.displayName : place.category.code}">
@@ -152,6 +267,24 @@
 
     <!-- footer -->
     <div th:replace="components/footer :: footer"></div>
+    </div>
+    
+    <script>
+  window.addEventListener('load', function () {
+    const skeleton = document.getElementById('loading-skeleton');
+    const mainContent = document.getElementById('main-content');
+
+    document.body.style.overflow = 'hidden';
+    
+    setTimeout(() => {
+      skeleton.style.display = 'none';
+      mainContent.style.visibility = 'visible';
+      mainContent.style.opacity = '1';
+      
+      document.body.style.overflow = '';
+    }, 3000);
+  });
+</script>
 </body>
 
 </html>
