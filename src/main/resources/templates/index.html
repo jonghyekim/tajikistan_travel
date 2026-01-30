@@ -5,35 +5,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title th:text="#{home.page.title}">Welcome Tajikistan</title>
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+    <!-- CSS files -->
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/skeleton.css}">
+
 </head>
 
 <body>
-
-    <!-- Skeleton loading screen -->
+    <!-- Loading Skeleton Screen (For loading state) -->
     <div id="loading-skeleton">
-
-        <!-- Skeleton header -->
         <div class="sk-header">
+            <!-- Skeleton for header elements -->
             <div class="skeleton-box sk-logo"></div>
             <div class="skeleton-box sk-nav"></div>
             <div class="skeleton-box sk-lang-group"></div>
         </div>
 
-        <!-- Skeleton hero section -->
         <div class="sk-hero">
+            <!-- Skeleton for Hero Section -->
             <div class="skeleton-box sk-hero-title"></div>
             <div class="skeleton-box sk-hero-subtitle"></div>
-
-            <!-- Skeleton search bar -->
             <div class="sk-hero-search">
                 <div class="sk-search-left">
                     <div class="skeleton-box sk-search-icon"></div>
@@ -42,8 +39,8 @@
             </div>
         </div>
 
-        <!-- Skeleton regions section -->
         <div class="sk-container">
+            <!-- Skeleton for content cards -->
             <div class="skeleton-box sk-title-sm"></div>
             <div class="skeleton-box sk-subtitle-sm"></div>
             <div class="sk-flex-row">
@@ -53,8 +50,8 @@
             </div>
         </div>
 
-        <!-- Skeleton categories section -->
         <div class="sk-container">
+            <!-- Skeleton for another set of content cards -->
             <div class="skeleton-box sk-title-sm"></div>
             <div class="skeleton-box sk-subtitle-sm"></div>
             <div class="sk-grid-3">
@@ -64,8 +61,8 @@
             </div>
         </div>
 
-        <!-- Skeleton footer -->
         <div class="sk-footer">
+            <!-- Skeleton for footer -->
             <div class="sk-footer-top">
                 <div class="skeleton-box sk-f-logo"></div>
                 <div class="skeleton-box sk-f-nav"></div>
@@ -75,35 +72,32 @@
         </div>
     </div>
 
-    <!-- Main page content -->
+    <!-- Main Content -->
     <div id="main-content" style="visibility: hidden; opacity: 0; transition: opacity 0.4s ease;">
-
-        <!-- Header component -->
+        
+        <!-- Header Component -->
         <div th:replace="components/header :: header"></div>
 
-        <!-- Hero section -->
+        <!-- Hero Section -->
         <section class="hero">
             <div class="hero-bg"></div>
 
             <div class="hero-content">
-                <!-- Hero title -->
                 <h1 class="hero-title" th:text="#{home.hero.title}">
                     Discover the Roof of the World
                 </h1>
 
-                <!-- Hero subtitle -->
                 <p class="hero-subtitle" th:utext="#{home.hero.subtitle}">
                     Explore majestic peaks, ancient history, and warm <br>
                     hospitality in the heart of Central Asia.
                 </p>
 
-                <!-- Search form -->
+                <!-- Hero Search Form -->
                 <form class="hero-search"
                       th:action="@{/filter}"
                       action="/filter"
                       method="get">
 
-                    <!-- Search input box -->
                     <div class="search-box">
                         <span class="material-icons">search</span>
                         <input
@@ -115,10 +109,8 @@
                             th:attr="aria-label=#{home.search.aria}" />
                     </div>
 
-                    <!-- Language parameter -->
                     <input type="hidden" name="lang" th:value="${lang}" />
 
-                    <!-- Search button -->
                     <button type="submit" class="search-button" th:text="#{home.search.button}">
                         Search
                     </button>
@@ -126,24 +118,19 @@
             </div>
         </section>
 
-        <!-- Regions section -->
+        <!-- Regions Section -->
         <section class="regions" id="regions">
             <div class="regions-container">
-
-                <!-- Regions header -->
                 <header class="regions-header">
-                    <h2 class="regions-title" th:text="#{home.regions.title}">
-                        Discover Tajikistan’s Regions
-                    </h2>
+                    <h2 class="regions-title" th:text="#{home.regions.title}">Discover Tajikistan’s Regions</h2>
                     <p class="regions-subtitle" th:text="#{home.regions.subtitle}">
                         Select a region to explore its unique landscapes, history, and culture.
                     </p>
                 </header>
 
-                <!-- Horizontal scrollable region cards -->
                 <div class="regions-scroll" aria-label="Tajikistan regions">
 
-                    <!-- Individual region card -->
+                    <!-- Region Cards -->
                     <a class="region-card"
                        th:href="@{/filter(region='DUSHANBE', lang=${lang})}"
                        aria-label="Dushanbe region">
@@ -154,40 +141,99 @@
                         </div>
                     </a>
 
-                    <!-- Sughd -->
-                    <!-- Khatlon -->
-                    <!-- GBAO -->
-                    <!-- DRS -->
+                    <a class="region-card"
+                       th:href="@{/filter(region='SUGHD', lang=${lang})}"
+                       aria-label="Sughd Region">
+                        <img class="region-image" src="../assets/images/home_reg_2.png" alt="Sughd Region" />
+                        <div class="region-overlay">
+                            <span class="region-chip" th:text="#{home.region.sughd.chip}">North</span>
+                            <h3 class="region-name" th:text="#{home.region.sughd.name}">Sughd Region</h3>
+                        </div>
+                    </a>
+
+                    <a class="region-card"
+                       th:href="@{/filter(region='KHATLON', lang=${lang})}"
+                       aria-label="Khatlon region">
+                        <img class="region-image" src="../assets/images/home_reg_3.png" alt="Khatlon region" />
+                        <div class="region-overlay">
+                            <span class="region-chip" th:text="#{home.region.khatlon.chip}">South</span>
+                            <h3 class="region-name" th:text="#{home.region.khatlon.name}">Khatlon</h3>
+                        </div>
+                    </a>
+
+                    <a class="region-card"
+                       th:href="@{/filter(region='GBAO', lang=${lang})}"
+                       aria-label="Gorno-Badakhshan Autonomous Province">
+                        <img class="region-image" src="../assets/images/home_reg_4.png"
+                            alt="Gorno-Badakhshan Autonomous Region" />
+                        <div class="region-overlay">
+                            <span class="region-chip" th:text="#{home.region.gbao.chip}">East</span>
+                            <h3 class="region-name" th:utext="#{home.region.gbao.name}">
+                                Gorno-Badakhshan<br>Autonomous Province
+                            </h3>
+                        </div>
+                    </a>
+
+                    <a class="region-card"
+                       th:href="@{/filter(region='DRS', lang=${lang})}"
+                       aria-label="Districts of Republican Subordination">
+                        <img class="region-image" src="../assets/images/home_reg_5.png" alt="Rasht Valley region" />
+                        <div class="region-overlay">
+                            <span class="region-chip" th:text="#{home.region.drs.chip}">Central</span>
+                            <h3 class="region-name" th:utext="#{home.region.drs.name}">
+                                Districts of Republican<br>Subordination
+                            </h3>
+                        </div>
+                    </a>
 
                 </div>
             </div>
         </section>
 
-        <!-- Categories section -->
+        <!-- Categories Section -->
         <section class="categories" id="categories">
             <div class="categories-container">
-
-                <!-- Categories header -->
                 <header class="categories-header">
-                    <h2 class="categories-title" th:text="#{home.categories.title}">
-                        Explore More Categories
-                    </h2>
+                    <h2 class="categories-title" th:text="#{home.categories.title}">Explore More Categories</h2>
                     <p class="categories-subtitle" th:text="#{home.categories.subtitle}">
                         Find exactly what you are looking for, from breathtaking nature to comfortable stays.
                     </p>
                 </header>
 
-                <!-- Category cards grid -->
                 <div class="categories-grid" aria-label="Categories">
-                    <!-- Each card links to filtered results -->
+                    <!-- Category Cards -->
+                    <a class="category-card" th:href="@{/filter(category='stay', lang=${lang})}" aria-label="Stays">
+                        <img class="category-image" src="../assets/images/home_cate_1.png" alt="Stays" />
+                        <div class="category-text">
+                            <h3 class="category-name" th:text="#{home.category.stays.name}">Stays</h3>
+                            <p class="category-desc" th:text="#{home.category.stays.desc}">Hotels &amp; Resorts</p>
+                        </div>
+                    </a>
+
+                    <a class="category-card" th:href="@{/filter(category='dining', lang=${lang})}" aria-label="Dining">
+                        <img class="category-image" src="../assets/images/home_cate_2.png" alt="Dining" />
+                        <div class="category-text">
+                            <h3 class="category-name" th:text="#{home.category.dining.name}">Dining</h3>
+                            <p class="category-desc" th:text="#{home.category.dining.desc}">Local food &amp; cafes</p>
+                        </div>
+                    </a>
+
+                    <a class="category-card" th:href="@{/filter(category='park', lang=${lang})}" aria-label="Parks">
+                        <img class="category-image" src="../assets/images/home_cate_3.png" alt="Parks" />
+                        <div class="category-text">
+                            <h3 class="category-name" th:text="#{home.category.parks.name}">Parks</h3>
+                            <p class="category-desc" th:text="#{home.category.parks.desc}">Nature escapes</p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!-- Footer component -->
+        <!-- Footer Component -->
         <div th:replace="components/footer :: footer"></div>
     </div>
 
+    <!-- Script for hiding loading skeleton and showing main content -->
     <script>
         window.addEventListener('load', function() {
             const skeleton = document.getElementById('loading-skeleton');
@@ -196,9 +242,8 @@
                 skeleton.style.display = 'none';
                 mainContent.style.visibility = 'visible';
                 mainContent.style.opacity = '1';
-            }, 3000);
+            }, 3000); 
         });
     </script>
-
 </body>
 </html>
