@@ -45,6 +45,7 @@ body {
     background-color: #FFFFFF60;
     border-radius: 20px;
     display: inline-flex;
+    text-align: center;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -54,6 +55,8 @@ body {
 .nav ul {
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 100%;
     gap: 48px;
     list-style: none;
     padding: 0;
