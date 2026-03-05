@@ -70,6 +70,15 @@
                     </button>
                 </form>
             </div>
+            
+            <!-- Auth UI (login status + buttons) -->
+			<div id="auth-box" class="auth-box">
+			    <span data-auth="status" class="auth-status"></span>
+			    
+			    <button type="button" data-auth="login" class="auth-btn">Login</button>
+			    <button type="button" data-auth="signup" class="auth-btn">Sign Up</button>
+			    <button type="button" data-auth="logout" class="auth-btn" style="display:none;">Logout</button>
+			</div>
 
             <!-- Except DETAIL PAGE -->
             <div th:if="${placeId == null}">
@@ -190,4 +199,5 @@
 
         </div>
     </div>
+	<script th:src="@{/js/auth.js}"></script>
 </header>
