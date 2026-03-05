@@ -24,3 +24,8 @@ spring:
 deepl:
   base-url: https://api.deepl.com
   api-key: ${deepl.api-key}
+
+jwt:
+  secret: "x9ByZQv4lJ9oH5z8K0a7Rk7pQ+0V0mE0X8sN5fLwCkA="
+  access-exp-seconds: 900       #15 minutes
+  refresh-exp-seconds: 1209600  #14 days
