@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Register</title>
+</head>
+
+<body>
+
+<h2>Register</h2>
+
+<form id="registerForm">
+
+	<div>
+        <label>Nickname</label>
+        <input type="text" id="nickname" required>
+    </div>
+
+    <div>
+        <label>Username</label>
+        <input type="text" id="username" required>
+    </div>
+
+    <div>
+        <label>Password</label>
+        <input type="password" id="password" required>
+    </div>
+
+	<div>
+        <label>Email</label>
+        <input type="email" id="email" required>
+    </div>
+    
+    <button type="submit">Register</button>
+
+</form>
+
+<p id="message"></p>
+
+<script>
+
+document.getElementById("registerForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const nickname = document.getElementById("nickname").value;
+
+    try {
+
+        const response = await fetch("/auth/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                password: password,
+                nickname: nickname
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("register failed");
+        }
+
+        document.getElementById("message").innerText = "Register success. Please login.";
+        window.location.href = "/auth/login";
+
+    } catch (err) {
+        document.getElementById("message").innerText = "Register failed";
+    }
+
+});
+
+</script>
+
+</body>
+</html>
