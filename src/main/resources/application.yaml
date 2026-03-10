@@ -22,7 +22,7 @@ spring:
           time_zone: Asia/Seoul
           
 deepl:
-  base-url: https://api.deepl.com
+  base-url: https://api-free.deepl.com
   api-key: ${deepl.api-key}
 
 jwt:

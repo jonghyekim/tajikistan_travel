@@ -15,8 +15,11 @@ import org.slf4j.LoggerFactory;
 public class DeepLClient {
 
     private static final Logger log = LoggerFactory.getLogger(DeepLClient.class);
+    private static final String PRO_BASE_URL = "https://api.deepl.com";
+    private static final String FREE_BASE_URL = "https://api-free.deepl.com";
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private volatile boolean endpointAdjustedLogged = false;
 
     @Value("${deepl.base-url}")
     private String baseUrl; // https://api-free.deepl.com  (Free) / https://api.deepl.com (Pro)
@@ -26,12 +29,18 @@ public class DeepLClient {
 
     public String translate(String text, String sourceLang, String targetLang, boolean enableBeta) {
         if (text == null || text.isBlank()) return text;
-        if (apiKey == null || apiKey.isBlank() || baseUrl == null || baseUrl.isBlank()) {
-            log.warn("DeepL disabled: missing apiKey/baseUrl");
+        if (apiKey == null || apiKey.isBlank()) {
+            log.warn("DeepL disabled: missing apiKey");
             return null;
         }
 
-        String url = baseUrl + "/v2/translate";
+        String resolvedBaseUrl = resolveBaseUrl();
+        if (resolvedBaseUrl == null || resolvedBaseUrl.isBlank()) {
+            log.warn("DeepL disabled: unable to resolve baseUrl");
+            return null;
+        }
+
+        String url = resolvedBaseUrl + "/v2/translate";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -85,5 +94,45 @@ public class DeepLClient {
             // If parsing fails, leave null for fallback
         }
         return null;
+    }
+
+    private String resolveBaseUrl() {
+        String configured = trimTrailingSlash(baseUrl);
+        boolean freeKey = apiKey != null && apiKey.trim().endsWith(":fx");
+
+        if (configured == null || configured.isBlank()) {
+            return freeKey ? FREE_BASE_URL : PRO_BASE_URL;
+        }
+
+        boolean usingFreeEndpoint = configured.contains("api-free.deepl.com");
+        boolean usingProEndpoint = configured.contains("api.deepl.com") && !usingFreeEndpoint;
+
+        if (freeKey && usingProEndpoint) {
+            logEndpointAdjustmentOnce(configured, FREE_BASE_URL);
+            return FREE_BASE_URL;
+        }
+
+        if (!freeKey && usingFreeEndpoint) {
+            logEndpointAdjustmentOnce(configured, PRO_BASE_URL);
+            return PRO_BASE_URL;
+        }
+
+        return configured;
+    }
+
+    private String trimTrailingSlash(String value) {
+        if (value == null) return null;
+        String trimmed = value.trim();
+        while (trimmed.endsWith("/")) {
+            trimmed = trimmed.substring(0, trimmed.length() - 1);
+        }
+        return trimmed;
+    }
+
+    private void logEndpointAdjustmentOnce(String from, String to) {
+        if (!endpointAdjustedLogged) {
+            endpointAdjustedLogged = true;
+            log.warn("DeepL base-url adjusted by key type: from={} to={}", from, to);
+        }
     }
 }

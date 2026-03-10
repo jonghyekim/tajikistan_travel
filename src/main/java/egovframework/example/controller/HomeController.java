@@ -1,6 +1,10 @@
 package egovframework.example.controller;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -53,6 +57,7 @@ public class HomeController {
                          @RequestParam(required = false) String query,
                          @RequestParam(required = false) String category,
                          @RequestParam(required = false) String region,
+                         @RequestParam(defaultValue = "1") Integer page,
                          @RequestParam(required = false) String lang,
                          HttpServletRequest request,
                          HttpServletResponse response) {
@@ -82,13 +87,34 @@ public class HomeController {
     		region = (region != null && !region.trim().isEmpty()) ? region.trim() : null;
 
             
-            List<TourPlace> results = tourPlaceRepository.searchWithFilters(query, category, region);
+            int pageSize = 9;
+            int currentPage = (page == null || page < 1) ? 1 : page;
+            Pageable pageable = PageRequest.of(
+                    currentPage - 1,
+                    pageSize,
+                    Sort.by(Sort.Direction.DESC, "updatedAt").and(Sort.by(Sort.Direction.DESC, "placeId"))
+            );
+
+            Page<TourPlace> resultPage = tourPlaceRepository.searchWithFilters(query, category, region, pageable);
+            if (resultPage.getTotalPages() > 0 && currentPage > resultPage.getTotalPages()) {
+                currentPage = resultPage.getTotalPages();
+                pageable = PageRequest.of(
+                        currentPage - 1,
+                        pageSize,
+                        Sort.by(Sort.Direction.DESC, "updatedAt").and(Sort.by(Sort.Direction.DESC, "placeId"))
+                );
+                resultPage = tourPlaceRepository.searchWithFilters(query, category, region, pageable);
+            }
+
+            List<TourPlace> results = resultPage.getContent();
             
             // for image loading
             for (TourPlace p : results) {
                 if (p.getImages() != null) {
                     p.getImages().size();
                 }
+                if (p.getCategory() != null) p.getCategory().getCode();
+                if (p.getRegion() != null) p.getRegion().getCode();
             }
             
             tourPlaceAutoTranslateService.ensureLocaleAndAttachDisplay(results, resolvedLang);
@@ -96,10 +122,28 @@ public class HomeController {
             codeAutoTranslateService.attachDisplayNamesForPlaces(results, resolvedLang);
             
             model.addAttribute("results", results);
+            model.addAttribute("totalResults", resultPage.getTotalElements());
+            model.addAttribute("totalPages", resultPage.getTotalPages());
+            model.addAttribute("currentPageNo", currentPage);
+
+            int pageBlockSize = 5;
+            int startPage = ((currentPage - 1) / pageBlockSize) * pageBlockSize + 1;
+            int endPage = Math.min(startPage + pageBlockSize - 1, resultPage.getTotalPages());
+            if (resultPage.getTotalPages() == 0) {
+                startPage = 0;
+                endPage = 0;
+            }
+            model.addAttribute("startPage", startPage);
+            model.addAttribute("endPage", endPage);
+            int prevBlockPage = Math.max(1, startPage - pageBlockSize);
+            int nextBlockPage = Math.min(resultPage.getTotalPages(), startPage + pageBlockSize);
+            model.addAttribute("prevBlockPage", prevBlockPage);
+            model.addAttribute("nextBlockPage", nextBlockPage);
             
             model.addAttribute("lastQuery", query);
             model.addAttribute("lastCategory", category);
             model.addAttribute("lastRegion", region);
+            model.addAttribute("lastPage", currentPage);
             
             // for navigation in header.html 
             model.addAttribute("currentPage", "filter");
