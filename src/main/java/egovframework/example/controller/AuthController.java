@@ -1,9 +1,6 @@
 package egovframework.example.controller;
 
-import egovframework.example.dto.auth.MemberRegisterRequest;
-import egovframework.example.dto.auth.MemberLoginRequest;
-import egovframework.example.dto.auth.TokenRefreshRequest;
-import egovframework.example.dto.auth.TokenResponse;
+import egovframework.example.dto.auth.*;
 import egovframework.example.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,18 +22,18 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(
+    public ResponseEntity<LoginResponseDto> login(
             @RequestBody MemberLoginRequest request
     ) {
-        TokenResponse response = memberService.login(request);
+    	LoginResponseDto response = memberService.login(request);
         return ResponseEntity.ok(response);
     }
     
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(
+    public ResponseEntity<TokenRefreshResponseDto> refresh(
             @RequestBody TokenRefreshRequest request
     ) {
-        TokenResponse response = memberService.refresh(request);
+    	TokenRefreshResponseDto response = memberService.refresh(request);
         return ResponseEntity.ok(response);
     }
     
