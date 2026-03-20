@@ -28,7 +28,8 @@ public class SecurityConfig {
             .authorizeRequests()
             	.antMatchers("/me/**").authenticated()
             	.antMatchers(HttpMethod.POST, "/api/reviews/**").authenticated()
-                .anyRequest().permitAll()
+            	.antMatchers(HttpMethod.DELETE, "/api/reviews/**").authenticated()
+            	.anyRequest().permitAll()
             .and()
 
             .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), 

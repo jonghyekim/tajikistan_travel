@@ -72,4 +72,39 @@ public class ReviewService {
         return trimmed.isEmpty() ? null : trimmed;
     }
 	
+	//작성된 리뷰 리스트 조회
+	@Transactional(readOnly = true)
+	public ReviewListResponse getReviews(Long placeId, Long loginMemberId) {
+	    List<Review> reviews = reviewRepository.findByPlace_PlaceIdOrderByCreatedAtDesc(placeId);
+
+	    double averageRating = reviewRepository.findAverageRatingByPlaceId(placeId);
+	    long reviewCount = reviewRepository.countByPlace_PlaceId(placeId);
+
+	    List<ReviewItemResponse> items = reviews.stream()
+	            .map(review -> new ReviewItemResponse(
+	                    review.getId(),
+	                    review.getMember().getNickname(),
+	                    review.getRating(),
+	                    review.getContent(),
+	                    review.getCreatedAt(),
+	                    loginMemberId != null && loginMemberId.equals(review.getMember().getId())
+	            ))
+	            .collect(Collectors.toList());
+
+	    return new ReviewListResponse(averageRating, reviewCount, items);
+	}
+	
+	//본인이 작성한 리 삭제
+	@Transactional
+	public void deleteReview(Long memberId, Long reviewId) {
+	    Review review = reviewRepository.findById(reviewId)
+	            .orElseThrow(() -> new IllegalArgumentException("review not found"));
+
+	    if (!review.getMember().getId().equals(memberId)) {
+	        throw new IllegalArgumentException("you can delete only your review");
+	    }
+
+	    reviewRepository.delete(review);
+	}
+	
 }
