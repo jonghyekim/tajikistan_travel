@@ -27,6 +27,7 @@ public class SecurityConfig {
 
             .authorizeRequests()
             	.antMatchers("/me/**").authenticated()
+            	.antMatchers(HttpMethod.POST, "/api/reviews/**").authenticated()
                 .anyRequest().permitAll()
             .and()
 
