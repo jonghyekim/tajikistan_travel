@@ -64,7 +64,7 @@ public class MemberService {
 	
 	//login
 	@Transactional
-    public TokenResponse login(MemberLoginRequest request) {
+    public LoginResponseDto login(MemberLoginRequest request) {
 		
 		cleanupTokens();
         
@@ -86,12 +86,12 @@ public class MemberService {
         rt.setRevokedAt(null);
         
         refreshTokenRepository.save(rt);
-        return new TokenResponse(accessToken, refreshToken, member.getNickname());
+        return new LoginResponseDto(accessToken, refreshToken, member.getNickname());
     }
 	
 	//Access token reissue
 	@Transactional
-    public TokenResponse refresh(TokenRefreshRequest request) {
+    public TokenRefreshResponseDto refresh(TokenRefreshRequest request) {
 		
 		cleanupTokens();
 		
@@ -133,10 +133,6 @@ public class MemberService {
         // 4) 새 access 발급
         Long memberId = memberIdFromJwt;
         
-        // 닉네임을 가져오기 위해 Member 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        
         String newAccessToken = jwtUtil.createAccessToken(memberId);
         
         // ✅ 5) Refresh Token Rotation
@@ -156,7 +152,7 @@ public class MemberService {
         refreshTokenRepository.save(newRt);
         
      // ✅ 응답은 새 refresh로 내려줌
-        return new TokenResponse(newAccessToken, newRefreshToken, member.getNickname());
+        return new TokenRefreshResponseDto(newAccessToken, newRefreshToken);
     }
 	
 	//logout
