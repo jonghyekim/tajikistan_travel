@@ -20,13 +20,39 @@
 /* Fullscreen skeleton overlay */
 #loading-skeleton {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100vh;
     background: #f5f5f5;
     z-index: 10000;
-    overflow-y: hidden;
+    overflow-y: auto;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+body.skeleton-pending {
+    overflow: hidden;
+}
+
+body.skeleton-pending #main-content {
+    visibility: hidden;
+    opacity: 0;
+}
+
+body.skeleton-ready #loading-skeleton {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+body.skeleton-ready #main-content {
+    visibility: visible;
+    opacity: 1;
+}
+
+#main-content {
+    transition: opacity 0.25s ease;
 }
 
 /* Skeleton header layout */
@@ -42,13 +68,17 @@
     z-index: 10001;
 }
 
+#loading-skeleton[data-kind="detail"] .sk-header {
+    position: static;
+}
+
 /* Header skeleton elements */
 .sk-logo { width: 150px; height: 60px; border-radius: 8px; }
 .sk-nav { width: 380px; height: 56px; border-radius: 20px; }
 .sk-lang-group { width: 120px; height: 30px; border-radius: 8px; }
 
 .sk-list-body {
-  padding-top: 120px; 
+    padding-top: 120px;
 }
 
 /* Hero skeleton */
@@ -61,11 +91,9 @@
     background: #f0f0f0;
 }
 
-/* Hero text placeholders */
 .sk-hero-title { width: 60%; height: 80px; margin-bottom: 24px; border-radius: 12px; }
 .sk-hero-subtitle { width: 45%; height: 30px; margin-bottom: 48px; border-radius: 8px; }
 
-/* Search bar skeleton */
 .sk-hero-search {
     margin: 36px auto 0;
     width: min(920px, 92%);
@@ -76,10 +104,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* Search icon and button skeletons */
 .sk-search-left { display: flex; align-items: center; flex: 1; }
 .sk-search-icon { width: 28px; height: 28px; border-radius: 50%; }
 .sk-search-button {
@@ -91,6 +118,133 @@
 
 /* Section containers */
 .sk-container { width: min(1280px, 92%); margin: 100px auto; }
+.sk-detail-container { width: min(1180px, 92%); margin: 0 auto; }
+#loading-skeleton[data-kind="detail"] .sk-header + .sk-detail-container { margin-top: 120px; }
+
+/* Detail skeleton */
+.sk-detail-meta-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.sk-chip {
+    width: 92px;
+    height: 32px;
+    border-radius: 12px;
+}
+
+.sk-chip-long {
+    width: 132px;
+}
+
+.sk-detail-title-row {
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+    margin-bottom: 18px;
+}
+
+.sk-back-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    flex: 0 0 44px;
+    transform: translateY(2px);
+}
+
+.sk-detail-title {
+    width: min(520px, 72%);
+    height: 44px;
+    border-radius: 12px;
+}
+
+.sk-detail-hero-shell {
+    width: 100%;
+    margin-top: 0;
+}
+
+.sk-detail-hero {
+    width: 100%;
+    height: clamp(420px, 56vh, 720px);
+    border-radius: 0;
+}
+
+.sk-detail-content-wrap {
+    max-width: 860px;
+    margin: 26px auto 0;
+}
+
+.sk-text-block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sk-text-line {
+    max-width: 860px;
+    height: 18px;
+    border-radius: 8px;
+}
+
+.sk-text-line.is-wide { width: min(860px, 100%); }
+.sk-text-line.is-mid { width: min(760px, 88%); }
+.sk-text-line.is-short { width: min(540px, 64%); }
+
+#loading-skeleton .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: stretch;
+}
+
+/* Emergency skeleton */
+.sk-contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sk-contact-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 24px;
+    align-items: center;
+}
+
+.sk-contact-main {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sk-contact-title {
+    width: 240px;
+    height: 24px;
+    border-radius: 8px;
+}
+
+.sk-contact-desc {
+    width: 360px;
+    height: 16px;
+    border-radius: 8px;
+}
+
+.sk-contact-badge {
+    width: 92px;
+    height: 34px;
+    border-radius: 10px;
+}
+
+.sk-contact-action {
+    width: 138px;
+    height: 46px;
+    border-radius: 14px;
+}
 
 /* Titles */
 .sk-title-sm { width: 320px; height: 34px; margin-bottom: 16px; border-radius: 8px; }
@@ -105,9 +259,104 @@
 .sk-card-cat { aspect-ratio: 27 / 14; border-radius: 28px; }
 
 /* Footer skeleton */
-.sk-footer { background: #333333; padding: 80px; margin-top: 100px; }
-.sk-footer-top { display: flex; justify-content: space-between; margin-bottom: 60px; }
+.sk-footer {
+    background: #333333;
+    padding: 80px;
+    margin-top: 100px;
+}
+
+.sk-footer-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 60px;
+}
+
 .sk-f-logo { width: 180px; height: 80px; border-radius: 8px; }
 .sk-f-nav { width: 220px; height: 160px; border-radius: 8px; }
 .sk-f-lang { width: 160px; height: 110px; border-radius: 8px; }
 .sk-f-line { width: 100%; height: 1px; background: #555555; }
+
+@media (max-width: 768px) {
+    .sk-header {
+        padding: 24px 20px;
+    }
+
+    .sk-nav {
+        width: 220px;
+    }
+
+    #loading-skeleton[data-kind="detail"] .sk-header {
+        padding: 16px 20px;
+    }
+
+    .sk-detail-container {
+        margin-top: 0;
+    }
+
+    #loading-skeleton[data-kind="detail"] .sk-header + .sk-detail-container {
+        margin-top: 88px;
+    }
+
+    .sk-detail-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .sk-back-btn {
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+    }
+
+    .sk-detail-title {
+        width: 100%;
+        height: 30px;
+    }
+
+    .sk-detail-hero {
+        height: clamp(260px, 42vh, 420px);
+    }
+
+    #loading-skeleton .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sk-contact-card {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .sk-contact-title,
+    .sk-contact-desc,
+    .sk-contact-action {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .sk-container,
+    .sk-detail-container {
+        width: min(1280px, 94%);
+    }
+
+    .sk-title-sm {
+        width: 240px;
+    }
+
+    .sk-subtitle-sm {
+        width: 320px;
+    }
+
+    .sk-contact-card {
+        padding: 16px;
+    }
+
+    #loading-skeleton .card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sk-footer {
+        padding: 48px 20px;
+    }
+}

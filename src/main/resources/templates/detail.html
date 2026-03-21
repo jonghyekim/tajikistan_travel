@@ -15,9 +15,65 @@
     <link rel="stylesheet" href="../css/header.css" />
     <link rel="stylesheet" href="../css/detail.css" />
     <link rel="stylesheet" href="../css/footer.css" />
+    <link rel="stylesheet" th:href="@{/css/skeleton.css}">
+    <style>
+        html, body { background: #f5f5f5; }
+    </style>
+    <script defer th:src="@{/js/skeleton.js}"></script>
+    <noscript>
+        <style>
+            #loading-skeleton { display: none !important; }
+            #main-content { visibility: visible !important; opacity: 1 !important; }
+        </style>
+    </noscript>
 </head>
 
-<body>
+<body class="skeleton-pending" data-skeleton-kind="detail">
+    <div id="loading-skeleton" data-kind="detail">
+        <div class="sk-header">
+            <div class="skeleton-box sk-logo"></div>
+            <div class="skeleton-box sk-nav"></div>
+            <div class="skeleton-box sk-lang-group"></div>
+        </div>
+
+        <div class="sk-detail-container">
+            <div class="sk-detail-meta-row">
+                <div class="skeleton-box sk-chip sk-chip-long"></div>
+                <div class="skeleton-box sk-chip"></div>
+            </div>
+
+            <div class="sk-detail-title-row">
+                <div class="skeleton-box sk-back-btn"></div>
+                <div class="skeleton-box sk-detail-title"></div>
+            </div>
+        </div>
+
+        <div class="sk-detail-hero-shell">
+            <div class="skeleton-box sk-detail-hero"></div>
+        </div>
+
+        <div class="sk-detail-container">
+            <div class="sk-detail-content-wrap">
+                <div class="sk-text-block">
+                    <div class="skeleton-box sk-text-line is-wide"></div>
+                    <div class="skeleton-box sk-text-line is-wide"></div>
+                    <div class="skeleton-box sk-text-line is-mid"></div>
+                    <div class="skeleton-box sk-text-line is-short"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sk-footer">
+            <div class="sk-footer-top">
+                <div class="skeleton-box sk-f-logo"></div>
+                <div class="skeleton-box sk-f-nav"></div>
+                <div class="skeleton-box sk-f-lang"></div>
+            </div>
+            <div class="skeleton-box sk-f-line"></div>
+        </div>
+    </div>
+
+    <div id="main-content">
     <!-- header -->
     <div th:replace="components/header :: header"></div>
 
@@ -86,6 +142,7 @@
 
     <!-- footer -->
     <div th:replace="components/footer :: footer"></div>
+    </div>
 </body>
 
 </html>

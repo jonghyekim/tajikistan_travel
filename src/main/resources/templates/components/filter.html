@@ -13,11 +13,21 @@
 	<link rel="stylesheet" th:href="@{/css/filter.css}">
 	<link rel="stylesheet" th:href="@{/css/footer.css}">
 	<link rel="stylesheet" th:href="@{/css/skeleton.css}">
+    <style>
+        html, body { background: #f5f5f5; }
+    </style>
+    <script defer th:src="@{/js/skeleton.js}"></script>
+    <noscript>
+        <style>
+            #loading-skeleton { display: none !important; }
+            #main-content { visibility: visible !important; opacity: 1 !important; }
+        </style>
+    </noscript>
 
 </head>
 
-<body>
-<div id="loading-skeleton">
+<body class="skeleton-pending" data-skeleton-kind="filter">
+<div id="loading-skeleton" data-kind="filter">
   <div class="sk-header">
     <div class="skeleton-box sk-logo"></div>
     <div class="skeleton-box sk-nav"></div>
@@ -130,7 +140,7 @@
   </div>
 </div>
 	
-<div id="main-content" style="visibility:hidden; opacity:0; transition: opacity 0.4s ease;">
+<div id="main-content">
     <!-- header -->
     <div th:replace="components/header :: header"></div>
 
@@ -268,23 +278,6 @@
     <!-- footer -->
     <div th:replace="components/footer :: footer"></div>
     </div>
-    
-    <script>
-  window.addEventListener('load', function () {
-    const skeleton = document.getElementById('loading-skeleton');
-    const mainContent = document.getElementById('main-content');
-
-    document.body.style.overflow = 'hidden';
-    
-    setTimeout(() => {
-      skeleton.style.display = 'none';
-      mainContent.style.visibility = 'visible';
-      mainContent.style.opacity = '1';
-      
-      document.body.style.overflow = '';
-    }, 3000);
-  });
-</script>
 </body>
 
 </html>

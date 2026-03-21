@@ -87,11 +87,17 @@
 
   function goToLogin() {
     const lang = getLangFromUrl();
+    if (global.PageSkeleton && typeof global.PageSkeleton.show === "function") {
+      global.PageSkeleton.show();
+    }
     window.location.href = "/auth/login?lang=" + encodeURIComponent(lang);
   }
   
   function goToSignup() {
     const lang = getLangFromUrl();
+    if (global.PageSkeleton && typeof global.PageSkeleton.show === "function") {
+      global.PageSkeleton.show();
+    }
     window.location.href = "/auth/signup?lang=" + encodeURIComponent(lang);
   }
 
@@ -115,6 +121,9 @@
     } finally {
       clearTokens();
       // 현재 페이지 유지하며 새로고침(헤더 반영)
+      if (global.PageSkeleton && typeof global.PageSkeleton.show === "function") {
+        global.PageSkeleton.show();
+      }
       window.location.reload();
     }
   }
