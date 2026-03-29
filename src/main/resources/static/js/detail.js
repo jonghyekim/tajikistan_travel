@@ -138,7 +138,7 @@ async function toggleFavorite(placeId, btnFavorite) {
             btnFavorite.classList.remove('active');
             btnFavorite.setAttribute('aria-label', '찜하기');
             const icon = btnFavorite.querySelector('.favorite-icon');
-            if (icon) icon.textContent = 'favorite_border';
+            if (icon) icon.textContent = 'favorite';
         } else {
             // Adding to favorites
             btnFavorite.classList.add('active');

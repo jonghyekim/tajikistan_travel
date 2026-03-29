@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Load favorites
     await loadFavorites(lang);
+    
+    // Attach favorite button listeners
+    attachFavoriteButtonListeners();
 });
 
 /**
@@ -116,6 +119,9 @@ function displayFavorites(places, lang) {
         }
     });
 
+    // Load ratings
+    loadRatings();
+
     // Hide skeleton loading
     const skeleton = document.getElementById('loading-skeleton');
     if (skeleton) {
@@ -146,17 +152,18 @@ function createPlaceCard(place, lang) {
     const category = place.categoryName || 'Category';
     const region = place.regionName || 'Region';
     const content = place.content || '';
+    const placeId = place.placeId;
 
-    // Create the link element
+    // Create wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'place-card-wrapper';
+
+    // Create the link element (only for image)
     const link = document.createElement('a');
     link.className = 'place-card-link';
-    link.href = `/detail/${place.placeId}?lang=${lang}&back=/me/favorites?lang=${lang}`;
+    link.href = `/detail/${placeId}?lang=${lang}&back=/me/favorites?lang=${lang}`;
     link.style.textDecoration = 'none';
     link.style.color = 'inherit';
-
-    // Create the article element
-    const article = document.createElement('article');
-    article.className = 'place-card';
 
     // Create the thumbnail div
     const thumbDiv = document.createElement('div');
@@ -172,16 +179,56 @@ function createPlaceCard(place, lang) {
     categoryBadge.textContent = escapeHtml(category);
     thumbDiv.appendChild(categoryBadge);
 
-    article.appendChild(thumbDiv);
+    link.appendChild(thumbDiv);
+    wrapper.appendChild(link);
 
     // Create the body div
     const bodyDiv = document.createElement('div');
     bodyDiv.className = 'place-body';
 
+    // Create header with title and rating/favorite
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'place-header';
+
     const titleElem = document.createElement('h3');
     titleElem.className = 'place-title';
     titleElem.textContent = escapeHtml(title);
-    bodyDiv.appendChild(titleElem);
+    headerDiv.appendChild(titleElem);
+
+    const metaDiv = document.createElement('div');
+    metaDiv.className = 'place-title-meta';
+
+    const ratingSpan = document.createElement('span');
+    ratingSpan.className = 'place-rating';
+
+    const starIcon = document.createElement('span');
+    starIcon.className = 'material-icons rating-icon';
+    starIcon.textContent = 'star';
+    ratingSpan.appendChild(starIcon);
+
+    const ratingValue = document.createElement('span');
+    ratingValue.className = 'rating-value';
+    ratingValue.setAttribute('data-place-id', placeId);
+    ratingValue.textContent = '0.0';
+    ratingSpan.appendChild(ratingValue);
+
+    metaDiv.appendChild(ratingSpan);
+
+    // Create favorite button inside meta
+    const favoriteBtn = document.createElement('button');
+    favoriteBtn.className = 'favorite-btn is-favorite';
+    favoriteBtn.setAttribute('data-place-id', placeId);
+    favoriteBtn.setAttribute('type', 'button');
+    favoriteBtn.setAttribute('aria-label', 'Remove from favorites');
+    
+    const favoriteIcon = document.createElement('span');
+    favoriteIcon.className = 'material-icons';
+    favoriteIcon.textContent = 'favorite';
+    favoriteBtn.appendChild(favoriteIcon);
+
+    metaDiv.appendChild(favoriteBtn);
+    headerDiv.appendChild(metaDiv);
+    bodyDiv.appendChild(headerDiv);
 
     if (content) {
         const descElem = document.createElement('p');
@@ -209,10 +256,9 @@ function createPlaceCard(place, lang) {
     tagsDiv.appendChild(regionBadge);
     bodyDiv.appendChild(tagsDiv);
 
-    article.appendChild(bodyDiv);
-    link.appendChild(article);
+    wrapper.appendChild(bodyDiv);
 
-    return link;
+    return wrapper;
 }
 
 /**
@@ -262,4 +308,102 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+/**
+ * Load average ratings for all visible place cards
+ */
+async function loadRatings() {
+    const ratingElements = document.querySelectorAll('.rating-value[data-place-id]');
+    
+    const ratingPromises = Array.from(ratingElements).map(async (element) => {
+        const placeId = element.getAttribute('data-place-id');
+        try {
+            const rating = await fetchRating(placeId);
+            element.textContent = rating.toFixed(1);
+        } catch (error) {
+            console.error(`Failed to load rating for place ${placeId}:`, error);
+            element.textContent = '0.0';
+        }
+    });
+    
+    await Promise.all(ratingPromises);
+}
+
+/**
+ * Fetch average rating for a specific place
+ */
+async function fetchRating(placeId) {
+    const response = await Auth.authFetch(`/api/reviews/${placeId}`);
+    
+    if (!response.ok) {
+        return 0;
+    }
+    
+    const data = await response.json();
+    return data.averageRating || 0;
+}
+
+/**
+ * Attach click listeners to all favorite buttons
+ */
+function attachFavoriteButtonListeners() {
+    const buttons = document.querySelectorAll('.favorite-btn');
+    
+    buttons.forEach(btn => {
+        btn.addEventListener('click', handleFavoriteClick);
+    });
+}
+
+/**
+ * Handle click on favorite button
+ */
+async function handleFavoriteClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const placeId = this.getAttribute('data-place-id');
+    const isFavorite = this.classList.contains('is-favorite');
+    
+    try {
+        if (isFavorite) {
+            // Remove from favorites
+            const response = await Auth.authFetch(`/me/favorite/delete/${placeId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.status === 401) {
+                Auth.goToLogin();
+                return;
+            }
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            // Remove the entire card from the DOM
+            const card = this.closest('.place-card-wrapper');
+            if (card) {
+                card.remove();
+            }
+            
+            // Update results count
+            const resultsDiv = document.getElementById('favorites-count');
+            const currentCount = document.querySelectorAll('.place-card-wrapper').length;
+            if (resultsDiv) {
+                resultsDiv.textContent = `${currentCount} Results`;
+            }
+            
+            // Show empty message if no favorites left
+            if (currentCount === 0) {
+                const emptyDiv = document.getElementById('favorites-empty');
+                if (emptyDiv) {
+                    emptyDiv.style.display = 'block';
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Failed to update favorite status:', error);
+        alert('Failed to update favorite information.');
+    }
 }

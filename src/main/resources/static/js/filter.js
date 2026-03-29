@@ -89,11 +89,8 @@ async function loadFavorites() {
  */
 function updateFavoriteButtonIcon(button) {
   const icon = button.querySelector('.material-icons');
-  if (button.classList.contains('is-favorite')) {
-    icon.textContent = 'favorite';
-  } else {
-    icon.textContent = 'favorite_border';
-  }
+  // Always use filled heart (favorite), only color changes
+  icon.textContent = 'favorite';
 }
 
 /**
@@ -115,6 +112,12 @@ async function handleFavoriteClick(event) {
   // Prevent default link behavior
   event.preventDefault();
   event.stopPropagation();
+  
+  // Check if user is logged in first
+  if (!Auth || !Auth.isLoggedIn()) {
+    handleUnauthorized();
+    return;
+  }
   
   const placeId = this.getAttribute('data-place-id');
   const isFavorite = this.classList.contains('is-favorite');
@@ -157,7 +160,7 @@ async function handleFavoriteClick(event) {
     }
   } catch (error) {
     console.error('Failed to update favorite status:', error);
-    alert('찜 정보를 업데이트하는데 실패했습니다.');
+    alert('Failed to update favorite information.');
   }
 }
 
@@ -165,7 +168,7 @@ async function handleFavoriteClick(event) {
  * Handle unauthorized access (not logged in)
  */
 function handleUnauthorized() {
-  const message = '로그인이 필요합니다.';
+  const message = 'Please log in to add favorites.';
   alert(message);
-  window.location.href = '/login';
+  Auth.goToLogin();
 }
