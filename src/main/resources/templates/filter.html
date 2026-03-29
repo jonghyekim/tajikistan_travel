@@ -215,49 +215,64 @@
                 </div>
 
                 <div class="card-grid">
-                    <a class="place-card-link"
+                    <div class="place-card-wrapper"
                        th:if="${results != null && !results.isEmpty()}"
                        th:each="place : ${results}"
                        th:with="thumbUrl=${(place.images != null and place.images.size() > 0 and place.images[0] != null) ? place.images[0].fileUrl : null},
                                 backUrl=${#httpServletRequest.requestURI + (#httpServletRequest.queryString != null ? '?' + #httpServletRequest.queryString : '')}"
-                       th:href="@{/detail/{id}(id=${place.placeId}, lang=${lang}, back=${backUrl})}"
-                       style="text-decoration:none; color:inherit;">
-
-                        <article class="place-card">
+                    >
+                        <a class="place-card-link"
+                           th:href="@{/detail/{id}(id=${place.placeId}, lang=${lang}, back=${backUrl})}"
+                           style="text-decoration:none; color:inherit;">
                             <div class="place-thumb">
                                 <img th:src="${thumbUrl} ?: @{/assets/images/home_reg_2.png}"
-     								alt="Place image" />
-
+         								alt="Place image" />
 
                                 <span class="badge badge-top"
                                       th:text="${place.category.displayName != null ? place.category.displayName : place.category.code}">
                                     Category
                                 </span>
                             </div>
+                        </a>
 
-                            <div class="place-body">
+                        <div class="place-body">
+                            <div class="place-header">
                                 <h3 class="place-title"
                                     th:text="${place.displayI18n != null && place.displayI18n.title != null ? place.displayI18n.title : #messages.msg('place.no_title')}">
                                     Place Title
                                 </h3>
 
-                                <p class="place-desc"
-                                   th:if="${place.displayI18n != null and place.displayI18n.content != null}"
-                                   th:text="${place.displayI18n.content}">
-                                </p>
-
-                                <div class="place-tags">
-                                    <span class="badge badge-bottom">
-                                        <span class="material-icons" aria-hidden="true">location_on</span>
-                                        <span
-                                            th:text="${place.region.displayName != null ? place.region.displayName : place.region.code}">
-                                            Region
-                                        </span>
+                                <div class="place-title-meta">
+                                    <span class="place-rating">
+                                        <span class="material-icons rating-icon">star</span>
+                                        <span class="rating-value" th:attr="data-place-id=${place.placeId}">0.0</span>
                                     </span>
+
+                                    <button class="favorite-btn" 
+                                            th:attr="data-place-id=${place.placeId}"
+                                            type="button"
+                                            aria-label="Add to favorites">
+                                        <span class="material-icons">favorite_border</span>
+                                    </button>
                                 </div>
                             </div>
-                        </article>
-                    </a>
+
+                            <p class="place-desc"
+                               th:if="${place.displayI18n != null and place.displayI18n.content != null}"
+                               th:text="${place.displayI18n.content}">
+                            </p>
+
+                            <div class="place-tags">
+                                <span class="badge badge-bottom">
+                                    <span class="material-icons" aria-hidden="true">location_on</span>
+                                    <span
+                                        th:text="${place.region.displayName != null ? place.region.displayName : place.region.code}">
+                                        Region
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- No Results -->
                     <div th:if="${results != null && results.isEmpty()}"
@@ -318,6 +333,8 @@
     <!-- footer -->
     <div th:replace="components/footer :: footer"></div>
     </div>
+    
+    <script th:src="@{/js/filter.js}"></script>
 </body>
 
 </html>
