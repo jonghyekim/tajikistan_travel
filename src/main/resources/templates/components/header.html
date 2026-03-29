@@ -199,6 +199,40 @@
                         </button>
                     </form>
                 </div>
+
+                <div th:if="${currentPage == 'favorites'}">
+                    <!-- EN -->
+                    <form th:action="@{/me/favorites}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="en">
+                        <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
+                            <img src="../assets/icons/lang_en_icon.png" alt="EN">
+                        </button>
+                    </form>
+
+                    <!-- TJ -->
+                    <form th:action="@{/me/favorites}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="tg">
+                        <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
+                            <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
+                        </button>
+                    </form>
+
+                    <!-- RU -->
+                    <form th:action="@{/me/favorites}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="ru">
+                        <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
+                            <img src="../assets/icons/lang_ru_icon.png" alt="RU">
+                        </button>
+                    </form>
+
+                    <!-- KO -->
+                    <form th:action="@{/me/favorites}" method="get" style="display:inline;">
+                        <input type="hidden" name="lang" value="ko">
+                        <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
+                            <img src="../assets/icons/lang_ko_icon.png" alt="KO">
+                        </button>
+                    </form>
+                </div>
             </div>
 
         </div>

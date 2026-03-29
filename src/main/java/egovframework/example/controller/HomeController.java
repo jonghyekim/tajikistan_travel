@@ -204,6 +204,20 @@ public class HomeController {
         return "emergency_contacts";
     }
 
+    // My Favorites page
+    @GetMapping("/me/favorites")
+    public String myFavorites(@RequestParam(required = false) String lang,
+                              Model model,
+                              HttpServletRequest request,
+                              HttpServletResponse response) {
+        String resolvedLang = resolveLang(lang, request, response);
+
+        model.addAttribute("lang", resolvedLang);
+        model.addAttribute("currentPage", "favorites");
+
+        return "mypage_favorites";
+    }
+
     private String normalizeBackUrl(String back, String lang) {
         if (back == null || back.isBlank()) return null;
         if (!back.startsWith("/")) return null;
