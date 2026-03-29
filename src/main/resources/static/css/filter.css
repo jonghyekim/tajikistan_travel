@@ -181,15 +181,21 @@ body {
 }
 
 /* card */
-.place-card {
+.place-card-wrapper {
     background: #fff;
     border-radius: 28px;
     overflow: hidden;
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
-
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
+}
+
+.place-card-link {
+    display: flex;
+    text-decoration: none;
+    color: inherit;
 }
 
 .place-thumb {
@@ -197,6 +203,7 @@ body {
     width: 100%;
     aspect-ratio: 16 / 9;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .place-thumb img {
@@ -237,11 +244,20 @@ body {
     flex: 1;
 }
 
+.place-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
 .place-title {
     margin: 0;
     font-size: 20px;
     font-weight: 700;
     letter-spacing: -0.01em;
+    flex: 1;
 }
 
 .place-desc {
@@ -275,6 +291,65 @@ body {
 .badge-bottom .material-icons {
     font-size: 16px;
     color: #134928;
+}
+
+/* Favorite Button & Rating */
+
+.place-title-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.favorite-btn {
+    width: auto;
+    height: auto;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: #ccc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.2s ease;
+    z-index: 10;
+}
+
+.favorite-btn:hover:not(.is-favorite) {
+    color: #ff6b5b;
+}
+
+.favorite-btn.is-favorite:hover {
+    color: #ccc;
+}
+
+.favorite-btn .material-icons {
+    font-size: 24px;
+}
+
+.favorite-btn.is-favorite {
+    color: #ff6b5b;
+}
+
+/* 평점 표시 */
+.place-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rating-icon {
+    font-size: 18px;
+    color: #ffc107;
+}
+
+.rating-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1b1b;
 }
 
 /* =========================

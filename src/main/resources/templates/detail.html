@@ -20,6 +20,8 @@
         html, body { background: #f5f5f5; }
     </style>
     <script defer th:src="@{/js/skeleton.js}"></script>
+    <meta name="place-id" th:content="${place != null ? place.placeId : ''}" />
+    <meta name="place-title" th:content="${place != null && place.displayI18n != null ? place.displayI18n.title : ''}" />
     <noscript>
         <style>
             #loading-skeleton { display: none !important; }
@@ -111,6 +113,20 @@
                     th:text="${place != null && place.displayI18n != null && place.displayI18n.title != null ? place.displayI18n.title : #messages.msg('place.no_title')}">
                     Place Title
                 </h1>
+
+                <!-- Rating and Favorite Button -->
+                <div class="detail-title-right">
+                    <div class="detail-rating" id="detail-rating" style="display:none;">
+                        <span class="material-icons rating-icon">star</span>
+                        <span class="rating-value"></span>
+                        <span class="rating-count"></span>
+                    </div>
+                    <button type="button" class="btn-favorite" id="btn-favorite" 
+                            aria-label="Add to favorites"
+                            th:attr="aria-label=#{detail.favorite.aria}">
+                        <span class="material-icons favorite-icon">favorite</span>
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -137,11 +153,59 @@
                     <span th:text="#{detail.no_description}">No description available.</span>
                 </p>
             </section>
+
+            <!-- reviews section -->
+            <section class="detail-reviews" aria-label="Reviews and experiences">
+                <header class="reviews-header">
+                    <span class="material-icons reviews-icon">rate_review</span>
+                    <h2 class="reviews-title" th:text="#{review.section.title}">Reviews & Experiences</h2>
+                </header>
+
+                <!-- review form (only for logged-in) -->
+                <div id="reviews-form-container" class="reviews-form-section" style="display:none;">
+                    <h3 class="reviews-form-title" th:text="#{review.form.title}">Leave a Review</h3>
+                    
+                    <div class="review-form">
+                        <div class="form-group">
+                            <label th:text="#{review.form.rating}">Rating</label>
+                            <div class="star-rating" id="star-rating">
+                                <button type="button" class="star-btn" data-rating="1" aria-label="1 star"><span class="material-icons">star</span></button>
+                                <button type="button" class="star-btn" data-rating="2" aria-label="2 stars"><span class="material-icons">star</span></button>
+                                <button type="button" class="star-btn" data-rating="3" aria-label="3 stars"><span class="material-icons">star</span></button>
+                                <button type="button" class="star-btn" data-rating="4" aria-label="4 stars"><span class="material-icons">star</span></button>
+                                <button type="button" class="star-btn" data-rating="5" aria-label="5 stars"><span class="material-icons">star</span></button>
+                                <span class="star-display"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="review-content" th:text="#{review.form.comment}">Your Comment</label>
+                            <textarea id="review-content" class="review-textarea" 
+                                      th:placeholder="#{review.form.placeholder}"
+                                      placeholder="Share your experience..."></textarea>
+                        </div>
+
+                        <button type="button" id="submit-review-btn" class="btn-submit-review" 
+                                th:text="#{review.form.submit}">Submit Review</button>
+                    </div>
+                </div>
+
+                <!-- reviews list -->
+                <div id="reviews-list-container" class="reviews-list-section">
+                    <div id="reviews-list" class="reviews-list"></div>
+                    <div id="reviews-empty" class="reviews-empty" style="display:none;">
+                        <span th:text="#{review.empty}">No reviews yet.</span>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
     <!-- footer -->
     <div th:replace="components/footer :: footer"></div>
+    <script th:src="@{/js/auth.js}"></script>
+    <script th:src="@{/js/detail.js}"></script>
+    <script th:src="@{/js/reviews.js}"></script>
     </div>
 </body>
 
