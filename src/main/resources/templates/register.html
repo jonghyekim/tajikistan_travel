@@ -1,81 +1,253 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" th:lang="${lang}" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>Register</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{register.page.title}">Sign Up - Welcome Tajikistan</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+
+    <style>
+        html, body {
+            background: #f5f5f5;
+        }
+    </style>
 </head>
 
 <body>
+    <div class="auth-page">
+        <!-- Background with overlay -->
+        <div class="auth-bg"></div>
+        <div class="auth-overlay"></div>
 
-<h2>Register</h2>
+        <!-- Auth Container -->
+        <div class="auth-container">
+            <div class="auth-card">
+                <!-- Logo -->
+                <div class="auth-header-logo">
+                    <a href="/" style="display: inline-flex;">
+                        <img src="../assets/logo/header_logo.png" alt="Welcome Tajikistan"
+                             th:attr="alt=#{site.title}" />
+                    </a>
+                </div>
 
-<form id="registerForm">
+                <!-- Header -->
+                <div class="auth-header">
+                    <h1 class="auth-title" th:text="#{register.title}">Create Your Account</h1>
+                    <p class="auth-subtitle" th:text="#{register.subtitle}">
+                        Join our community to save favorites and personalize your journey
+                    </p>
+                </div>
 
-	<div>
-        <label>Nickname</label>
-        <input type="text" id="nickname" required>
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form">
+                    <!-- Nickname Field -->
+                    <div class="form-group">
+                        <label for="nickname" class="form-label">
+                            <span th:text="#{register.nickname}">Display Name</span>
+                            <span class="required">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="nickname"
+                            name="nickname"
+                            class="form-input"
+                            th:placeholder="#{register.nickname.placeholder}"
+                            placeholder="How should we call you?"
+                            required
+                            minlength="2"
+                            maxlength="50" />
+                    </div>
+
+                    <!-- Username Field -->
+                    <div class="form-group">
+                        <label for="username" class="form-label">
+                            <span th:text="#{register.username}">Username</span>
+                            <span class="required">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="form-input"
+                            th:placeholder="#{register.username.placeholder}"
+                            placeholder="Choose a unique username"
+                            required
+                            minlength="3"
+                            maxlength="30"
+                            autocomplete="username" />
+                        <small style="font-size: 12px; color: #888; margin-top: 4px; display: block;">
+                            <span th:text="#{register.username.hint}">3-30 characters, no spaces</span>
+                        </small>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <span th:text="#{register.email}">Email Address</span>
+                            <span class="required">*</span>
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-input"
+                            th:placeholder="#{register.email.placeholder}"
+                            placeholder="your@email.com"
+                            required
+                            autocomplete="email" />
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">
+                            <span th:text="#{register.password}">Password</span>
+                            <span class="required">*</span>
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input"
+                            th:placeholder="#{register.password.placeholder}"
+                            placeholder="Create a strong password"
+                            required
+                            minlength="6"
+                            autocomplete="new-password" />
+                        <small style="font-size: 12px; color: #888; margin-top: 4px; display: block;">
+                            <span th:text="#{register.password.hint}">Minimum 6 characters</span>
+                        </small>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="message" class="form-message error" style="display: none;"></div>
+
+                    <!-- Sign Up Button -->
+                    <button type="submit" class="form-button form-button-primary">
+                        <span th:text="#{register.button}">Create Account</span>
+                    </button>
+
+                    <!-- Divider (Optional) -->
+                    <!-- <div class="form-divider" th:text="#{register.divider}">or</div> -->
+                </form>
+
+                <!-- Footer Links -->
+                <div class="form-footer">
+                    <p>
+                        <span th:text="#{register.loginPrompt}">Already have an account?</span>
+                        <a href="/auth/login" class="form-link" th:text="#{register.loginLink}">
+                            Sign In
+                        </a>
+                    </p>
+                    <p style="font-size: 12px; color: #999; margin-top: 12px;">
+                        <span th:text="#{register.terms}">By creating an account, you agree to our Terms of Service</span>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div>
-        <label>Username</label>
-        <input type="text" id="username" required>
-    </div>
+    <!-- Validation Script -->
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
 
-    <div>
-        <label>Password</label>
-        <input type="password" id="password" required>
-    </div>
+            const nickname = document.getElementById("nickname").value.trim();
+            const username = document.getElementById("username").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const messageElement = document.getElementById("message");
+            const submitButton = e.target.querySelector('button[type="submit"]');
 
-	<div>
-        <label>Email</label>
-        <input type="email" id="email" required>
-    </div>
-    
-    <button type="submit">Register</button>
+            // Clear previous message
+            messageElement.style.display = "none";
 
-</form>
+            // Basic validation
+            if (!nickname || !username || !email || !password) {
+                messageElement.innerText = "Please fill in all fields";
+                messageElement.className = "form-message error";
+                messageElement.style.display = "block";
+                return;
+            }
 
-<p id="message"></p>
+            if (username.length < 3) {
+                messageElement.innerText = "Username must be at least 3 characters";
+                messageElement.className = "form-message error";
+                messageElement.style.display = "block";
+                return;
+            }
 
-<script>
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                messageElement.innerText = "Please enter a valid email address";
+                messageElement.className = "form-message error";
+                messageElement.style.display = "block";
+                return;
+            }
 
-document.getElementById("registerForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+            if (password.length < 6) {
+                messageElement.innerText = "Password must be at least 6 characters";
+                messageElement.className = "form-message error";
+                messageElement.style.display = "block";
+                return;
+            }
 
-    const username = document.getElementById("username").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const nickname = document.getElementById("nickname").value;
+            // Set loading state
+            submitButton.disabled = true;
+            submitButton.classList.add("loading");
 
-    try {
+            try {
+                const response = await fetch("/auth/signup", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password,
+                        nickname: nickname
+                    })
+                });
 
-        const response = await fetch("/auth/signup", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                username: username,
-                email: email,
-                password: password,
-                nickname: nickname
-            })
+                if (!response.ok) {
+                    let errorMsg = "Registration failed. Please try again.";
+                    
+                    if (response.status === 409) {
+                        errorMsg = "Username or email already exists";
+                    } else if (response.status === 400) {
+                        errorMsg = "Invalid input. Please check your information.";
+                    }
+
+                    messageElement.innerText = errorMsg;
+                    messageElement.className = "form-message error";
+                    messageElement.style.display = "block";
+                    return;
+                }
+
+                // Success
+                messageElement.innerText = "Account created successfully! Redirecting to login...";
+                messageElement.className = "form-message success";
+                messageElement.style.display = "block";
+
+                // Redirect after short delay
+                setTimeout(() => {
+                    window.location.href = "/auth/login";
+                }, 1500);
+
+            } catch (err) {
+                console.error("Registration error:", err);
+                messageElement.innerText = "An error occurred. Please try again.";
+                messageElement.className = "form-message error";
+                messageElement.style.display = "block";
+            } finally {
+                // Reset loading state (in case of error)
+                submitButton.disabled = false;
+                submitButton.classList.remove("loading");
+            }
         });
-
-        if (!response.ok) {
-            throw new Error("register failed");
-        }
-
-        document.getElementById("message").innerText = "Register success. Please login.";
-        window.location.href = "/auth/login";
-
-    } catch (err) {
-        document.getElementById("message").innerText = "Register failed";
-    }
-
-});
-
-</script>
-
+    </script>
 </body>
+
 </html>

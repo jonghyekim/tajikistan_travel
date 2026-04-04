@@ -1,0 +1,554 @@
+/* auth.css - Modern Login & Register Pages */
+
+* {
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'Pretendard';
+    src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
+    font-weight: 45 920;
+    font-style: normal;
+    font-display: swap;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Pretendard', sans-serif;
+    background: #f5f5f5;
+}
+
+/* =========================
+   Auth Container (Hero Section)
+========================= */
+
+.auth-page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.auth-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('../assets/images/home_hero.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    z-index: 0;
+}
+
+/* Overlay for readability */
+.auth-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(45, 74, 142, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 1;
+}
+
+/* =========================
+   Auth Card Container
+========================= */
+
+.auth-container {
+    position: relative;
+    z-index: 2;
+    width: min(440px, 92%);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 28px;
+    padding: 44px 36px;
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: slideInCard 0.5s ease-out 0.1s backwards;
+}
+
+@keyframes slideInCard {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* =========================
+   Typography
+========================= */
+
+.auth-header {
+    text-align: center;
+    margin: 0 0 32px;
+}
+
+.auth-title {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1b1b1b;
+    letter-spacing: -0.01em;
+}
+
+.auth-subtitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 400;
+    color: #666666;
+    line-height: 1.5;
+}
+
+/* =========================
+   Form Elements
+========================= */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: fadeIn 0.4s ease-out backwards;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.15s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.25s; }
+.form-group:nth-child(4) { animation-delay: 0.3s; }
+
+/* Password visibility toggle */
+.password-group {
+    position: relative;
+}
+
+.password-group .form-input {
+    padding-right: 52px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b8b8b8;
+    font-size: 20px;
+    transition: color 0.2s ease-out;
+    line-height: 1;
+}
+
+.password-toggle:hover {
+    color: #666666;
+}
+
+.password-toggle:focus {
+    outline: none;
+    color: #0d3aa3;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1b1b;
+    letter-spacing: -0.005em;
+}
+
+.form-label .required {
+    color: #e74c3c;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e8edf8;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: 'Pretendard', sans-serif;
+    color: #1b1b1b;
+    background: #ffffff;
+    transition: all 0.25s ease-out;
+    outline: none;
+}
+
+.form-input::placeholder {
+    color: #b8b8b8;
+}
+
+.form-input:hover {
+    border-color: #d0daf0;
+}
+
+.form-input:focus {
+    border-color: #0d3aa3;
+    box-shadow: 0 0 0 3px rgba(13, 58, 163, 0.1);
+    background: #fafbfd;
+}
+
+.form-input:disabled {
+    background: #f5f5f5;
+    color: #999999;
+    cursor: not-allowed;
+}
+
+/* =========================
+   Buttons
+========================= */
+
+.form-button {
+    width: 100%;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Pretendard', sans-serif;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    transition: all 0.25s ease-out;
+    outline: none;
+    margin-top: 8px;
+    animation: fadeIn 0.4s ease-out backwards 0.35s;
+}
+
+.form-button-primary {
+    background: linear-gradient(135deg, #0d3aa3 0%, #1e4ca8 100%);
+    color: #ffffff;
+    border: none;
+}
+
+.form-button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(13, 58, 163, 0.3);
+    background: linear-gradient(135deg, #0d3aa3 0%, #1e4ca8 100%);
+}
+
+.form-button-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(13, 58, 163, 0.2);
+}
+
+.form-button-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* =========================
+   Links & Navigation
+========================= */
+
+.form-footer {
+    margin-top: 24px;
+    text-align: center;
+    animation: fadeIn 0.4s ease-out backwards 0.4s;
+}
+
+.form-footer p {
+    margin: 0;
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.6;
+}
+
+.form-link {
+    color: #0d3aa3;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease-out;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.form-link:hover {
+    color: #1e4ca8;
+    background: rgba(13, 58, 163, 0.05);
+}
+
+.form-link:active {
+    color: #0a2850;
+}
+
+/* =========================
+   Error & Success Messages
+========================= */
+
+.form-message {
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-message.error {
+    background: #fff5f5;
+    color: #c53030;
+    border: 1px solid #fca5a5;
+}
+
+.form-message.success {
+    background: #f0fdf4;
+    color: #065f46;
+    border: 1px solid #86efac;
+}
+
+/* =========================
+   Header with Logo
+========================= */
+
+.auth-header-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.auth-header-logo img {
+    height: 50px;
+    width: auto;
+}
+
+/* =========================
+   Divider
+========================= */
+
+.form-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    font-size: 13px;
+    color: #b8b8b8;
+    animation: fadeIn 0.4s ease-out backwards 0.32s;
+}
+
+.form-divider::before,
+.form-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e8edf8, transparent);
+}
+
+/* =========================
+   Loading State
+========================= */
+
+.form-button.loading {
+    position: relative;
+    color: transparent;
+}
+
+.form-button.loading::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 50%;
+    left: 50%;
+    margin-left: -9px;
+    margin-top: -9px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================
+   Responsive Design
+========================= */
+
+@media (max-width: 768px) {
+    .auth-card {
+        padding: 36px 24px;
+        border-radius: 24px;
+    }
+
+    .auth-title {
+        font-size: 26px;
+    }
+
+    .auth-container {
+        width: min(100%, 96%);
+    }
+
+    .form-button {
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+
+    .form-input {
+        padding: 11px 14px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-page {
+        padding: 12px;
+    }
+
+    .auth-card {
+        padding: 28px 18px;
+        border-radius: 20px;
+    }
+
+    .auth-header {
+        margin-bottom: 24px;
+    }
+
+    .auth-title {
+        font-size: 22px;
+    }
+
+    .auth-subtitle {
+        font-size: 13px;
+    }
+
+    .form-label {
+        font-size: 13px;
+    }
+
+    .form-input {
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 10px;
+    }
+
+    .form-button {
+        padding: 11px 14px;
+        font-size: 14px;
+        margin-top: 6px;
+    }
+
+    .form-footer p {
+        font-size: 13px;
+    }
+
+    .form-footer {
+        margin-top: 18px;
+    }
+}
+
+/* =========================
+   Accessibility
+========================= */
+
+.form-input:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+.form-button:focus-visible {
+    outline: 2px solid #0d3aa3;
+    outline-offset: 2px;
+}
+
+.form-link:focus-visible {
+    outline: 2px solid #0d3aa3;
+    outline-offset: 2px;
+}
+
+/* =========================
+   Dark Mode Support (Optional)
+========================= */
+
+@media (prefers-color-scheme: dark) {
+    .auth-card {
+        background: rgba(30, 30, 40, 0.92);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .auth-title {
+        color: #ffffff;
+    }
+
+    .auth-subtitle {
+        color: #c0c0c0;
+    }
+
+    .form-label {
+        color: #e0e0e0;
+    }
+
+    .form-input {
+        background: rgba(255, 255, 255, 0.05);
+        color: #e0e0e0;
+        border-color: rgba(13, 58, 163, 0.3);
+    }
+
+    .form-input::placeholder {
+        color: #888888;
+    }
+
+    .form-input:focus {
+        background: rgba(13, 58, 163, 0.15);
+    }
+
+    .form-link {
+        color: #5ba3ff;
+    }
+
+    .form-link:hover {
+        background: rgba(91, 163, 255, 0.1);
+        color: #7bb3ff;
+    }
+}

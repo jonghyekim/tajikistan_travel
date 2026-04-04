@@ -1,7 +1,6 @@
 <!--  header.html  -->
 <header class="header">
     <div class="header-container">
-        <!-- Logo -->
         <div class="header-logo">
             <a th:href="@{/}" class="logo">
                 <img src="../assets/logo/header_logo.png" alt="Welcome Tajikistan"
@@ -10,29 +9,41 @@
         </div>
 
         <!-- Navigation -->
-		<nav class="nav">
-		    <ul>
-		        <li>
-		            <a th:href="@{/filter(lang=${lang})}"
-		               th:classappend="${currentPage == 'filter'} ? 'nav-active' : ''"
+        <nav class="nav">
+            <ul>
+                <li>
+                    <a th:href="@{/filter(lang=${lang})}"
+                       th:classappend="${currentPage == 'filter'} ? 'nav-active' : ''"
                        th:text="#{header.nav.travel}">
-		                Travel Information
-		            </a>
-		        </li>
-		        <li>
-		            <a th:href="@{/emergency_contacts(lang=${lang})}"
-		               th:classappend="${currentPage == 'emergency_contacts'} ? 'nav-active' : ''"
+                        Travel Information
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/emergency_contacts(lang=${lang})}"
+                       th:classappend="${currentPage == 'emergency_contacts'} ? 'nav-active' : ''"
                        th:text="#{header.nav.emergency}">
-		                Emergency Contacts
-		            </a>
-		        </li>
-		    </ul>
-		</nav>
+                        Emergency Contacts
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
         <!-- Language -->
         <div class="language-container">
+            <div id="auth-box" class="auth-box">
+                <div data-auth="guest-actions" class="auth-actions">
+                    <button type="button" data-auth="login" class="auth-btn auth-login">Login</button>
+                    <button type="button" data-auth="signup" class="auth-btn auth-signup">Sign Up</button>
+                </div>
 
-			<!-- For DETAIL PAGE -->
+                <div data-auth="user-panel" class="auth-user-panel" hidden>
+                    <span data-auth="status" class="auth-status">User</span>
+                    <span class="auth-separator" aria-hidden="true">|</span>
+                    <button type="button" data-auth="logout" class="auth-btn auth-logout">Logout</button>
+                </div>
+            </div>
+
+            <!-- For DETAIL PAGE -->
             <div th:if="${placeId != null}">
                 <!-- EN -->
                 <form th:action="@{/detail/{id}(id=${placeId})}" method="get" style="display:inline;">
@@ -70,15 +81,6 @@
                     </button>
                 </form>
             </div>
-            
-            <!-- Auth UI (login status + buttons) -->
-			<div id="auth-box" class="auth-box">
-			    <span data-auth="status" class="auth-status"></span>
-			    
-			    <button type="button" data-auth="login" class="auth-btn">Login</button>
-			    <button type="button" data-auth="signup" class="auth-btn">Sign Up</button>
-			    <button type="button" data-auth="logout" class="auth-btn" style="display:none;">Logout</button>
-			</div>
 
             <!-- Except DETAIL PAGE -->
             <div th:if="${placeId == null}">

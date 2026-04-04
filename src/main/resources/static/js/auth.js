@@ -137,16 +137,22 @@
     const signupBtn = box.querySelector('[data-auth="signup"]'); // ✅ 추가
     const logoutBtn = box.querySelector('[data-auth="logout"]');
     const statusText = box.querySelector('[data-auth="status"]');
+    const guestActions = box.querySelector('[data-auth="guest-actions"]');
+    const userPanel = box.querySelector('[data-auth="user-panel"]');
 
     if (isLoggedIn()) {
 	  const currentNickname = getNickname() || "User"; // 저장된 닉네임을 가져옴 (없으면 User)
 	  if (statusText) statusText.textContent = `${currentNickname}`;
+      if (guestActions) guestActions.style.display = "none";
+      if (userPanel) userPanel.hidden = false;
 	  
       if (loginBtn) loginBtn.style.display = "none";
       if (signupBtn) signupBtn.style.display = "none"; // ✅ 추가
       if (logoutBtn) logoutBtn.style.display = "inline-flex";
     } else {
       if (statusText) statusText.textContent = "";
+      if (guestActions) guestActions.style.display = "inline-flex";
+      if (userPanel) userPanel.hidden = true;
       if (loginBtn) loginBtn.style.display = "inline-flex";
       if (signupBtn) signupBtn.style.display = "inline-flex"; // ✅ 추가
       if (logoutBtn) logoutBtn.style.display = "none";
