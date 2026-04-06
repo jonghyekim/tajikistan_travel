@@ -80,8 +80,8 @@ body {
 }
 
 .dashboard-tab:not(.active) {
-    background: #B4B2B2;
-    color: #EAEAEA;
+    background: #EAEAEA;
+    color: #B4B2B2;
 }
 
 .dashboard-section-header {

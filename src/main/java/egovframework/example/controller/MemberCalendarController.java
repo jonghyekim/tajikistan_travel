@@ -1,61 +1,70 @@
 package egovframework.example.controller;
 
-import java.util.Locale;
+import java.time.LocalDate;
+import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.ui.Model;
-import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping("/me")
+import egovframework.example.dto.calendar.CalendarPlaceResponseDto;
+import egovframework.example.dto.calendar.CalendarRequestDto;
+import egovframework.example.service.MemberCalendarService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/me/calendar")
+@RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class MemberCalendarController {
-    @Autowired private LocaleResolver localeResolver;
 
-    // Calendar 페이지
-    @GetMapping("/calendar")
-    public String calendarPage(@RequestParam(required = false) String lang,
-                               Model model,
-                               HttpServletRequest request,
-                               HttpServletResponse response) {
-        model.addAttribute("lang", resolveLang(lang, request, response));
-        model.addAttribute("currentPage", "calendar");
-        return "calendar"; // templates/calendar.html
+    private final MemberCalendarService memberCalendarService;
+
+    @PostMapping("/add")
+    public void addCalendar(@RequestBody CalendarRequestDto requestDto,
+                            Authentication authentication) {
+        Long memberId = (Long) authentication.getPrincipal();
+        memberCalendarService.addCalendar(memberId, requestDto);
     }
 
-    private String resolveLang(String lang, HttpServletRequest request, HttpServletResponse response) {
-        String resolved = normalizeLang(lang);
-        if (resolved == null) {
-            Locale currentLocale = localeResolver.resolveLocale(request);
-            resolved = normalizeLang(currentLocale != null ? currentLocale.toLanguageTag() : null);
-        }
-        if (resolved == null) {
-            resolved = "en";
-        }
+    @GetMapping("/list")
+    public List<CalendarPlaceResponseDto> getMyCalendars(
+            @RequestParam(defaultValue = "en") String lang,
+            Authentication authentication) {
 
-        localeResolver.setLocale(request, response, Locale.forLanguageTag(resolved));
-        return resolved;
+        Long memberId = (Long) authentication.getPrincipal();
+        return memberCalendarService.getMyCalendars(memberId, lang);
     }
 
-    private String normalizeLang(String lang) {
-        if (lang == null || lang.isBlank()) {
-            return null;
-        }
+    @GetMapping("/date")
+    public List<CalendarPlaceResponseDto> getMyCalendarsByDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(defaultValue = "en") String lang,
+            Authentication authentication) {
 
-        String normalized = lang.trim().toLowerCase(Locale.ROOT);
-        if (normalized.contains("-")) {
-            normalized = normalized.substring(0, normalized.indexOf('-'));
-        }
+        Long memberId = (Long) authentication.getPrincipal();
+        return memberCalendarService.getMyCalendarsByDate(memberId, startDate, lang);
+    }
 
-        if (normalized.equals("en") || normalized.equals("ru") || normalized.equals("tg") || normalized.equals("ko")) {
-            return normalized;
-        }
-        return null;
+    @DeleteMapping("/delete/{calendarId}")
+    public void removeCalendar(@PathVariable Long calendarId,
+                               Authentication authentication) {
+
+        Long memberId = (Long) authentication.getPrincipal();
+        memberCalendarService.removeCalendarById(memberId, calendarId);
+    }
+
+    @GetMapping("/place-ids")
+    public List<Long> getMyCalendarPlaceIds(Authentication authentication) {
+        Long memberId = (Long) authentication.getPrincipal();
+        return memberCalendarService.getMyCalendarPlaceIds(memberId);
     }
 }
