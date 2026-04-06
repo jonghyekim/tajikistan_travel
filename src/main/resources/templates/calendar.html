@@ -13,7 +13,10 @@
     <link rel="stylesheet" th:href="@{/css/calendar.css}">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.css">
+    <link rel="icon" th:href="@{/assets/logo/favicon.png}">
 </head>
+
+<th:block th:replace="~{components/head :: head}"></th:block>
 
 <body>
     <div th:replace="components/header :: header"></div>
