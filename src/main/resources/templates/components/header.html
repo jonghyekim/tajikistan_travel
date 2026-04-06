@@ -1,5 +1,6 @@
 <!--  header.html  -->
-<header class="header">
+<header class="header"
+        th:classappend="${currentPage == 'filter' or currentPage == 'emergency_contacts' or currentPage == 'favorites' or currentPage == 'calendar'} ? ' header-right-contrast'">
     <div class="header-container">
         <div class="header-logo">
             <a th:href="@{/}" class="logo">
@@ -32,212 +33,208 @@
         <div class="language-container">
             <div id="auth-box" class="auth-box">
                 <div data-auth="guest-actions" class="auth-actions">
-                    <button type="button" data-auth="login" class="auth-btn auth-login">Login</button>
-                    <button type="button" data-auth="signup" class="auth-btn auth-signup">Sign Up</button>
+                    <button type="button" data-auth="login" class="auth-btn auth-login" th:text="#{header.auth.login}">Login</button>
+                    <button type="button" data-auth="signup" class="auth-btn auth-signup" th:text="#{header.auth.signup}">Sign Up</button>
                 </div>
 
                 <div data-auth="user-panel" class="auth-user-panel" hidden>
-                    <span data-auth="status" class="auth-status">User</span>
-                    <span class="auth-separator" aria-hidden="true">|</span>
-                    <button type="button" data-auth="logout" class="auth-btn auth-logout">Logout</button>
+                    <a th:href="@{/me/favorites(lang=${lang})}" class="auth-profile-link">
+                        <span class="auth-profile-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" fill="none" focusable="false" aria-hidden="true">
+                                <path d="M2.75 7.1 8 2.75l5.25 4.35" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4.25 6.7v6.05h7.5V6.7" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span data-auth="status" class="auth-status">User</span>
+                        <span class="auth-profile-chevron" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" fill="none" focusable="false" aria-hidden="true">
+                                <path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                    </a>
+                    <button type="button" data-auth="logout" class="auth-btn auth-logout" th:text="#{header.auth.logout}">Logout</button>
                 </div>
             </div>
 
             <!-- For DETAIL PAGE -->
-            <div th:if="${placeId != null}">
-                <!-- EN -->
-                <form th:action="@{/detail/{id}(id=${placeId})}" method="get" style="display:inline;">
-                    <input type="hidden" name="back" th:if="${backUrl != null}" th:value="${backUrl}">
-                    <input type="hidden" name="lang" value="en">
-                    <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
-                        <img src="../assets/icons/lang_en_icon.png" alt="EN">
-                    </button>
-                </form>
+            <form th:if="${placeId != null}"
+                  th:action="@{/detail/{id}(id=${placeId})}"
+                  method="get"
+                  class="language-form">
+                <input type="hidden" name="back" th:if="${backUrl != null}" th:value="${backUrl}">
+                <details class="language-dropdown" data-language-dropdown>
+                    <summary class="language-trigger" aria-label="Select language">
+                        <span class="language-trigger-icon" aria-hidden="true">
+                            🌐
+                        </span>
+                        <span class="language-trigger-label">
+                            <th:block th:switch="${lang}">
+                                <span th:case="'ko'">KO</span>
+                                <span th:case="'ru'">RU</span>
+                                <span th:case="'tg'">TG</span>
+                                <span th:case="*">EN</span>
+                            </th:block>
+                        </span>
+                    </summary>
 
-                <!-- TJ -->
-                <form th:action="@{/detail/{id}(id=${placeId})}" method="get" style="display:inline;">
-                    <input type="hidden" name="back" th:if="${backUrl != null}" th:value="${backUrl}">
-                    <input type="hidden" name="lang" value="tg">
-                    <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
-                        <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
-                    </button>
-                </form>
-
-                <!-- RU -->
-                <form th:action="@{/detail/{id}(id=${placeId})}" method="get" style="display:inline;">
-                    <input type="hidden" name="back" th:if="${backUrl != null}" th:value="${backUrl}">
-                    <input type="hidden" name="lang" value="ru">
-                    <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
-                        <img src="../assets/icons/lang_ru_icon.png" alt="RU">
-                    </button>
-                </form>
-
-                <!-- KO -->
-                <form th:action="@{/detail/{id}(id=${placeId})}" method="get" style="display:inline;">
-                    <input type="hidden" name="back" th:if="${backUrl != null}" th:value="${backUrl}">
-                    <input type="hidden" name="lang" value="ko">
-                    <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
-                        <img src="../assets/icons/lang_ko_icon.png" alt="KO">
-                    </button>
-                </form>
-            </div>
+                    <div class="language-menu" role="listbox" aria-label="Language options">
+                        <button type="submit" name="lang" value="en" class="language-option" th:classappend="${lang == 'en'} ? ' is-active'">English</button>
+                        <button type="submit" name="lang" value="ru" class="language-option" th:classappend="${lang == 'ru'} ? ' is-active'">Русский</button>
+                        <button type="submit" name="lang" value="tg" class="language-option" th:classappend="${lang == 'tg'} ? ' is-active'">Тоҷикӣ</button>
+                        <button type="submit" name="lang" value="ko" class="language-option" th:classappend="${lang == 'ko'} ? ' is-active'">한국어</button>
+                    </div>
+                </details>
+            </form>
 
             <!-- Except DETAIL PAGE -->
             <div th:if="${placeId == null}">
-                <div th:if="${currentPage == 'filter'}">
-                    <!-- EN -->
-                    <form th:action="@{/filter}" method="get" style="display:inline;">
-                        <input type="hidden" name="query" th:value="${lastQuery}">
-                        <input type="hidden" name="category" th:value="${lastCategory}">
-                        <input type="hidden" name="region" th:value="${lastRegion}">
-                        <input type="hidden" name="page" th:value="${lastPage}">
-                        <input type="hidden" name="lang" value="en">
-                        <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
-                            <img src="../assets/icons/lang_en_icon.png" alt="EN">
-                        </button>
-                    </form>
+                <form th:if="${currentPage == 'filter'}"
+                      th:action="@{/filter}"
+                      method="get"
+                      class="language-form">
+                    <input type="hidden" name="query" th:value="${lastQuery}">
+                    <input type="hidden" name="category" th:value="${lastCategory}">
+                    <input type="hidden" name="region" th:value="${lastRegion}">
+                    <input type="hidden" name="page" th:value="${lastPage}">
+                    <details class="language-dropdown" data-language-dropdown>
+                        <summary class="language-trigger" aria-label="Select language">
+                            <span class="language-trigger-icon" aria-hidden="true">
+                                🌐
+                            </span>
+                            <span class="language-trigger-label">
+                                <th:block th:switch="${lang}">
+                                    <span th:case="'ko'">KO</span>
+                                    <span th:case="'ru'">RU</span>
+                                    <span th:case="'tg'">TG</span>
+                                    <span th:case="*">EN</span>
+                                </th:block>
+                            </span>
+                        </summary>
 
-                    <!-- TJ -->
-                    <form th:action="@{/filter}" method="get" style="display:inline;">
-                        <input type="hidden" name="query" th:value="${lastQuery}">
-                        <input type="hidden" name="category" th:value="${lastCategory}">
-                        <input type="hidden" name="region" th:value="${lastRegion}">
-                        <input type="hidden" name="page" th:value="${lastPage}">
-                        <input type="hidden" name="lang" value="tg">
-                        <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
-                            <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
-                        </button>
-                    </form>
+                        <div class="language-menu" role="listbox" aria-label="Language options">
+                            <button type="submit" name="lang" value="en" class="language-option" th:classappend="${lang == 'en'} ? ' is-active'">English</button>
+                            <button type="submit" name="lang" value="ru" class="language-option" th:classappend="${lang == 'ru'} ? ' is-active'">Русский</button>
+                            <button type="submit" name="lang" value="tg" class="language-option" th:classappend="${lang == 'tg'} ? ' is-active'">Тоҷикӣ</button>
+                            <button type="submit" name="lang" value="ko" class="language-option" th:classappend="${lang == 'ko'} ? ' is-active'">한국어</button>
+                        </div>
+                    </details>
+                </form>
 
-                    <!-- RU -->
-                    <form th:action="@{/filter}" method="get" style="display:inline;">
-                        <input type="hidden" name="query" th:value="${lastQuery}">
-                        <input type="hidden" name="category" th:value="${lastCategory}">
-                        <input type="hidden" name="region" th:value="${lastRegion}">
-                        <input type="hidden" name="page" th:value="${lastPage}">
-                        <input type="hidden" name="lang" value="ru">
-                        <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
-                            <img src="../assets/icons/lang_ru_icon.png" alt="RU">
-                        </button>
-                    </form>
+                <form th:if="${currentPage == 'emergency_contacts'}"
+                      th:action="@{/emergency_contacts}"
+                      method="get"
+                      class="language-form">
+                    <details class="language-dropdown" data-language-dropdown>
+                        <summary class="language-trigger" aria-label="Select language">
+                            <span class="language-trigger-icon" aria-hidden="true">
+                                🌐
+                            </span>
+                            <span class="language-trigger-label">
+                                <th:block th:switch="${lang}">
+                                    <span th:case="'ko'">KO</span>
+                                    <span th:case="'ru'">RU</span>
+                                    <span th:case="'tg'">TG</span>
+                                    <span th:case="*">EN</span>
+                                </th:block>
+                            </span>
+                        </summary>
 
-                    <!-- KO -->
-                    <form th:action="@{/filter}" method="get" style="display:inline;">
-                        <input type="hidden" name="query" th:value="${lastQuery}">
-                        <input type="hidden" name="category" th:value="${lastCategory}">
-                        <input type="hidden" name="region" th:value="${lastRegion}">
-                        <input type="hidden" name="page" th:value="${lastPage}">
-                        <input type="hidden" name="lang" value="ko">
-                        <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
-                            <img src="../assets/icons/lang_ko_icon.png" alt="KO">
-                        </button>
-                    </form>
-                </div>
+                        <div class="language-menu" role="listbox" aria-label="Language options">
+                            <button type="submit" name="lang" value="en" class="language-option" th:classappend="${lang == 'en'} ? ' is-active'">English</button>
+                            <button type="submit" name="lang" value="ru" class="language-option" th:classappend="${lang == 'ru'} ? ' is-active'">Русский</button>
+                            <button type="submit" name="lang" value="tg" class="language-option" th:classappend="${lang == 'tg'} ? ' is-active'">Тоҷикӣ</button>
+                            <button type="submit" name="lang" value="ko" class="language-option" th:classappend="${lang == 'ko'} ? ' is-active'">한국어</button>
+                        </div>
+                    </details>
+                </form>
 
-                <div th:if="${currentPage == 'emergency_contacts'}">
-                    <!-- EN -->
-                    <form th:action="@{/emergency_contacts}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="en">
-                        <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
-                            <img src="../assets/icons/lang_en_icon.png" alt="EN">
-                        </button>
-                    </form>
+                <form th:if="${currentPage == 'home' or currentPage == null}"
+                      th:action="@{/}"
+                      method="get"
+                      class="language-form">
+                    <details class="language-dropdown" data-language-dropdown>
+                        <summary class="language-trigger" aria-label="Select language">
+                            <span class="language-trigger-icon" aria-hidden="true">
+                                🌐
+                            </span>
+                            <span class="language-trigger-label">
+                                <th:block th:switch="${lang}">
+                                    <span th:case="'ko'">KO</span>
+                                    <span th:case="'ru'">RU</span>
+                                    <span th:case="'tg'">TG</span>
+                                    <span th:case="*">EN</span>
+                                </th:block>
+                            </span>
+                        </summary>
 
-                    <!-- TJ -->
-                    <form th:action="@{/emergency_contacts}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="tg">
-                        <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
-                            <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
-                        </button>
-                    </form>
+                        <div class="language-menu" role="listbox" aria-label="Language options">
+                            <button type="submit" name="lang" value="en" class="language-option" th:classappend="${lang == 'en'} ? ' is-active'">English</button>
+                            <button type="submit" name="lang" value="ru" class="language-option" th:classappend="${lang == 'ru'} ? ' is-active'">Русский</button>
+                            <button type="submit" name="lang" value="tg" class="language-option" th:classappend="${lang == 'tg'} ? ' is-active'">Тоҷикӣ</button>
+                            <button type="submit" name="lang" value="ko" class="language-option" th:classappend="${lang == 'ko'} ? ' is-active'">한국어</button>
+                        </div>
+                    </details>
+                </form>
 
-                    <!-- RU -->
-                    <form th:action="@{/emergency_contacts}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="ru">
-                        <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
-                            <img src="../assets/icons/lang_ru_icon.png" alt="RU">
-                        </button>
-                    </form>
+                <form th:if="${currentPage == 'favorites'}"
+                      th:action="@{/me/favorites}"
+                      method="get"
+                      class="language-form">
+                    <details class="language-dropdown" data-language-dropdown>
+                        <summary class="language-trigger" aria-label="Select language">
+                            <span class="language-trigger-icon" aria-hidden="true">
+                                🌐
+                            </span>
+                            <span class="language-trigger-label">
+                                <th:block th:switch="${lang}">
+                                    <span th:case="'ko'">KO</span>
+                                    <span th:case="'ru'">RU</span>
+                                    <span th:case="'tg'">TG</span>
+                                    <span th:case="*">EN</span>
+                                </th:block>
+                            </span>
+                        </summary>
 
-                    <!-- KO -->
-                    <form th:action="@{/emergency_contacts}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="ko">
-                        <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
-                            <img src="../assets/icons/lang_ko_icon.png" alt="KO">
-                        </button>
-                    </form>
-                </div>
+                        <div class="language-menu" role="listbox" aria-label="Language options">
+                            <button type="submit" name="lang" value="en" class="language-option" th:classappend="${lang == 'en'} ? ' is-active'">English</button>
+                            <button type="submit" name="lang" value="ru" class="language-option" th:classappend="${lang == 'ru'} ? ' is-active'">Русский</button>
+                            <button type="submit" name="lang" value="tg" class="language-option" th:classappend="${lang == 'tg'} ? ' is-active'">Тоҷикӣ</button>
+                            <button type="submit" name="lang" value="ko" class="language-option" th:classappend="${lang == 'ko'} ? ' is-active'">한국어</button>
+                        </div>
+                    </details>
+                </form>
 
-                <div th:if="${currentPage == 'home' or currentPage == null}">
-                    <!-- EN -->
-                    <form th:action="@{/}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="en">
-                        <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
-                            <img src="../assets/icons/lang_en_icon.png" alt="EN">
-                        </button>
-                    </form>
+                <form th:if="${currentPage == 'calendar'}"
+                      th:action="@{/me/calendar}"
+                      method="get"
+                      class="language-form">
+                    <details class="language-dropdown" data-language-dropdown>
+                        <summary class="language-trigger" aria-label="Select language">
+                            <span class="language-trigger-icon" aria-hidden="true">
+                                🌐
+                            </span>
+                            <span class="language-trigger-label">
+                                <th:block th:switch="${lang}">
+                                    <span th:case="'ko'">KO</span>
+                                    <span th:case="'ru'">RU</span>
+                                    <span th:case="'tg'">TG</span>
+                                    <span th:case="*">EN</span>
+                                </th:block>
+                            </span>
+                        </summary>
 
-                    <!-- TJ -->
-                    <form th:action="@{/}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="tg">
-                        <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
-                            <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
-                        </button>
-                    </form>
-
-                    <!-- RU -->
-                    <form th:action="@{/}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="ru">
-                        <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
-                            <img src="../assets/icons/lang_ru_icon.png" alt="RU">
-                        </button>
-                    </form>
-
-                    <!-- KO -->
-                    <form th:action="@{/}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="ko">
-                        <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
-                            <img src="../assets/icons/lang_ko_icon.png" alt="KO">
-                        </button>
-                    </form>
-                </div>
-
-                <div th:if="${currentPage == 'favorites'}">
-                    <!-- EN -->
-                    <form th:action="@{/me/favorites}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="en">
-                        <button class="lang-btn en" type="submit" th:disabled="${lang == 'en'}">
-                            <img src="../assets/icons/lang_en_icon.png" alt="EN">
-                        </button>
-                    </form>
-
-                    <!-- TJ -->
-                    <form th:action="@{/me/favorites}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="tg">
-                        <button class="lang-btn tj" type="submit" th:disabled="${lang == 'tg'}">
-                            <img src="../assets/icons/lang_tj_icon.png" alt="TJ">
-                        </button>
-                    </form>
-
-                    <!-- RU -->
-                    <form th:action="@{/me/favorites}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="ru">
-                        <button class="lang-btn ru" type="submit" th:disabled="${lang == 'ru'}">
-                            <img src="../assets/icons/lang_ru_icon.png" alt="RU">
-                        </button>
-                    </form>
-
-                    <!-- KO -->
-                    <form th:action="@{/me/favorites}" method="get" style="display:inline;">
-                        <input type="hidden" name="lang" value="ko">
-                        <button class="lang-btn ko" type="submit" th:disabled="${lang == 'ko'}">
-                            <img src="../assets/icons/lang_ko_icon.png" alt="KO">
-                        </button>
-                    </form>
-                </div>
+                        <div class="language-menu" role="listbox" aria-label="Language options">
+                            <button type="submit" name="lang" value="en" class="language-option" th:classappend="${lang == 'en'} ? ' is-active'">English</button>
+                            <button type="submit" name="lang" value="ru" class="language-option" th:classappend="${lang == 'ru'} ? ' is-active'">Русский</button>
+                            <button type="submit" name="lang" value="tg" class="language-option" th:classappend="${lang == 'tg'} ? ' is-active'">Тоҷикӣ</button>
+                            <button type="submit" name="lang" value="ko" class="language-option" th:classappend="${lang == 'ko'} ? ' is-active'">한국어</button>
+                        </div>
+                    </details>
+                </form>
             </div>
 
         </div>
     </div>
+    <script th:src="@{/js/header-language.js}"></script>
 	<script th:src="@{/js/auth.js}"></script>
 </header>

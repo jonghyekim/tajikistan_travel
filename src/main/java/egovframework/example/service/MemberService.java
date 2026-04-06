@@ -2,6 +2,7 @@ package egovframework.example.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
 import egovframework.example.domain.Member;
@@ -37,6 +38,15 @@ public class MemberService {
         refreshTokenRepository.deleteExpired(now);
         refreshTokenRepository.deleteOldRevoked(cutoff);
     }
+
+    @Scheduled(
+        fixedDelayString = "${auth.token-cleanup-delay-ms:1800000}",
+        initialDelayString = "${auth.token-cleanup-initial-delay-ms:60000}"
+    )
+    @Transactional
+    public void cleanupTokensOnSchedule() {
+        cleanupTokens();
+    }
 	
     //register
 	@Transactional
@@ -65,9 +75,6 @@ public class MemberService {
 	//login
 	@Transactional
     public LoginResponseDto login(MemberLoginRequest request) {
-		
-		cleanupTokens();
-        
 		Member member = memberRepository.findByUsername(request.getUsername())
                 .orElseThrow(() ->
                 new UnauthorizedException("아이디 또는 비밀번호가 올바르지 않습니다.")
@@ -92,9 +99,6 @@ public class MemberService {
 	//Access token reissue
 	@Transactional
     public TokenRefreshResponseDto refresh(TokenRefreshRequest request) {
-		
-		cleanupTokens();
-		
         String refreshToken = request.getRefreshToken();
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new UnauthorizedException("refresh token이 필요합니다.");
@@ -158,8 +162,6 @@ public class MemberService {
 	//logout
 	@Transactional
 	public void logout(TokenRefreshRequest request) {
-	    cleanupTokens();
-
 	    String refreshToken = request.getRefreshToken();
 	    if (refreshToken == null || refreshToken.isBlank()) return;
 
