@@ -48,6 +48,53 @@ body {
     letter-spacing: -0.02em;
 }
 
+.list-subtitle {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #8f8f8f;
+}
+
+.dashboard-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 40px;
+}
+
+.dashboard-tab {
+    height: 68px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.dashboard-tab.active {
+    background: #16502C;
+    color: #FFFFFF;
+}
+
+.dashboard-tab:not(.active) {
+    background: #B4B2B2;
+    color: #EAEAEA;
+}
+
+.dashboard-section-header {
+    margin-top: 32px;
+}
+
+.dashboard-section-title {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
 /* =========================
    Filter Panel
 ========================= */
@@ -414,6 +461,11 @@ body {
     .card-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .dashboard-tab {
+        font-size: 22px;
+        height: 62px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -423,6 +475,20 @@ body {
 
     .list-title {
         font-size: 32px;
+    }
+
+    .dashboard-tabs {
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    .dashboard-tab {
+        height: 56px;
+        font-size: 18px;
+    }
+
+    .dashboard-section-title {
+        font-size: 24px;
     }
 
     .filter-panel {
@@ -464,6 +530,10 @@ body {
 
     .card-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-tabs {
+        grid-template-columns: 1fr;
     }
 }
 

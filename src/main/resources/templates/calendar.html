@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="${lang}" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Travel Dashboard - Calendar</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/calendar.css}">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.css">
+</head>
+
+<body>
+    <div th:replace="components/header :: header"></div>
+
+    <main class="calendar-page">
+        <div class="calendar-container">
+            <header class="calendar-header">
+                <h1 class="dashboard-title">My Travel Dashboard</h1>
+
+                <div class="dashboard-tabs" aria-label="Dashboard menu">
+                    <a th:href="@{/me/favorites}" class="dashboard-tab">Favorites</a>
+                    <a th:href="@{/me/calendar}" class="dashboard-tab active" aria-current="page">Calendar</a>
+                </div>
+
+                <div class="dashboard-section-header">
+                    <h2 class="dashboard-section-title">Calendar</h2>
+                    <p class="dashboard-section-subtitle">
+                        Drag and drop your saved places into the calendar to create your itinerary,
+                        and easily save your travel plans as an image with date-based notes.
+                    </p>
+                </div>
+            </header>
+
+            <section class="calendar-content">
+                <aside class="saved-panel">
+                    <div class="saved-panel-header">
+                        <h3 class="results-count" id="favorites-side-count">0 Favorites</h3>
+                    </div>
+
+                    <div id="external-events" class="saved-card-list">
+                        <!-- JS로 실제 favorites 카드 렌더링 -->
+                    </div>
+
+                    <div id="calendar-empty" class="calendar-empty" style="display:none;">
+                        No favorite destinations yet.
+                    </div>
+                </aside>
+
+                <section class="calendar-board">
+                    <div id="calendar"></div>
+                </section>
+            </section>
+        </div>
+    </main>
+
+    <div th:replace="components/footer :: footer"></div>
+
+    <script th:src="@{/js/auth.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+
+    <script>
+        let calendarInstance = null;
+        let draggableInstance = null;
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            if (!Auth || !Auth.isLoggedIn()) {
+                Auth.goToLogin();
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const lang = urlParams.get('lang') || 'en';
+
+            initCalendar();
+            await loadFavoriteCardsForCalendar(lang);
+        });
+
+        function initCalendar() {
+            const calendarEl = document.getElementById('calendar');
+
+            calendarInstance = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                initialDate: '2026-07-01',
+                locale: 'en',
+                height: 'auto',
+                expandRows: true,
+
+                headerToolbar: {
+                    left: 'prev',
+                    center: 'title',
+                    right: 'next'
+                },
+
+                droppable: true,
+                editable: true,
+                dayMaxEvents: 2,
+                fixedWeekCount: false,
+
+                eventClick: function (info) {
+                    const shouldDelete = confirm('Remove "' + info.event.title + '" from the calendar?');
+                    if (shouldDelete) {
+                        info.event.remove();
+                    }
+                }
+            });
+
+            calendarInstance.render();
+        }
+
+        async function loadFavoriteCardsForCalendar(lang) {
+            try {
+                const listResponse = await Auth.authFetch(`/me/favorite/list?lang=${lang}`);
+
+                if (!listResponse.ok) {
+                    showCalendarEmpty();
+                    return;
+                }
+
+                const places = await listResponse.json();
+
+                if (!places || places.length === 0) {
+                    showCalendarEmpty();
+                    return;
+                }
+
+                renderCalendarFavoriteCards(places, lang);
+                enableExternalDragging();
+            } catch (error) {
+                console.error('Failed to load calendar favorites:', error);
+                showCalendarEmpty();
+            }
+        }
+
+        function renderCalendarFavoriteCards(places, lang) {
+            const container = document.getElementById('external-events');
+            const countEl = document.getElementById('favorites-side-count');
+            const emptyEl = document.getElementById('calendar-empty');
+
+            container.innerHTML = '';
+            emptyEl.style.display = 'none';
+
+            countEl.textContent = `${places.length} Favorites`;
+
+            places.forEach(place => {
+                const card = createSidebarPlaceCard(place, lang);
+                if (card) {
+                    container.appendChild(card);
+                }
+            });
+        }
+
+        function createSidebarPlaceCard(place, lang) {
+            if (!place || !place.placeId) return null;
+
+            const imageUrl = place.imageUrl || '/assets/images/home_reg_2.png';
+            const title = place.title || 'No Title';
+            const category = place.categoryName || 'Category';
+            const region = place.regionName || 'Region';
+            const content = place.content || '';
+            const placeId = place.placeId;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'place-card-wrapper sidebar-place-card fc-draggable-event';
+            wrapper.setAttribute('data-title', title);
+            wrapper.setAttribute('data-region', region);
+            wrapper.setAttribute('data-place-id', placeId);
+
+            const thumbDiv = document.createElement('div');
+            thumbDiv.className = 'place-thumb sidebar-place-thumb';
+
+            const img = document.createElement('img');
+            img.src = escapeHtml(imageUrl);
+            img.alt = escapeHtml(title);
+            thumbDiv.appendChild(img);
+
+            const categoryBadge = document.createElement('span');
+            categoryBadge.className = 'badge badge-top';
+            categoryBadge.textContent = escapeHtml(category);
+            thumbDiv.appendChild(categoryBadge);
+
+            wrapper.appendChild(thumbDiv);
+
+            const bodyDiv = document.createElement('div');
+            bodyDiv.className = 'place-body sidebar-place-body';
+
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'place-header sidebar-place-header';
+
+            const titleElem = document.createElement('h3');
+            titleElem.className = 'place-title sidebar-place-title';
+            titleElem.textContent = escapeHtml(title);
+            headerDiv.appendChild(titleElem);
+
+            bodyDiv.appendChild(headerDiv);
+
+            if (content) {
+                const descElem = document.createElement('p');
+                descElem.className = 'place-desc sidebar-place-desc';
+                descElem.textContent = escapeHtml(content);
+                bodyDiv.appendChild(descElem);
+            }
+
+            const tagsDiv = document.createElement('div');
+            tagsDiv.className = 'place-tags';
+
+            const regionBadge = document.createElement('span');
+            regionBadge.className = 'badge badge-bottom';
+
+            const locationIcon = document.createElement('span');
+            locationIcon.className = 'material-icons';
+            locationIcon.setAttribute('aria-hidden', 'true');
+            locationIcon.textContent = 'location_on';
+            regionBadge.appendChild(locationIcon);
+
+            const regionText = document.createElement('span');
+            regionText.textContent = escapeHtml(region);
+            regionBadge.appendChild(regionText);
+
+            tagsDiv.appendChild(regionBadge);
+            bodyDiv.appendChild(tagsDiv);
+
+            wrapper.appendChild(bodyDiv);
+
+            wrapper.addEventListener('dblclick', function () {
+                window.location.href = `/detail/${placeId}?lang=${lang}&back=/me/calendar?lang=${lang}`;
+            });
+
+            return wrapper;
+        }
+
+        function enableExternalDragging() {
+            const externalEventsEl = document.getElementById('external-events');
+
+            if (draggableInstance && typeof draggableInstance.destroy === 'function') {
+                draggableInstance.destroy();
+            }
+
+            draggableInstance = new FullCalendar.Draggable(externalEventsEl, {
+                itemSelector: '.fc-draggable-event',
+                eventData: function (eventEl) {
+                    return {
+                        title: eventEl.dataset.title,
+                        allDay: true,
+                        extendedProps: {
+                            region: eventEl.dataset.region || '',
+                            placeId: eventEl.dataset.placeId || ''
+                        }
+                    };
+                }
+            });
+        }
+
+        function showCalendarEmpty() {
+            const container = document.getElementById('external-events');
+            const countEl = document.getElementById('favorites-side-count');
+            const emptyEl = document.getElementById('calendar-empty');
+
+            container.innerHTML = '';
+            countEl.textContent = '0 Favorites';
+            emptyEl.style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,591 @@
+* {
+    box-sizing: border-box;
+}
+
+.header {
+    background-color: #FFFFFF;
+}
+
+@font-face {
+    font-family: 'Pretendard';
+    src: url('../assets/fonts/PretendardVariable.ttf') format('truetype');
+    font-weight: 45 920;
+    font-style: normal;
+    font-display: swap;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Pretendard', sans-serif;
+    color: #1b1b1b;
+    background: #f6f6fb;
+}
+
+/* =========================
+   Layout
+========================= */
+
+.calendar-page {
+    padding: 120px 0 120px;
+}
+
+.calendar-container {
+    width: min(1280px, 92%);
+    margin: 0 auto;
+}
+
+.calendar-header {
+    margin-bottom: 28px;
+}
+
+.dashboard-title {
+    margin: 0;
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 40px;
+}
+
+.dashboard-tab {
+    height: 68px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.dashboard-tab.active {
+    background: #16502C;
+    color: #FFFFFF;
+}
+
+.dashboard-tab:not(.active) {
+    background: #EAEAEA;
+    color: #B4B2B2;
+}
+
+.dashboard-section-header {
+    margin-top: 32px;
+}
+
+.dashboard-section-title {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-section-subtitle {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #8f8f8f;
+}
+
+.calendar-content {
+    margin-top: 34px;
+    display: grid;
+    grid-template-columns: 330px minmax(0, 1fr);
+    gap: 36px;
+    align-items: start;
+}
+
+/* =========================
+   Left panel
+========================= */
+
+.saved-panel {
+    background: #ffffff;
+    border-radius: 28px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
+    padding: 20px;
+    height: 760px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.saved-panel-header {
+    flex: 0 0 auto;
+    margin-bottom: 14px;
+}
+
+.results-count {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.saved-card-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-right: 6px;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.saved-card-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.saved-card-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.saved-card-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.14);
+    border-radius: 999px;
+}
+
+.calendar-empty {
+    color: #8f8f8f;
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 8px 2px 0;
+}
+
+.fc-draggable-event {
+    cursor: grab;
+}
+
+.fc-draggable-event:active {
+    cursor: grabbing;
+}
+
+/* =========================
+   Sidebar cards
+   filter.css 카드 디자인 기반
+========================= */
+
+.place-card-wrapper {
+    background: #fff;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid #D5D5D5;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    position: relative;
+}
+
+.place-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.place-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.badge-top {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #e9ffeb;
+    color: #134928;
+    border: 1px solid rgba(19, 73, 40, 0.12);
+}
+
+.place-body {
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.place-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.place-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    flex: 1;
+}
+
+.place-desc {
+    margin: 8px 0 12px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: #a3a3a3;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
+
+.place-tags {
+    display: flex;
+    gap: 10px;
+}
+
+.badge-bottom {
+    background: #e9ffeb;
+    color: #134928;
+    border: 1px solid rgba(19, 73, 40, 0.12);
+    border-radius: 10px;
+    padding: 7px 10px;
+}
+
+.badge-bottom .material-icons {
+    font-size: 16px;
+    color: #134928;
+}
+
+/* sidebar only scale down */
+.sidebar-place-card {
+    border-radius: 22px;
+    flex: 0 0 auto;
+    height: auto;
+    align-self: stretch;
+    border: 1px solid #D5D5D5;
+    box-shadow: none;
+}
+
+.sidebar-place-thumb {
+    aspect-ratio: 16 / 9;
+}
+
+.sidebar-place-body {
+    padding: 14px 14px 13px;
+    display: flex;
+    flex-direction: column;
+    flex: unset;
+}
+
+.sidebar-place-header {
+    margin-bottom: 6px;
+}
+
+.sidebar-place-title {
+    font-size: 16px;
+    line-height: 1.35;
+}
+
+.sidebar-place-desc {
+    margin: 6px 0 10px;
+    font-size: 12px;
+    line-height: 1.45;
+    -webkit-line-clamp: 3;
+}
+
+.sidebar-place-card .place-tags {
+    display: flex;
+    gap: 10px;
+    margin-top: 0;
+}
+
+.sidebar-place-card .badge {
+    font-size: 11px;
+    padding: 5px 9px;
+    border-radius: 9px;
+}
+
+.sidebar-place-card .badge-top {
+    top: 8px;
+    right: 8px;
+}
+
+.sidebar-place-card .badge-bottom {
+    padding: 6px 9px;
+    border-radius: 9px;
+}
+
+.sidebar-place-card .badge-bottom .material-icons {
+    font-size: 14px;
+}
+
+/* =========================
+   Calendar board
+========================= */
+
+.calendar-board {
+    min-width: 0;
+    background: #ffffff;
+    border-radius: 32px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
+    padding: 24px;
+}
+
+#calendar {
+    width: 100%;
+}
+
+/* =========================
+   FullCalendar custom
+========================= */
+
+.fc {
+    font-family: 'Pretendard', sans-serif;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+    margin-bottom: 18px;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1b1b1b;
+}
+
+.fc .fc-button {
+    background: transparent !important;
+    border: none !important;
+    color: #8f8f8f !important;
+    box-shadow: none !important;
+    padding: 4px 8px !important;
+}
+
+.fc .fc-button:hover {
+    color: #1b1b1b !important;
+}
+
+.fc .fc-button:focus {
+    box-shadow: none !important;
+}
+
+.fc .fc-button .fc-icon {
+    font-size: 20px;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+    border: none;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: #e5e5e5;
+}
+
+.fc .fc-col-header-cell {
+    background: #ffffff;
+}
+
+.fc .fc-col-header-cell-cushion {
+    padding: 10px 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1b1b1b;
+    text-decoration: none;
+}
+
+.fc .fc-daygrid-day {
+    background: #ffffff;
+}
+
+.fc .fc-daygrid-day-frame {
+    min-height: 118px;
+}
+
+.fc .fc-daygrid-day-number {
+    padding: 8px 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1b1b;
+    text-decoration: none;
+}
+
+.fc .fc-day-sun .fc-daygrid-day-number,
+.fc .fc-col-header-cell.fc-day-sun .fc-col-header-cell-cushion {
+    color: #e53935;
+}
+
+.fc .fc-day-sat .fc-daygrid-day-number,
+.fc .fc-col-header-cell.fc-day-sat .fc-col-header-cell-cushion {
+    color: #1a33d6;
+}
+
+.fc-h-event {
+    background: #2f7d48;
+    border: none;
+    border-radius: 4px;
+    padding: 1px 2px;
+}
+
+.fc-event-title {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.fc .fc-daygrid-event {
+    margin: 2px 6px;
+}
+
+.fc .fc-day-today {
+    background: rgba(22, 80, 44, 0.04) !important;
+}
+
+.fc-direction-ltr .fc-daygrid-event.fc-event-start,
+.fc-direction-ltr .fc-daygrid-event.fc-event-end {
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.fc-event-mirror {
+    opacity: 0.9;
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1180px) {
+    .calendar-content {
+        grid-template-columns: 300px minmax(0, 1fr);
+        gap: 24px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .calendar-page {
+        padding: 100px 0;
+    }
+
+    .dashboard-tab {
+        font-size: 22px;
+        height: 62px;
+    }
+
+    .calendar-content {
+        grid-template-columns: 1fr;
+    }
+
+    .saved-panel {
+        height: auto;
+        max-height: none;
+    }
+
+    .saved-card-list {
+        max-height: 520px;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-page {
+        padding: 88px 0;
+    }
+
+    .dashboard-title {
+        font-size: 32px;
+    }
+
+    .dashboard-tabs {
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    .dashboard-tab {
+        height: 56px;
+        font-size: 18px;
+    }
+
+    .dashboard-section-title {
+        font-size: 24px;
+    }
+
+    .dashboard-section-subtitle {
+        font-size: 16px;
+    }
+
+    .calendar-board {
+        padding: 16px;
+        border-radius: 24px;
+    }
+
+    .saved-panel {
+        padding: 16px;
+        border-radius: 24px;
+    }
+
+    .sidebar-place-title {
+        font-size: 15px;
+    }
+
+    .sidebar-place-desc {
+        font-size: 11.5px;
+    }
+
+    .fc .fc-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 20px;
+    }
+
+    .fc .fc-daygrid-day-frame {
+        min-height: 92px;
+    }
+}
+
+@media (max-width: 560px) {
+    .calendar-container {
+        width: min(1280px, 94%);
+    }
+
+    .dashboard-tabs {
+        grid-template-columns: 1fr;
+    }
+
+    .saved-card-list {
+        max-height: 420px;
+        justify-content: flex-start;
+    }
+
+    .fc .fc-daygrid-day-frame {
+        min-height: 80px;
+    }
+
+    .fc .fc-col-header-cell-cushion {
+        font-size: 12px;
+    }
+
+    .fc .fc-daygrid-day-number {
+        font-size: 12px;
+    }
+}

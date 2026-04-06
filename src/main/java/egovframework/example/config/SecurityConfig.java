@@ -27,6 +27,7 @@ public class SecurityConfig {
 
             .authorizeRequests()
             	.antMatchers(HttpMethod.GET, "/me/favorites").permitAll()
+            	.antMatchers(HttpMethod.GET, "/me/calendar").permitAll()
             	.antMatchers("/me/**").authenticated()
             	.antMatchers(HttpMethod.POST, "/api/reviews/**").authenticated()
             	.antMatchers(HttpMethod.DELETE, "/api/reviews/**").authenticated()
