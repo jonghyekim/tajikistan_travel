@@ -16,8 +16,6 @@
     <link rel="icon" th:href="@{/assets/logo/favicon.png}">
 </head>
 
-<th:block th:replace="~{components/head :: head}"></th:block>
-
 <body>
     <div th:replace="components/header :: header"></div>
 
@@ -80,16 +78,17 @@
             const urlParams = new URLSearchParams(window.location.search);
             const lang = urlParams.get('lang') || 'en';
 
-            initCalendar();
+            initCalendar(lang);
             await loadFavoriteCardsForCalendar(lang);
+            await loadSavedCalendars(lang);
         });
 
-        function initCalendar() {
+        function initCalendar(lang) {
             const calendarEl = document.getElementById('calendar');
 
             calendarInstance = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                initialDate: '2026-07-01',
+                initialDate: new Date(),
                 locale: 'en',
                 height: 'auto',
                 expandRows: true,
@@ -105,10 +104,61 @@
                 dayMaxEvents: 2,
                 fixedWeekCount: false,
 
-                eventClick: function (info) {
-                    const shouldDelete = confirm('Remove "' + info.event.title + '" from the calendar?');
-                    if (shouldDelete) {
+                eventReceive: async function (info) {
+                    const placeId = Number(info.event.extendedProps.placeId);
+                    const startDate = formatDate(info.event.start);
+
+                    try {
+                        const response = await Auth.authFetch('/me/calendar/add', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                placeId: placeId,
+                                startDate: startDate
+                            })
+                        });
+
+                        if (!response.ok) {
+                            info.event.remove();
+                            alert('Failed to save calendar event.');
+                            return;
+                        }
+
+                        await loadSavedCalendars(lang);
+                    } catch (error) {
+                        console.error('Failed to save calendar event:', error);
                         info.event.remove();
+                        alert('Failed to save calendar event.');
+                    }
+                },
+
+                eventClick: async function (info) {
+                    const calendarId = info.event.extendedProps.calendarId;
+                    const shouldDelete = confirm('Remove "' + info.event.title + '" from the calendar?');
+
+                    if (!shouldDelete) return;
+
+                    if (!calendarId) {
+                        info.event.remove();
+                        return;
+                    }
+
+                    try {
+                        const response = await Auth.authFetch(`/me/calendar/delete/${calendarId}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (!response.ok) {
+                            alert('Failed to delete calendar event.');
+                            return;
+                        }
+
+                        info.event.remove();
+                    } catch (error) {
+                        console.error('Failed to delete calendar event:', error);
+                        alert('Failed to delete calendar event.');
                     }
                 }
             });
@@ -140,6 +190,41 @@
             }
         }
 
+        async function loadSavedCalendars(lang) {
+            try {
+                const response = await Auth.authFetch(`/me/calendar/list?lang=${lang}`);
+
+                if (!response.ok) {
+                    console.error('Failed to load saved calendars');
+                    return;
+                }
+
+                const calendars = await response.json();
+
+                if (!calendarInstance) return;
+
+                calendarInstance.getEvents().forEach(event => event.remove());
+
+                calendars.forEach(item => {
+                    calendarInstance.addEvent({
+                        title: item.title || 'No Title',
+                        start: item.startDate,
+                        allDay: true,
+                        extendedProps: {
+                            calendarId: item.calendarId,
+                            placeId: item.placeId,
+                            region: item.regionName || '',
+                            content: item.content || '',
+                            imageUrl: item.imageUrl || '',
+                            categoryName: item.categoryName || ''
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Failed to load saved calendars:', error);
+            }
+        }
+
         function renderCalendarFavoriteCards(places, lang) {
             const container = document.getElementById('external-events');
             const countEl = document.getElementById('favorites-side-count');
@@ -147,7 +232,6 @@
 
             container.innerHTML = '';
             emptyEl.style.display = 'none';
-
             countEl.textContent = `${places.length} Favorites`;
 
             places.forEach(place => {
@@ -175,19 +259,18 @@
             wrapper.setAttribute('data-place-id', placeId);
 
             const thumbDiv = document.createElement('div');
+            wrapper.appendChild(thumbDiv);
             thumbDiv.className = 'place-thumb sidebar-place-thumb';
 
             const img = document.createElement('img');
-            img.src = escapeHtml(imageUrl);
-            img.alt = escapeHtml(title);
+            img.src = imageUrl;
+            img.alt = title;
             thumbDiv.appendChild(img);
 
             const categoryBadge = document.createElement('span');
             categoryBadge.className = 'badge badge-top';
-            categoryBadge.textContent = escapeHtml(category);
+            categoryBadge.textContent = category;
             thumbDiv.appendChild(categoryBadge);
-
-            wrapper.appendChild(thumbDiv);
 
             const bodyDiv = document.createElement('div');
             bodyDiv.className = 'place-body sidebar-place-body';
@@ -197,7 +280,7 @@
 
             const titleElem = document.createElement('h3');
             titleElem.className = 'place-title sidebar-place-title';
-            titleElem.textContent = escapeHtml(title);
+            titleElem.textContent = title;
             headerDiv.appendChild(titleElem);
 
             bodyDiv.appendChild(headerDiv);
@@ -205,7 +288,7 @@
             if (content) {
                 const descElem = document.createElement('p');
                 descElem.className = 'place-desc sidebar-place-desc';
-                descElem.textContent = escapeHtml(content);
+                descElem.textContent = content;
                 bodyDiv.appendChild(descElem);
             }
 
@@ -222,7 +305,7 @@
             regionBadge.appendChild(locationIcon);
 
             const regionText = document.createElement('span');
-            regionText.textContent = escapeHtml(region);
+            regionText.textContent = region;
             regionBadge.appendChild(regionText);
 
             tagsDiv.appendChild(regionBadge);
@@ -269,16 +352,14 @@
             emptyEl.style.display = 'block';
         }
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
+        function formatDate(date) {
+            if (!date) return '';
+
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            return `${year}-${month}-${day}`;
         }
     </script>
 </body>
