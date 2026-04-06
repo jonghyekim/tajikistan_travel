@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    // Get language from URL or default to 'en'
+    // Get language from URL first, then fall back to the server-rendered html lang.
     const urlParams = new URLSearchParams(window.location.search);
-    const lang = urlParams.get('lang') || 'en';
+    const lang = urlParams.get('lang') || document.documentElement.lang || 'en';
     console.log('Current language:', lang);
 
     // Load favorites

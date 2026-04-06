@@ -16,6 +16,16 @@ document.addEventListener('DOMContentLoaded', function() {
     setupFavoriteButton(placeId);
 });
 
+function setFavoriteButtonState(btnFavorite, isFavorite) {
+    if (!btnFavorite) return;
+
+    btnFavorite.classList.toggle('active', isFavorite);
+    btnFavorite.setAttribute('aria-label', isFavorite ? '찜 취소' : '찜하기');
+
+    const icon = btnFavorite.querySelector('.favorite-icon');
+    if (icon) icon.textContent = 'favorite';
+}
+
 /**
  * Load rating from reviews API
  */
@@ -67,6 +77,8 @@ function setupFavoriteButton(placeId) {
     // Check if user is logged in and get favorite status
     if (Auth && Auth.isLoggedIn()) {
         checkFavoriteStatus(placeId, btnFavorite);
+    } else {
+        setFavoriteButtonState(btnFavorite, false);
     }
 
     // Add click handler
@@ -80,6 +92,15 @@ function setupFavoriteButton(placeId) {
 
         toggleFavorite(placeId, btnFavorite);
     });
+
+    window.addEventListener('auth:changed', function (event) {
+        if (event.detail && event.detail.loggedIn) {
+            checkFavoriteStatus(placeId, btnFavorite);
+            return;
+        }
+
+        setFavoriteButtonState(btnFavorite, false);
+    });
 }
 
 /**
@@ -92,13 +113,7 @@ async function checkFavoriteStatus(placeId, btnFavorite) {
 
         const favoriteIds = await response.json();
         const isFavorite = favoriteIds.includes(parseInt(placeId, 10));
-
-        if (isFavorite) {
-            btnFavorite.classList.add('active');
-            btnFavorite.setAttribute('aria-label', '찜 취소');
-            const icon = btnFavorite.querySelector('.favorite-icon');
-            if (icon) icon.textContent = 'favorite';
-        }
+        setFavoriteButtonState(btnFavorite, isFavorite);
     } catch (error) {
         console.error('Error checking favorite status:', error);
     }
@@ -134,17 +149,9 @@ async function toggleFavorite(placeId, btnFavorite) {
 
         // Update button state
         if (isFavorited) {
-            // Removing from favorites
-            btnFavorite.classList.remove('active');
-            btnFavorite.setAttribute('aria-label', '찜하기');
-            const icon = btnFavorite.querySelector('.favorite-icon');
-            if (icon) icon.textContent = 'favorite';
+            setFavoriteButtonState(btnFavorite, false);
         } else {
-            // Adding to favorites
-            btnFavorite.classList.add('active');
-            btnFavorite.setAttribute('aria-label', '찜 취소');
-            const icon = btnFavorite.querySelector('.favorite-icon');
-            if (icon) icon.textContent = 'favorite';
+            setFavoriteButtonState(btnFavorite, true);
         }
     } catch (error) {
         console.error('Error toggling favorite:', error);

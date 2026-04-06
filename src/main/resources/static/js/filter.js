@@ -9,6 +9,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadRatings();
   await loadFavorites();
   attachFavoriteButtonListeners();
+
+  window.addEventListener('auth:changed', async (event) => {
+    if (event.detail && event.detail.loggedIn) {
+      await loadFavorites();
+      return;
+    }
+
+    clearFavoritesUI();
+  });
 });
 
 /**
@@ -54,6 +63,7 @@ async function fetchRating(placeId) {
  */
 async function loadFavorites() {
   try {
+    clearFavoritesUI();
     const response = await Auth.authFetch('/me/favorite/place-ids');
     
     // 401 means user is not logged in - this is okay
@@ -81,6 +91,13 @@ async function loadFavorites() {
       console.warn('Could not load favorites:', error);
     }
   }
+}
+
+function clearFavoritesUI() {
+  document.querySelectorAll('.favorite-btn.is-favorite').forEach((btn) => {
+    btn.classList.remove('is-favorite');
+    updateFavoriteButtonIcon(btn);
+  });
 }
 
 /**

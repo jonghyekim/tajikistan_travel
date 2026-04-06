@@ -25,8 +25,8 @@
                 <h1 class="dashboard-title">My Travel Dashboard</h1>
 
                 <div class="dashboard-tabs" aria-label="Dashboard menu">
-                    <a th:href="@{/me/favorites}" class="dashboard-tab">Favorites</a>
-                    <a th:href="@{/me/calendar}" class="dashboard-tab active" aria-current="page">Calendar</a>
+                    <a th:href="@{/me/favorites(lang=${lang})}" class="dashboard-tab">Favorites</a>
+                    <a th:href="@{/me/calendar(lang=${lang})}" class="dashboard-tab active" aria-current="page">Calendar</a>
                 </div>
 
                 <div class="dashboard-section-header">
@@ -76,7 +76,7 @@
             }
 
             const urlParams = new URLSearchParams(window.location.search);
-            const lang = urlParams.get('lang') || 'en';
+            const lang = urlParams.get('lang') || document.documentElement.lang || 'en';
 
             initCalendar(lang);
             await loadFavoriteCardsForCalendar(lang);

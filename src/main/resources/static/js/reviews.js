@@ -243,4 +243,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Initial load
   updateAuthUI();
   await loadReviews();
+
+  window.addEventListener("auth:changed", async function () {
+    updateAuthUI();
+    await loadReviews();
+  });
 });

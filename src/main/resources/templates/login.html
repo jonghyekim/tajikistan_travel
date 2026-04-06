@@ -137,6 +137,7 @@
             const password = document.getElementById("password").value;
             const errorElement = document.getElementById("error");
             const submitButton = e.target.querySelector('button[type="submit"]');
+            let redirecting = false;
 
             // Validation
             if (!username || !password) {
@@ -173,9 +174,9 @@
 
                 // Get language parameter and redirect
                 const lang = new URL(window.location.href).searchParams.get("lang") || "en";
-                setTimeout(() => {
-                    window.location.href = "/?lang=" + encodeURIComponent(lang);
-                }, 300);
+                redirecting = true;
+                window.location.replace("/?lang=" + encodeURIComponent(lang));
+                return;
 
             } catch (err) {
                 console.error("Login error:", err);
@@ -183,8 +184,10 @@
                 errorElement.style.display = "block";
             } finally {
                 // Reset loading state (in case of error)
-                submitButton.disabled = false;
-                submitButton.classList.remove("loading");
+                if (!redirecting) {
+                    submitButton.disabled = false;
+                    submitButton.classList.remove("loading");
+                }
             }
         });
     </script>

@@ -5,7 +5,14 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import egovframework.example.dto.calendar.CalendarPlaceResponseDto;
 import egovframework.example.dto.calendar.CalendarRequestDto;
@@ -21,7 +28,6 @@ public class MemberCalendarController {
 
     private final MemberCalendarService memberCalendarService;
 
-    // 일정 추가
     @PostMapping("/add")
     public void addCalendar(@RequestBody CalendarRequestDto requestDto,
                             Authentication authentication) {
@@ -29,7 +35,6 @@ public class MemberCalendarController {
         memberCalendarService.addCalendar(memberId, requestDto);
     }
 
-    // 전체 일정 조회
     @GetMapping("/list")
     public List<CalendarPlaceResponseDto> getMyCalendars(
             @RequestParam(defaultValue = "en") String lang,
@@ -39,7 +44,6 @@ public class MemberCalendarController {
         return memberCalendarService.getMyCalendars(memberId, lang);
     }
 
-    // 날짜별 일정 조회
     @GetMapping("/date")
     public List<CalendarPlaceResponseDto> getMyCalendarsByDate(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -50,7 +54,6 @@ public class MemberCalendarController {
         return memberCalendarService.getMyCalendarsByDate(memberId, startDate, lang);
     }
 
-    // 일정 삭제 (calendarId 기준)
     @DeleteMapping("/delete/{calendarId}")
     public void removeCalendar(@PathVariable Long calendarId,
                                Authentication authentication) {
@@ -59,7 +62,6 @@ public class MemberCalendarController {
         memberCalendarService.removeCalendarById(memberId, calendarId);
     }
 
-    // (선택) 캘린더에 담긴 placeId 목록만
     @GetMapping("/place-ids")
     public List<Long> getMyCalendarPlaceIds(Authentication authentication) {
         Long memberId = (Long) authentication.getPrincipal();

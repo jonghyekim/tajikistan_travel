@@ -262,11 +262,32 @@ public class HomeController {
     }
     
     private String resolveLang(String lang, HttpServletRequest request, HttpServletResponse response) {
-        String resolved = (lang == null || lang.isBlank()) ? "en" : lang.trim().toLowerCase();
-        if (!resolved.equals("en") && !resolved.equals("ru") && !resolved.equals("tg") && !resolved.equals("ko")) {
+        String resolved = normalizeLang(lang);
+        if (resolved == null) {
+            Locale currentLocale = localeResolver.resolveLocale(request);
+            resolved = normalizeLang(currentLocale != null ? currentLocale.toLanguageTag() : null);
+        }
+        if (resolved == null) {
             resolved = "en";
         }
+
         localeResolver.setLocale(request, response, Locale.forLanguageTag(resolved));
         return resolved;
+    }
+
+    private String normalizeLang(String lang) {
+        if (lang == null || lang.isBlank()) {
+            return null;
+        }
+
+        String normalized = lang.trim().toLowerCase(Locale.ROOT);
+        if (normalized.contains("-")) {
+            normalized = normalized.substring(0, normalized.indexOf('-'));
+        }
+
+        if (normalized.equals("en") || normalized.equals("ru") || normalized.equals("tg") || normalized.equals("ko")) {
+            return normalized;
+        }
+        return null;
     }
 }

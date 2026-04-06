@@ -43,95 +43,118 @@
                 </div>
 
                 <!-- Register Form -->
-                <form id="registerForm" class="auth-form">
-                    <!-- Nickname Field -->
-                    <div class="form-group">
-                        <label for="nickname" class="form-label">
-                            <span th:text="#{register.nickname}">Display Name</span>
-                            <span class="required">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="nickname"
-                            name="nickname"
-                            class="form-input"
-                            th:placeholder="#{register.nickname.placeholder}"
-                            placeholder="How should we call you?"
-                            required
-                            minlength="2"
-                            maxlength="50" />
+                <form id="registerForm" class="auth-form" novalidate>
+                    <div
+                        class="form-step-indicator"
+                        id="stepIndicator"
+                        th:attr="data-step-one=#{register.step(1,2)},data-step-two=#{register.step(2,2)}"
+                        th:text="#{register.step(1,2)}">Step 1 of 2</div>
+
+                    <div class="form-step is-active" data-step="1">
+                        <div class="form-group">
+                            <label for="nickname" class="form-label">
+                                <span th:text="#{register.nickname}">Display Name</span>
+                                <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="nickname"
+                                name="nickname"
+                                class="form-input"
+                                th:placeholder="#{register.nickname.placeholder}"
+                                placeholder="How should we call you?"
+                                required
+                                minlength="2"
+                                maxlength="50" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <span th:text="#{register.email}">Email Address</span>
+                                <span class="required">*</span>
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-input"
+                                th:placeholder="#{register.email.placeholder}"
+                                placeholder="your@email.com"
+                                required
+                                autocomplete="email" />
+                        </div>
+
+                        <div class="form-step-actions">
+                            <button type="button" id="nextStepButton" class="form-button form-button-primary">
+                                <span th:text="#{register.next}">Next</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Username Field -->
-                    <div class="form-group">
-                        <label for="username" class="form-label">
-                            <span th:text="#{register.username}">Username</span>
-                            <span class="required">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            class="form-input"
-                            th:placeholder="#{register.username.placeholder}"
-                            placeholder="Choose a unique username"
-                            required
-                            minlength="3"
-                            maxlength="30"
-                            autocomplete="username" />
-                        <small style="font-size: 12px; color: #888; margin-top: 4px; display: block;">
-                            <span th:text="#{register.username.hint}">3-30 characters, no spaces</span>
-                        </small>
+                    <div class="form-step" data-step="2" aria-hidden="true">
+                        <div class="form-group">
+                            <label for="username" class="form-label">
+                                <span th:text="#{register.username}">Username</span>
+                                <span class="required">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                class="form-input"
+                                th:placeholder="#{register.username.placeholder}"
+                                placeholder="Choose a unique username"
+                                required
+                                minlength="3"
+                                maxlength="30"
+                                autocomplete="username" />
+                            <small class="form-hint">
+                                <span th:text="#{register.username.hint}">3-30 characters, no spaces</span>
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <span th:text="#{register.password}">Password</span>
+                                <span class="required">*</span>
+                            </label>
+                            <div class="password-group">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    class="form-input"
+                                    th:placeholder="#{register.password.placeholder}"
+                                    placeholder="Create a strong password"
+                                    required
+                                    minlength="6"
+                                    autocomplete="new-password" />
+                                <button
+                                    type="button"
+                                    id="passwordToggle"
+                                    class="password-toggle"
+                                    aria-label="Show password"
+                                    aria-controls="password"
+                                    aria-pressed="false">
+                                    <span class="material-icons" aria-hidden="true">visibility</span>
+                                </button>
+                            </div>
+                            <small class="form-hint">
+                                <span th:text="#{register.password.hint}">Minimum 6 characters</span>
+                            </small>
+                        </div>
+
+                        <div class="form-step-actions form-step-actions-split">
+                            <button type="button" id="backStepButton" class="form-button form-button-secondary">
+                                <span th:text="#{register.back}">Back</span>
+                            </button>
+                            <button type="submit" class="form-button form-button-primary">
+                                <span th:text="#{register.button}">Create Account</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Email Field -->
-                    <div class="form-group">
-                        <label for="email" class="form-label">
-                            <span th:text="#{register.email}">Email Address</span>
-                            <span class="required">*</span>
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            class="form-input"
-                            th:placeholder="#{register.email.placeholder}"
-                            placeholder="your@email.com"
-                            required
-                            autocomplete="email" />
-                    </div>
-
-                    <!-- Password Field -->
-                    <div class="form-group">
-                        <label for="password" class="form-label">
-                            <span th:text="#{register.password}">Password</span>
-                            <span class="required">*</span>
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-input"
-                            th:placeholder="#{register.password.placeholder}"
-                            placeholder="Create a strong password"
-                            required
-                            minlength="6"
-                            autocomplete="new-password" />
-                        <small style="font-size: 12px; color: #888; margin-top: 4px; display: block;">
-                            <span th:text="#{register.password.hint}">Minimum 6 characters</span>
-                        </small>
-                    </div>
-
-                    <!-- Error Message -->
-                    <div id="message" class="form-message error" style="display: none;"></div>
-
-                    <!-- Sign Up Button -->
-                    <button type="submit" class="form-button form-button-primary">
-                        <span th:text="#{register.button}">Create Account</span>
-                    </button>
-
-                    <!-- Divider (Optional) -->
-                    <!-- <div class="form-divider" th:text="#{register.divider}">or</div> -->
+                    <div id="message" class="form-message error" style="display: none;" aria-live="polite"></div>
                 </form>
 
                 <!-- Footer Links -->
@@ -142,7 +165,7 @@
                             Sign In
                         </a>
                     </p>
-                    <p style="font-size: 12px; color: #999; margin-top: 12px;">
+                    <p class="form-footnote">
                         <span th:text="#{register.terms}">By creating an account, you agree to our Terms of Service</span>
                     </p>
                 </div>
@@ -152,51 +175,125 @@
 
     <!-- Validation Script -->
     <script>
-        document.getElementById("registerForm").addEventListener("submit", async function (e) {
+        const registerForm = document.getElementById("registerForm");
+        const messageElement = document.getElementById("message");
+        const stepIndicator = document.getElementById("stepIndicator");
+        const steps = Array.from(registerForm.querySelectorAll(".form-step"));
+        const nextStepButton = document.getElementById("nextStepButton");
+        const backStepButton = document.getElementById("backStepButton");
+        const passwordInput = document.getElementById("password");
+        const passwordToggle = document.getElementById("passwordToggle");
+        const passwordToggleIcon = passwordToggle.querySelector(".material-icons");
+        let currentStep = 1;
+
+        function showMessage(text, type) {
+            messageElement.innerText = text;
+            messageElement.className = "form-message " + type;
+            messageElement.style.display = "block";
+        }
+
+        function clearMessage() {
+            messageElement.style.display = "none";
+        }
+
+        function updateStep(nextStep) {
+            currentStep = nextStep;
+
+            steps.forEach((step) => {
+                const isActive = Number(step.dataset.step) === nextStep;
+                step.classList.toggle("is-active", isActive);
+                step.setAttribute("aria-hidden", String(!isActive));
+            });
+
+            stepIndicator.innerText = nextStep === 1
+                ? stepIndicator.dataset.stepOne
+                : stepIndicator.dataset.stepTwo;
+            clearMessage();
+        }
+
+        function validateStepOne() {
+            const nickname = document.getElementById("nickname").value.trim();
+            const email = document.getElementById("email").value.trim();
+
+            if (!nickname || !email) {
+                showMessage("Please fill in all fields", "error");
+                return false;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showMessage("Please enter a valid email address", "error");
+                return false;
+            }
+
+            return true;
+        }
+
+        passwordToggle.addEventListener("click", function () {
+            const isHidden = passwordInput.type === "password";
+            passwordInput.type = isHidden ? "text" : "password";
+            passwordToggle.setAttribute("aria-pressed", String(isHidden));
+            passwordToggle.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+            passwordToggleIcon.textContent = isHidden ? "visibility_off" : "visibility";
+        });
+
+        nextStepButton.addEventListener("click", function () {
+            if (!validateStepOne()) {
+                return;
+            }
+
+            updateStep(2);
+            document.getElementById("username").focus();
+        });
+
+        backStepButton.addEventListener("click", function () {
+            updateStep(1);
+            document.getElementById("nickname").focus();
+        });
+
+        registerForm.addEventListener("submit", async function (e) {
             e.preventDefault();
 
             const nickname = document.getElementById("nickname").value.trim();
             const username = document.getElementById("username").value.trim();
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
-            const messageElement = document.getElementById("message");
             const submitButton = e.target.querySelector('button[type="submit"]');
 
-            // Clear previous message
-            messageElement.style.display = "none";
+            if (currentStep === 1) {
+                if (!validateStepOne()) {
+                    return;
+                }
 
-            // Basic validation
+                updateStep(2);
+                document.getElementById("username").focus();
+                return;
+            }
+
+            clearMessage();
+
             if (!nickname || !username || !email || !password) {
-                messageElement.innerText = "Please fill in all fields";
-                messageElement.className = "form-message error";
-                messageElement.style.display = "block";
+                showMessage("Please fill in all fields", "error");
                 return;
             }
 
             if (username.length < 3) {
-                messageElement.innerText = "Username must be at least 3 characters";
-                messageElement.className = "form-message error";
-                messageElement.style.display = "block";
+                showMessage("Username must be at least 3 characters", "error");
                 return;
             }
 
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                messageElement.innerText = "Please enter a valid email address";
-                messageElement.className = "form-message error";
-                messageElement.style.display = "block";
+                showMessage("Please enter a valid email address", "error");
                 return;
             }
 
             if (password.length < 6) {
-                messageElement.innerText = "Password must be at least 6 characters";
-                messageElement.className = "form-message error";
-                messageElement.style.display = "block";
+                showMessage("Password must be at least 6 characters", "error");
                 return;
             }
 
-            // Set loading state
             submitButton.disabled = true;
             submitButton.classList.add("loading");
+            backStepButton.disabled = true;
 
             try {
                 const response = await fetch("/auth/signup", {
@@ -221,31 +318,23 @@
                         errorMsg = "Invalid input. Please check your information.";
                     }
 
-                    messageElement.innerText = errorMsg;
-                    messageElement.className = "form-message error";
-                    messageElement.style.display = "block";
+                    showMessage(errorMsg, "error");
                     return;
                 }
 
-                // Success
-                messageElement.innerText = "Account created successfully! Redirecting to login...";
-                messageElement.className = "form-message success";
-                messageElement.style.display = "block";
+                showMessage("Account created successfully! Redirecting to login...", "success");
 
-                // Redirect after short delay
                 setTimeout(() => {
                     window.location.href = "/auth/login";
                 }, 1500);
 
             } catch (err) {
                 console.error("Registration error:", err);
-                messageElement.innerText = "An error occurred. Please try again.";
-                messageElement.className = "form-message error";
-                messageElement.style.display = "block";
+                showMessage("An error occurred. Please try again.", "error");
             } finally {
-                // Reset loading state (in case of error)
                 submitButton.disabled = false;
                 submitButton.classList.remove("loading");
+                backStepButton.disabled = false;
             }
         });
     </script>
