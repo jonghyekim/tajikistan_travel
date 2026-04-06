@@ -115,6 +115,9 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
 }
 
 .saved-panel-header {
@@ -131,7 +134,9 @@ body {
 .saved-card-list {
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -170,7 +175,6 @@ body {
 
 /* =========================
    Sidebar cards
-   filter.css 카드 디자인 기반
 ========================= */
 
 .place-card-wrapper {
@@ -343,14 +347,19 @@ body {
 
 .calendar-board {
     min-width: 0;
+    width: 100%;
+    max-width: 100%;
     background: #ffffff;
     border-radius: 32px;
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
     padding: 24px;
+    overflow: hidden;
 }
 
 #calendar {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
 }
 
 /* =========================
@@ -491,16 +500,65 @@ body {
 
     .calendar-content {
         grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .calendar-content > * {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
     }
 
     .saved-panel {
         height: auto;
         max-height: none;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow: hidden;
     }
 
     .saved-card-list {
-        max-height: 520px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: stretch;
         justify-content: flex-start;
+        gap: 14px;
+        padding-right: 0;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .saved-card-list::-webkit-scrollbar {
+        height: 8px;
+        width: auto;
+    }
+
+    .sidebar-place-card {
+        flex: 0 0 240px;
+        width: 240px;
+        min-width: 240px;
+        max-width: 240px;
+    }
+
+    .calendar-board {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    #calendar {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
     }
 }
 
@@ -531,35 +589,136 @@ body {
         font-size: 16px;
     }
 
-    .calendar-board {
-        padding: 16px;
-        border-radius: 24px;
+    .calendar-content {
+        gap: 20px;
+    }
+
+    .calendar-content > * {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
     }
 
     .saved-panel {
         padding: 16px;
         border-radius: 24px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .saved-card-list {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 12px;
+        padding-bottom: 6px;
+        padding-right: 0;
+        justify-content: flex-start;
+        align-items: stretch;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .saved-card-list::-webkit-scrollbar {
+        height: 7px;
+    }
+
+    .sidebar-place-card {
+        flex: 0 0 210px;
+        width: 210px;
+        min-width: 210px;
+        max-width: 210px;
+        border-radius: 18px;
+        align-self: auto;
+    }
+
+    .sidebar-place-thumb {
+        aspect-ratio: 16 / 9;
+    }
+
+    .sidebar-place-body {
+        padding: 11px 11px 10px;
     }
 
     .sidebar-place-title {
-        font-size: 15px;
+        font-size: 14px;
+        line-height: 1.3;
     }
 
     .sidebar-place-desc {
-        font-size: 11.5px;
+        margin: 5px 0 8px;
+        font-size: 11px;
+        line-height: 1.4;
+        -webkit-line-clamp: 2;
+    }
+
+    .sidebar-place-card .badge {
+        font-size: 10px;
+        padding: 4px 8px;
+        border-radius: 8px;
+    }
+
+    .sidebar-place-card .badge-bottom {
+        padding: 5px 8px;
+    }
+
+    .sidebar-place-card .badge-bottom .material-icons {
+        font-size: 13px;
+    }
+
+    .calendar-board {
+        padding: 16px;
+        border-radius: 24px;
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .calendar-board #calendar,
+    #calendar {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
     }
 
     .fc .fc-toolbar {
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 6px;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .fc .fc-toolbar-title {
-        font-size: 20px;
+        font-size: 18px;
+    }
+
+    .fc .fc-col-header-cell-cushion {
+        padding: 8px 2px;
+        font-size: 11px;
+    }
+
+    .fc .fc-daygrid-day-number {
+        padding: 6px 6px 0;
+        font-size: 11px;
     }
 
     .fc .fc-daygrid-day-frame {
-        min-height: 92px;
+        min-height: 72px;
+    }
+
+    .fc .fc-daygrid-event {
+        margin: 1px 4px;
+    }
+
+    .fc-event-title {
+        font-size: 10px;
     }
 }
 
@@ -572,20 +731,136 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .saved-card-list {
-        max-height: 420px;
-        justify-content: flex-start;
+    .calendar-content > * {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
     }
 
-    .fc .fc-daygrid-day-frame {
-        min-height: 80px;
+    .saved-panel {
+        padding: 14px;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .saved-card-list {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 10px;
+        padding-bottom: 6px;
+        justify-content: flex-start;
+        align-items: stretch;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .saved-card-list::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .sidebar-place-card {
+        flex: 0 0 180px;
+        width: 180px;
+        min-width: 180px;
+        max-width: 180px;
+        border-radius: 16px;
+    }
+
+    .sidebar-place-body {
+        padding: 10px 10px 9px;
+    }
+
+    .sidebar-place-title {
+        font-size: 13px;
+    }
+
+    .sidebar-place-desc {
+        margin: 4px 0 7px;
+        font-size: 10.5px;
+        line-height: 1.35;
+        -webkit-line-clamp: 2;
+    }
+
+    .sidebar-place-card .badge {
+        font-size: 9.5px;
+        padding: 4px 7px;
+        border-radius: 7px;
+    }
+
+    .sidebar-place-card .badge-top {
+        top: 6px;
+        right: 6px;
+    }
+
+    .sidebar-place-card .badge-bottom {
+        padding: 4px 7px;
+        border-radius: 7px;
+    }
+
+    .sidebar-place-card .badge-bottom .material-icons {
+        font-size: 12px;
+    }
+
+    .calendar-board {
+        padding: 12px;
+        border-radius: 20px;
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .calendar-board #calendar,
+    #calendar {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .fc .fc-toolbar {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 16px;
+    }
+
+    .fc .fc-button {
+        padding: 2px 4px !important;
+    }
+
+    .fc .fc-button .fc-icon {
+        font-size: 16px;
     }
 
     .fc .fc-col-header-cell-cushion {
-        font-size: 12px;
+        padding: 6px 1px;
+        font-size: 10px;
     }
 
     .fc .fc-daygrid-day-number {
-        font-size: 12px;
+        padding: 5px 5px 0;
+        font-size: 10px;
+    }
+
+    .fc .fc-daygrid-day-frame {
+        min-height: 60px;
+    }
+
+    .fc .fc-daygrid-event {
+        margin: 1px 3px;
+    }
+
+    .fc-event-title {
+        font-size: 9px;
     }
 }
