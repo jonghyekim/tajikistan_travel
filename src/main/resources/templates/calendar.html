@@ -65,12 +65,82 @@
                     </div>
                 </aside>
 
-                <section class="calendar-board">
-                    <div id="calendar"></div>
-                </section>
+                <div class="calendar-section-wrapper">
+                    <section class="calendar-board">
+                        <div id="calendar"></div>
+                    </section>
+
+                    <button id="add-note-btn" class="add-note-btn" title="Add note to calendar">
+                        <span class="material-icons">add</span>
+                    </button>
+                </div>
             </section>
         </div>
     </main>
+
+    <!-- Note Modal -->
+    <div id="note-modal" class="note-modal" style="display: none;">
+        <div class="note-modal-overlay"></div>
+        <div class="note-modal-content">
+            <div class="note-modal-header">
+                <h2>Add Note to Calendar</h2>
+                <button id="note-modal-close" class="note-modal-close" type="button">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+
+            <div class="note-modal-body">
+                <!-- Date Picker -->
+                <div class="note-form-group">
+                    <label class="note-label">SELECT DATE</label>
+                    <button id="date-display-btn" class="date-display-btn" type="button">
+                        <span class="material-icons">event</span>
+                        <span id="date-display-text">April 13, 2026</span>
+                    </button>
+
+                    <input type="hidden" id="note-date" />
+                </div>
+
+                <!-- Note Textarea -->
+                <div class="note-form-group">
+                    <label for="note-textarea" class="note-label">NOTE CONTENT</label>
+                    <textarea id="note-textarea" class="note-textarea" placeholder="Write your note here..." maxlength="500"></textarea>
+                    <div class="note-char-count">
+                        <span id="note-char-used">0</span> / 500
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Picker Floating Modal (hidden by default) -->
+            <div class="calendar-picker-backdrop" id="calendar-picker-backdrop" style="display: none;"></div>
+            <div class="calendar-picker-floating" id="calendar-picker" style="display: none;">
+                <div class="calendar-picker-header">
+                    <button id="cal-prev-btn" class="cal-nav-btn" type="button">
+                        <span class="material-icons">chevron_left</span>
+                    </button>
+                    <div id="cal-month-year" class="cal-month-year">April 2026</div>
+                    <button id="cal-next-btn" class="cal-nav-btn" type="button">
+                        <span class="material-icons">chevron_right</span>
+                    </button>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="weekday">Sun</div>
+                    <div class="weekday">Mon</div>
+                    <div class="weekday">Tue</div>
+                    <div class="weekday">Wed</div>
+                    <div class="weekday">Thu</div>
+                    <div class="weekday">Fri</div>
+                    <div class="weekday">Sat</div>
+                </div>
+                <div class="calendar-days" id="cal-days"></div>
+            </div>
+
+            <div class="note-modal-footer">
+                <button id="note-cancel-btn" class="note-btn note-btn-cancel" type="button">Cancel</button>
+                <button id="note-save-btn" class="note-btn note-btn-save" type="button">Save Note</button>
+            </div>
+        </div>
+    </div>
 
     <div th:replace="components/footer :: footer"></div>
 
@@ -432,6 +502,199 @@
                 console.error('Failed to copy calendar to clipboard:', error);
                 alert('Failed to copy calendar to clipboard. Please try again.');
             }
+        }
+
+        // Note Modal with Calendar Picker
+        let calendarMonth = new Date().getMonth();
+        let calendarYear = new Date().getFullYear();
+        let selectedDate = new Date();
+
+        const noteModal = document.getElementById('note-modal');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const noteModalClose = document.getElementById('note-modal-close');
+        const noteCancelBtn = document.getElementById('note-cancel-btn');
+        const noteSaveBtn = document.getElementById('note-save-btn');
+        const noteModalOverlay = document.querySelector('.note-modal-overlay');
+        const noteTextarea = document.getElementById('note-textarea');
+        const noteCharUsed = document.getElementById('note-char-used');
+        const noteDateInput = document.getElementById('note-date');
+
+        const dateDisplayBtn = document.getElementById('date-display-btn');
+        const dateDisplayText = document.getElementById('date-display-text');
+        const calendarPickerDiv = document.getElementById('calendar-picker');
+        const calendarBackdropDiv = document.getElementById('calendar-picker-backdrop');
+        const calPrevBtn = document.getElementById('cal-prev-btn');
+        const calNextBtn = document.getElementById('cal-next-btn');
+
+        // Event Listeners
+        addNoteBtn.addEventListener('click', openNoteModal);
+        noteModalClose.addEventListener('click', closeNoteModal);
+        noteCancelBtn.addEventListener('click', closeNoteModal);
+        noteModalOverlay.addEventListener('click', closeNoteModal);
+        dateDisplayBtn.addEventListener('click', toggleCalendar);
+        calendarBackdropDiv.addEventListener('click', closeCalendar);
+        calPrevBtn.addEventListener('click', () => changeMonth(-1));
+        calNextBtn.addEventListener('click', () => changeMonth(1));
+        noteTextarea.addEventListener('input', () => {
+            noteCharUsed.textContent = noteTextarea.value.length;
+        });
+        noteSaveBtn.addEventListener('click', saveNote);
+
+        function positionCalendar() {
+            const dateBtn = document.getElementById('date-display-btn');
+            const modal = document.querySelector('.note-modal-content');
+            
+            if (!dateBtn || !modal) return;
+            
+            const dateRect = dateBtn.getBoundingClientRect();
+            const modalRect = modal.getBoundingClientRect();
+            
+            // Calendar를 date 버튼 바로 아래, modal 내에서 정렬
+            const top = dateRect.bottom - modalRect.top + 8; // 8px gap
+            const left = dateRect.left - modalRect.left;
+            
+            calendarPickerDiv.style.position = 'absolute';
+            calendarPickerDiv.style.top = top + 'px';
+            calendarPickerDiv.style.left = left + 'px';
+            calendarPickerDiv.style.minWidth = dateRect.width + 'px';
+        }
+
+        function toggleCalendar() {
+            if (calendarPickerDiv.style.display === 'none') {
+                positionCalendar();
+                calendarPickerDiv.style.display = 'block';
+                calendarBackdropDiv.style.display = 'block';
+                renderCalendar();
+            } else {
+                closeCalendar();
+            }
+        }
+
+        function closeCalendar() {
+            calendarPickerDiv.style.display = 'none';
+            calendarBackdropDiv.style.display = 'none';
+        }
+
+        function changeMonth(offset) {
+            calendarMonth += offset;
+            if (calendarMonth > 11) {
+                calendarMonth = 0;
+                calendarYear++;
+            } else if (calendarMonth < 0) {
+                calendarMonth = 11;
+                calendarYear--;
+            }
+            renderCalendar();
+        }
+
+        function updateDateDisplay() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = selectedDate.toLocaleDateString('en-US', options);
+            dateDisplayText.textContent = dateStr;
+            noteDateInput.value = formatDate(selectedDate);
+            closeCalendar();
+        }
+
+        function renderCalendar() {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                                'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('cal-month-year').textContent = `${monthNames[calendarMonth]} ${calendarYear}`;
+
+            const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+            const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+            const daysInPrevMonth = new Date(calendarYear, calendarMonth, 0).getDate();
+
+            const calDays = document.getElementById('cal-days');
+            calDays.innerHTML = '';
+
+            // Previous month's days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = document.createElement('button');
+                day.className = 'cal-day other-month';
+                day.textContent = daysInPrevMonth - i;
+                day.type = 'button';
+                calDays.appendChild(day);
+            }
+
+            // Current month's days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayBtn = document.createElement('button');
+                dayBtn.className = 'cal-day';
+                dayBtn.textContent = day;
+                dayBtn.type = 'button';
+
+                // Highlight today
+                const today = new Date();
+                if (day === today.getDate() && 
+                    calendarMonth === today.getMonth() && 
+                    calendarYear === today.getFullYear()) {
+                    dayBtn.classList.add('today');
+                }
+
+                // Highlight selected date
+                if (day === selectedDate.getDate() && 
+                    calendarMonth === selectedDate.getMonth() && 
+                    calendarYear === selectedDate.getFullYear()) {
+                    dayBtn.classList.add('selected');
+                }
+
+                dayBtn.addEventListener('click', () => {
+                    selectedDate = new Date(calendarYear, calendarMonth, day);
+                    updateDateDisplay();
+                });
+
+                calDays.appendChild(dayBtn);
+            }
+
+            // Next month's days
+            const totalCells = calDays.children.length;
+            const remainingCells = 42 - totalCells;
+            for (let day = 1; day <= remainingCells; day++) {
+                const dayBtn = document.createElement('button');
+                dayBtn.className = 'cal-day other-month';
+                dayBtn.textContent = day;
+                dayBtn.type = 'button';
+                calDays.appendChild(dayBtn);
+            }
+        }
+
+        function openNoteModal() {
+            const today = new Date();
+            calendarMonth = today.getMonth();
+            calendarYear = today.getFullYear();
+            selectedDate = new Date(today);
+            
+            updateDateDisplay();
+            closeCalendar();
+            noteTextarea.value = '';
+            noteCharUsed.textContent = '0';
+            
+            noteModal.style.display = 'flex';
+            setTimeout(() => noteTextarea.focus(), 100);
+        }
+
+        function closeNoteModal() {
+            noteModal.style.display = 'none';
+            closeCalendar();
+        }
+
+        function saveNote() {
+            const date = noteDateInput.value;
+            const content = noteTextarea.value.trim();
+
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            if (!content) {
+                alert('Please write a note');
+                return;
+            }
+
+            console.log('Save note:', { date, content });
+            alert('Note saved successfully!');
+            closeNoteModal();
         }
     </script>
 </body>
