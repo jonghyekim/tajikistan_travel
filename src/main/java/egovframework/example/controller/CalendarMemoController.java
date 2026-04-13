@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,10 +30,10 @@ public class CalendarMemoController {
     private final CalendarMemoService calendarMemoService;
 
     @PostMapping("/save")
-    public CalendarMemoResponseDto saveOrUpdateMemo(@RequestBody CalendarMemoRequestDto requestDto,
-                                                     Authentication authentication) {
+    public CalendarMemoResponseDto addMemo(@RequestBody CalendarMemoRequestDto requestDto,
+                                           Authentication authentication) {
         Long memberId = (Long) authentication.getPrincipal();
-        return calendarMemoService.addOrUpdateMemo(memberId, requestDto);
+        return calendarMemoService.addMemo(memberId, requestDto);
     }
 
     @GetMapping("/list")
@@ -48,6 +49,21 @@ public class CalendarMemoController {
 
         Long memberId = (Long) authentication.getPrincipal();
         return calendarMemoService.getMemoByDate(memberId, startDate);
+    }
+
+    @GetMapping("/{memoId}")
+    public CalendarMemoResponseDto getMemoById(@PathVariable Long memoId,
+                                               Authentication authentication) {
+        Long memberId = (Long) authentication.getPrincipal();
+        return calendarMemoService.getMemoById(memberId, memoId);
+    }
+
+    @PutMapping("/{memoId}")
+    public CalendarMemoResponseDto updateMemo(@PathVariable Long memoId,
+                                              @RequestBody CalendarMemoRequestDto requestDto,
+                                              Authentication authentication) {
+        Long memberId = (Long) authentication.getPrincipal();
+        return calendarMemoService.updateMemo(memberId, memoId, requestDto);
     }
 
     @DeleteMapping("/{memoId}")

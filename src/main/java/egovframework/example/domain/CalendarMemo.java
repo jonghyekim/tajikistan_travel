@@ -12,10 +12,6 @@ import lombok.*;
 @Entity
 @Table(
     name = "calendar_memo",
-    uniqueConstraints = @UniqueConstraint(
-        name = "uk_member_date",
-        columnNames = {"member_id", "start_date"}
-    ),
     indexes = {
         @Index(name = "idx_member_date", columnList = "member_id, start_date")
     }

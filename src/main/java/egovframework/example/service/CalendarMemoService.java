@@ -23,20 +23,14 @@ public class CalendarMemoService {
     private final CalendarMemoRepository calendarMemoRepository;
     private final MemberRepository memberRepository;
 
-    public CalendarMemoResponseDto addOrUpdateMemo(Long memberId, CalendarMemoRequestDto requestDto) {
+    public CalendarMemoResponseDto addMemo(Long memberId, CalendarMemoRequestDto requestDto) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        CalendarMemo memo = calendarMemoRepository
-                .findByMember_IdAndStartDate(memberId, requestDto.getStartDate())
-                .orElse(null);
-
-        if (memo == null) {
-            memo = new CalendarMemo();
-            memo.setMember(member);
-            memo.setStartDate(requestDto.getStartDate());
-        }
-
+        // 항상 새로운 메모 생성 (같은 날짜에 여러 개 가능)
+        CalendarMemo memo = new CalendarMemo();
+        memo.setMember(member);
+        memo.setStartDate(requestDto.getStartDate());
         memo.setMemo(requestDto.getMemo());
         calendarMemoRepository.save(memo);
 
@@ -83,6 +77,41 @@ public class CalendarMemoService {
         if (memo == null) {
             return null;
         }
+
+        return new CalendarMemoResponseDto(
+                memo.getMemoId(),
+                memo.getStartDate(),
+                memo.getMemo()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public CalendarMemoResponseDto getMemoById(Long memberId, Long memoId) {
+        CalendarMemo memo = calendarMemoRepository.findById(memoId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메모입니다."));
+
+        if (!memo.getMember().getId().equals(memberId)) {
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+
+        return new CalendarMemoResponseDto(
+                memo.getMemoId(),
+                memo.getStartDate(),
+                memo.getMemo()
+        );
+    }
+
+    public CalendarMemoResponseDto updateMemo(Long memberId, Long memoId, CalendarMemoRequestDto requestDto) {
+        CalendarMemo memo = calendarMemoRepository.findById(memoId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메모입니다."));
+
+        if (!memo.getMember().getId().equals(memberId)) {
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+
+        memo.setStartDate(requestDto.getStartDate());
+        memo.setMemo(requestDto.getMemo());
+        calendarMemoRepository.save(memo);
 
         return new CalendarMemoResponseDto(
                 memo.getMemoId(),

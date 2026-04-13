@@ -1269,9 +1269,15 @@ body {
 .note-modal-footer {
     padding: 16px 24px 24px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     gap: 12px;
     border-top: 1px solid #e0e0e0;
+}
+
+.note-modal-footer-buttons {
+    display: flex;
+    gap: 12px;
 }
 
 .note-btn {
@@ -1303,6 +1309,30 @@ body {
 
 .note-btn-cancel:hover {
     background: #e0e0e0;
+}
+
+.note-btn-delete {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.note-btn-delete:hover {
+    background: #dc2626;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.note-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.note-btn-save:disabled {
+    background: #13574a;
+}
+
+.note-btn-save:disabled:hover {
+    background: #13574a;
+    box-shadow: none;
 }
 
 @media (max-width: 768px) {
