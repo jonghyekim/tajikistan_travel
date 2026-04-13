@@ -14,6 +14,8 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.css">
     <link rel="icon" th:href="@{/assets/logo/favicon.png}">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
 <body>
@@ -35,6 +37,16 @@
                         Drag and drop your saved places into the calendar to create your itinerary,
                         and easily save your travel plans as an image with date-based notes.
                     </p>
+                    <div class="download-buttons">
+                        <button id="download-image-btn" class="download-btn download-btn-image" title="Download calendar as PNG image">
+                            <span class="material-icons">image</span>
+                            <span>Download as Image</span>
+                        </button>
+                        <button id="copy-image-btn" class="download-btn download-btn-copy" title="Copy calendar to clipboard">
+                            <span class="material-icons">content_copy</span>
+                            <span>Copy to Clipboard</span>
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -360,6 +372,66 @@
             const day = String(date.getDate()).padStart(2, '0');
 
             return `${year}-${month}-${day}`;
+        }
+
+        // 다운로드 및 복사 버튼 이벤트
+        document.getElementById('download-image-btn').addEventListener('click', downloadCalendarAsImage);
+        document.getElementById('copy-image-btn').addEventListener('click', copyCalendarToClipboard);
+
+        async function downloadCalendarAsImage() {
+            const calendarBoard = document.querySelector('.calendar-board');
+            const timestamp = new Date().toISOString().slice(0, 10);
+            
+            try {
+                const canvas = await html2canvas(calendarBoard, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+                
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = `travel-calendar-${timestamp}.png`;
+                link.click();
+            } catch (error) {
+                console.error('Failed to download calendar as image:', error);
+                alert('Failed to download calendar as image. Please try again.');
+            }
+        }
+
+        async function copyCalendarToClipboard() {
+            const calendarBoard = document.querySelector('.calendar-board');
+            const copyBtn = document.getElementById('copy-image-btn');
+            const originalText = copyBtn.querySelector('span:last-child').textContent;
+            
+            try {
+                const canvas = await html2canvas(calendarBoard, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+                
+                canvas.toBlob(async function (blob) {
+                    try {
+                        await navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]);
+                        
+                        copyBtn.querySelector('span:last-child').textContent = 'Copied!';
+                        setTimeout(() => {
+                            copyBtn.querySelector('span:last-child').textContent = originalText;
+                        }, 2000);
+                    } catch (error) {
+                        console.error('Failed to copy to clipboard:', error);
+                        alert('Failed to copy to clipboard. Please try again.');
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to copy calendar to clipboard:', error);
+                alert('Failed to copy calendar to clipboard. Please try again.');
+            }
         }
     </script>
 </body>

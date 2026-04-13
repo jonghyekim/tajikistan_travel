@@ -94,6 +94,60 @@ body {
     color: #8f8f8f;
 }
 
+.download-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.download-btn .material-icons {
+    font-size: 20px;
+}
+
+.download-btn-image {
+    background: #008eff;
+    color: #ffffff;
+}
+
+.download-btn-image:hover {
+    background: #0079d6;
+    box-shadow: 0 4px 12px rgba(0, 142, 255, 0.25);
+}
+
+.download-btn-copy {
+    background: #f0f0f0;
+    color: #1b1b1b;
+}
+
+.download-btn-copy:hover {
+    background: #e0e0e0;
+}
+
+.download-btn:active {
+    transform: scale(0.98);
+}
+
+.download-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .calendar-content {
     margin-top: 34px;
     display: grid;
@@ -587,6 +641,15 @@ body {
 
     .dashboard-section-subtitle {
         font-size: 16px;
+    }
+
+    .download-buttons {
+        flex-direction: column;
+    }
+
+    .download-btn {
+        width: 100%;
+        justify-content: center;
     }
 
     .calendar-content {
