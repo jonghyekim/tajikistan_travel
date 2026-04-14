@@ -121,13 +121,13 @@ body {
 }
 
 .download-btn-image {
-    background: #008eff;
+    background: #3b82f6;
     color: #ffffff;
 }
 
 .download-btn-image:hover {
-    background: #0079d6;
-    box-shadow: 0 4px 12px rgba(0, 142, 255, 0.25);
+    background: #1e40af;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
 }
 
 .download-btn-copy {
@@ -966,22 +966,22 @@ body {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: #1a6b5f;
+    background: #2f7d48;
     color: #ffffff;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(26, 107, 95, 0.3);
+    box-shadow: 0 4px 12px rgba(47, 125, 72, 0.3);
     transition: all 0.2s ease;
     z-index: 15;
     font-size: 0;
 }
 
 .add-note-btn:hover {
-    background: #146b52;
-    box-shadow: 0 6px 16px rgba(26, 107, 95, 0.4);
+    background: #237d48;
+    box-shadow: 0 6px 16px rgba(47, 125, 72, 0.4);
     transform: scale(1.1);
 }
 
@@ -1121,13 +1121,13 @@ body {
     border: none;
     cursor: pointer;
     padding: 4px 8px;
-    color: #1a6b5f;
+    color: #2f7d48;
     border-radius: 4px;
     transition: background 0.2s ease;
 }
 
 .cal-nav-btn:hover {
-    background: rgba(26, 107, 95, 0.1);
+    background: rgba(47, 125, 72, 0.1);
 }
 
 .cal-nav-btn .material-icons {
@@ -1190,13 +1190,13 @@ body {
 }
 
 .cal-day.today {
-    background: rgba(26, 107, 95, 0.15);
-    color: #1a6b5f;
+    background: rgba(47, 125, 72, 0.15);
+    color: #2f7d48;
     font-weight: 700;
 }
 
 .cal-day.selected {
-    background: #1a6b5f;
+    background: #2f7d48;
     color: #ffffff;
     font-weight: 700;
 }
@@ -1219,8 +1219,8 @@ body {
 
 .note-textarea:focus {
     outline: none;
-    border-color: #1a6b5f;
-    box-shadow: 0 0 0 3px rgba(26, 107, 95, 0.1);
+    border-color: #2f7d48;
+    box-shadow: 0 0 0 3px rgba(47, 125, 72, 0.1);
 }
 
 .note-char-count {
@@ -1248,7 +1248,7 @@ body {
 
 #date-display-btn:hover {
     background: #f9f9f9;
-    border-color: #1a6b5f;
+    border-color: #2f7d48;
 }
 
 #date-display-btn:active {
@@ -1257,7 +1257,7 @@ body {
 
 #date-display-btn .material-icons {
     font-size: 20px;
-    color: #1a6b5f;
+    color: #2f7d48;
     flex-shrink: 0;
 }
 
@@ -1293,13 +1293,13 @@ body {
 }
 
 .note-btn-save {
-    background: #1a6b5f;
+    background: #2f7d48;
     color: #ffffff;
 }
 
 .note-btn-save:hover {
-    background: #146b52;
-    box-shadow: 0 4px 12px rgba(26, 107, 95, 0.3);
+    background: #237d48;
+    box-shadow: 0 4px 12px rgba(47, 125, 72, 0.3);
 }
 
 .note-btn-cancel {

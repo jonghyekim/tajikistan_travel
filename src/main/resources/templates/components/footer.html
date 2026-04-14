@@ -25,12 +25,14 @@
                 </ul>
             </nav>
 
-            <!-- My Collections -->
+            <!-- My Travel Dashboard -->
             <nav class="footer-nav">
-                <p th:text="#{footer.collections}">My Collections</p>
+                <p th:text="#{footer.dashboard}">My Travel Dashboard</p>
                 <ul>
                     <li><a th:href="@{/me/favorites(lang=${lang})}"
-                           th:text="#{favorites.page.title}">My Favorite Destinations</a></li>
+                           th:text="#{favorites.label}">Favorites</a></li>
+                    <li><a th:href="@{/me/calendar(lang=${lang})}"
+                           th:text="#{calendar.label}">Calendar</a></li>
                 </ul>
             </nav>
 
