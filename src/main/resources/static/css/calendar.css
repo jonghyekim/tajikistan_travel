@@ -94,6 +94,60 @@ body {
     color: #8f8f8f;
 }
 
+.download-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.download-btn .material-icons {
+    font-size: 20px;
+}
+
+.download-btn-image {
+    background: #3b82f6;
+    color: #ffffff;
+}
+
+.download-btn-image:hover {
+    background: #1e40af;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.download-btn-copy {
+    background: #f0f0f0;
+    color: #1b1b1b;
+}
+
+.download-btn-copy:hover {
+    background: #e0e0e0;
+}
+
+.download-btn:active {
+    transform: scale(0.98);
+}
+
+.download-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .calendar-content {
     margin-top: 34px;
     display: grid;
@@ -589,6 +643,15 @@ body {
         font-size: 16px;
     }
 
+    .download-buttons {
+        flex-direction: column;
+    }
+
+    .download-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     .calendar-content {
         gap: 20px;
     }
@@ -727,6 +790,23 @@ body {
         width: min(1280px, 94%);
     }
 
+    .add-note-btn {
+        bottom: -48px;
+        right: auto;
+        left: calc(100% - 8px);
+        width: 44px;
+        height: 44px;
+    }
+
+    .add-note-btn .material-icons {
+        font-size: 20px;
+    }
+
+    .calendar-picker-floating {
+        max-width: calc(100vw - 32px);
+        max-height: 60vh;
+    }
+
     .dashboard-tabs {
         grid-template-columns: 1fr;
     }
@@ -862,5 +942,435 @@ body {
 
     .fc-event-title {
         font-size: 9px;
+    }
+}
+
+/* =========================
+   Note Modal Styles
+========================= */
+
+.calendar-section-wrapper {
+    position: relative;
+    margin-bottom: 60px;
+}
+
+.calendar-board {
+    position: relative;
+}
+
+.add-note-btn {
+    position: absolute;
+    bottom: -68px;
+    right: auto;
+    left: calc(100% - 8px);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #2f7d48;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(47, 125, 72, 0.3);
+    transition: all 0.2s ease;
+    z-index: 15;
+    font-size: 0;
+}
+
+.add-note-btn:hover {
+    background: #237d48;
+    box-shadow: 0 6px 16px rgba(47, 125, 72, 0.4);
+    transform: scale(1.1);
+}
+
+.add-note-btn .material-icons {
+    font-size: 28px;
+}
+
+.note-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+}
+
+.note-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.note-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    z-index: 1001;
+}
+
+.note-modal-header {
+    padding: 24px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.note-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1b1b1b;
+}
+
+.note-modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.note-modal-close:hover {
+    color: #1b1b1b;
+}
+
+.note-modal-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.note-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.note-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Calendar Picker Backdrop */
+.calendar-picker-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 1001;
+}
+
+/* Calendar Picker Floating Modal */
+.calendar-picker-floating {
+    position: absolute;
+    background: #e8e8e8;
+    border: 1px solid #d0d0d0;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    z-index: 1002;
+    min-width: 320px;
+}
+
+/* Legacy Calendar Picker (kept for compatibility) */
+.calendar-picker {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #ffffff;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+}
+
+.calendar-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.cal-nav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    color: #2f7d48;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.cal-nav-btn:hover {
+    background: rgba(47, 125, 72, 0.1);
+}
+
+.cal-nav-btn .material-icons {
+    font-size: 20px;
+}
+
+.cal-month-year {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1b1b;
+    min-width: 120px;
+    text-align: center;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #e0e0e0;
+}
+
+.weekday {
+    background: #f9f9f9;
+    padding: 8px 0;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #e0e0e0;
+    min-height: 220px;
+}
+
+.cal-day {
+    background: #ffffff;
+    border: none;
+    padding: 12px 0;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'Pretendard', sans-serif;
+    color: #1b1b1b;
+    transition: background 0.2s ease;
+    font-weight: 500;
+}
+
+.cal-day:hover:not(.other-month) {
+    background: #f5f5f5;
+}
+
+.cal-day.other-month {
+    color: #d0d0d0;
+    background: #fafafa;
+    cursor: default;
+}
+
+.cal-day.today {
+    background: rgba(47, 125, 72, 0.15);
+    color: #2f7d48;
+    font-weight: 700;
+}
+
+.cal-day.selected {
+    background: #2f7d48;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.note-textarea {
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14px;
+    color: #1b1b1b;
+    resize: none;
+    height: 150px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.note-textarea::placeholder {
+    color: #999;
+}
+
+.note-textarea:focus {
+    outline: none;
+    border-color: #2f7d48;
+    box-shadow: 0 0 0 3px rgba(47, 125, 72, 0.1);
+}
+
+.note-char-count {
+    font-size: 12px;
+    color: #999;
+    text-align: right;
+}
+
+#date-display-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1b1b1b;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#date-display-btn:hover {
+    background: #f9f9f9;
+    border-color: #2f7d48;
+}
+
+#date-display-btn:active {
+    transform: scale(0.98);
+}
+
+#date-display-btn .material-icons {
+    font-size: 20px;
+    color: #2f7d48;
+    flex-shrink: 0;
+}
+
+#date-display-text {
+    flex: 1;
+    text-align: left;
+}
+
+.note-modal-footer {
+    padding: 16px 24px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.note-modal-footer-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.note-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 40px;
+}
+
+.note-btn-save {
+    background: #2f7d48;
+    color: #ffffff;
+}
+
+.note-btn-save:hover {
+    background: #237d48;
+    box-shadow: 0 4px 12px rgba(47, 125, 72, 0.3);
+}
+
+.note-btn-cancel {
+    background: #f0f0f0;
+    color: #1b1b1b;
+}
+
+.note-btn-cancel:hover {
+    background: #e0e0e0;
+}
+
+.note-btn-delete {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.note-btn-delete:hover {
+    background: #dc2626;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.note-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.note-btn-save:disabled {
+    background: #13574a;
+}
+
+.note-btn-save:disabled:hover {
+    background: #13574a;
+    box-shadow: none;
+}
+
+@media (max-width: 768px) {
+    .add-note-btn {
+        bottom: -58px;
+        right: auto;
+        left: calc(100% - 8px);
+        width: 48px;
+        height: 48px;
+    }
+
+    .add-note-btn .material-icons {
+        font-size: 24px;
+    }
+
+    .calendar-picker-floating {
+        max-width: 90vw;
+        max-height: 70vh;
+    }
+
+    .calendar-days {
+        min-height: 180px;
+    }
+
+    .note-modal-content {
+        width: 95%;
+        max-width: 100%;
+    }
+
+    .note-modal-header {
+        padding: 20px;
+    }
+
+    .note-modal-body {
+        padding: 20px;
+    }
+
+    .note-textarea {
+        height: 120px;
     }
 }
