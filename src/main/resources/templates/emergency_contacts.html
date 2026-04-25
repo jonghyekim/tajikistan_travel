@@ -103,102 +103,23 @@
 
                 <!-- Contact List -->
                 <div class="contact-list">
-                    <!-- Emergency -->
-                    <article class="contact-card">
+                    <article class="contact-card" th:each="contact : ${contacts}">
                         <div class="contact-info">
-                            <h3 class="contact-title" th:text="#{emergency.general.title}">General Emergency</h3>
-                            <p class="contact-desc" th:text="#{emergency.general.desc}">
+                            <h3 class="contact-title" th:text="${contact.displayI18n.title}">General Emergency</h3>
+                            <p class="contact-desc" th:text="${contact.displayI18n.description}">
                                 Universal emergency line (Police / Ambulance / Fire)
                             </p>
                         </div>
                         <div class="contact-badge">
-                            <span class="badge badge-emergency" th:text="#{emergency.badge.emergency}">Emergency</span>
+                            <span class="badge"
+                                  th:classappend="'badge-' + ${contact.badgeType}"
+                                  th:text="${contact.displayI18n.badgeLabel}">
+                                Emergency
+                            </span>
                         </div>
-                        <a href="tel:112" class="contact-phone">
+                        <a href="tel:112" class="contact-phone" th:href="'tel:' + ${contact.phoneDial}">
                             <span class="material-icons" aria-hidden="true">call</span>
-                            112
-                        </a>
-                    </article>
-
-                    <article class="contact-card">
-                        <div class="contact-info">
-                            <h3 class="contact-title" th:text="#{emergency.police.title}">Police</h3>
-                            <p class="contact-desc" th:text="#{emergency.police.desc}">Emergency police assistance</p>
-                        </div>
-                        <div class="contact-badge">
-                            <span class="badge badge-police" th:text="#{emergency.badge.police}">Police</span>
-                        </div>
-                        <a href="tel:102" class="contact-phone">
-                            <span class="material-icons" aria-hidden="true">call</span>
-                            102
-                        </a>
-                    </article>
-
-                    <article class="contact-card">
-                        <div class="contact-info">
-                            <h3 class="contact-title" th:text="#{emergency.ambulance.title}">Ambulance</h3>
-                            <p class="contact-desc" th:text="#{emergency.ambulance.desc}">
-                                Medical emergency / ambulance dispatch
-                            </p>
-                        </div>
-                        <div class="contact-badge">
-                            <span class="badge badge-medical" th:text="#{emergency.badge.medical}">Medical</span>
-                        </div>
-                        <a href="tel:103" class="contact-phone">
-                            <span class="material-icons" aria-hidden="true">call</span>
-                            103
-                        </a>
-                    </article>
-
-                    <article class="contact-card">
-                        <div class="contact-info">
-                            <h3 class="contact-title" th:text="#{emergency.fire.title}">Fire Service</h3>
-                            <p class="contact-desc" th:text="#{emergency.fire.desc}">Fire emergency / rescue</p>
-                        </div>
-                        <div class="contact-badge">
-                            <span class="badge badge-fire" th:text="#{emergency.badge.fire}">Fire</span>
-                        </div>
-                        <a href="tel:101" class="contact-phone">
-                            <span class="material-icons" aria-hidden="true">call</span>
-                            101
-                        </a>
-                    </article>
-
-                    <!-- Medical (Hospitals) -->
-                    <article class="contact-card">
-                        <div class="contact-info">
-                            <h3 class="contact-title" th:text="#{emergency.clinic.title}">
-                                Prospekt Clinic (Dushanbe)
-                            </h3>
-                            <p class="contact-desc" th:text="#{emergency.clinic.desc}">
-                                Hospital / clinic in Dushanbe
-                            </p>
-                        </div>
-                        <div class="contact-badge">
-                            <span class="badge badge-medical" th:text="#{emergency.badge.medical}">Medical</span>
-                        </div>
-                        <a href="tel:+992487024400" class="contact-phone">
-                            <span class="material-icons" aria-hidden="true">call</span>
-                            +992 48 702 4400
-                        </a>
-                    </article>
-
-                    <!-- Embassy (Optional but useful) -->
-                    <article class="contact-card">
-                        <div class="contact-info">
-                            <h3 class="contact-title" th:text="#{emergency.embassy.title}">
-                                U.S. Embassy (Dushanbe)
-                            </h3>
-                            <p class="contact-desc" th:text="#{emergency.embassy.desc}">
-                                Embassy contact (consular assistance)
-                            </p>
-                        </div>
-                        <div class="contact-badge">
-                            <span class="badge badge-embassy" th:text="#{emergency.badge.embassy}">Embassy</span>
-                        </div>
-                        <a href="tel:+992372292000" class="contact-phone">
-                            <span class="material-icons" aria-hidden="true">call</span>
-                            +992 372 29 20 00
+                            <span th:text="${contact.phoneDisplay}">112</span>
                         </a>
                     </article>
                 </div>
