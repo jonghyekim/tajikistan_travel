@@ -279,4 +279,25 @@
             </div>
         </div>
     </div>
+    <link rel="stylesheet" th:href="@{/css/chat-widget.css}">
+    <div class="chat-test-widget" data-chat-widget th:attr="data-lang=${lang}">
+        <button type="button" class="chat-test-toggle" data-chat-toggle>Chat Test</button>
+        <section class="chat-test-panel" data-chat-panel hidden>
+            <div class="chat-test-head">
+                <strong>Chat API Test</strong>
+                <button type="button" data-chat-close aria-label="Close">x</button>
+            </div>
+            <div class="chat-test-messages" data-chat-messages>
+                <div class="chat-test-message bot">Type a message and send it to /api/chat.</div>
+            </div>
+            <div class="chat-test-form" data-chat-form>
+                <input type="text"
+                       data-chat-input
+                       autocomplete="off"
+                       placeholder="emergency police phone number">
+                <button type="button" data-chat-send>Send</button>
+            </div>
+        </section>
+    </div>
+    <script th:src="@{/js/chat-widget.js}"></script>
 </footer>
