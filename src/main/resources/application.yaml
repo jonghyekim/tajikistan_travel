@@ -20,6 +20,9 @@ spring:
         default_batch_fetch_size: 100
         jdbc:
           time_zone: Asia/Seoul
+
+  cache:
+    type: simple
           
 deepl:
   base-url: https://api-free.deepl.com
@@ -29,3 +32,11 @@ jwt:
   secret: "x9ByZQv4lJ9oH5z8K0a7Rk7pQ+0V0mE0X8sN5fLwCkA="
   access-exp-seconds: 900       #15 minutes
   refresh-exp-seconds: 1209600  #14 days
+
+chatbot:
+  llm:
+    mode: mock
+    endpoint: ${CHATBOT_LLM_ENDPOINT:}
+    api-key: ${OPENAI_API_KEY:${CHATBOT_LLM_API_KEY:}}
+    model: ${CHATBOT_LLM_MODEL:gpt-5-mini}
+    timeout-seconds: ${CHATBOT_LLM_TIMEOUT_SECONDS:30}
