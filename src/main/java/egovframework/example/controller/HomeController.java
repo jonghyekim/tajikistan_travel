@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 
 import egovframework.example.domain.CategoryCode;
+import egovframework.example.domain.EmergencyContact;
 import egovframework.example.domain.RegionCode;
 import egovframework.example.domain.TourPlace;
 import egovframework.example.repository.CategoryCodeRepository;
 import egovframework.example.repository.RegionCodeRepository;
 import egovframework.example.repository.TourPlaceRepository;
 import egovframework.example.service.CodeAutoTranslateService;
+import egovframework.example.service.EmergencyContactService;
 import egovframework.example.service.TourPlaceAutoTranslateService;
 
 // for image loading
@@ -38,6 +40,7 @@ public class HomeController {
     @Autowired private RegionCodeRepository regionCodeRepository;
     @Autowired private TourPlaceAutoTranslateService tourPlaceAutoTranslateService;
     @Autowired private CodeAutoTranslateService codeAutoTranslateService;
+    @Autowired private EmergencyContactService emergencyContactService;
     @Autowired private LocaleResolver localeResolver;
 
     @GetMapping("/")
@@ -197,8 +200,10 @@ public class HomeController {
                                       HttpServletRequest request,
                                       HttpServletResponse response) {
         String resolvedLang = resolveLang(lang, request, response);
+        List<EmergencyContact> contacts = emergencyContactService.findActiveContacts(resolvedLang);
 
         model.addAttribute("lang", resolvedLang);
+        model.addAttribute("contacts", contacts);
         model.addAttribute("currentPage", "emergency_contacts");
 
         return "emergency_contacts";
