@@ -196,7 +196,7 @@ body {
     gap: 16px;
     padding-right: 6px;
     align-items: stretch;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .saved-card-list::-webkit-scrollbar {
@@ -269,6 +269,8 @@ body {
     font-weight: 600;
     line-height: 1;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .badge-top {
@@ -379,6 +381,9 @@ body {
     font-size: 11px;
     padding: 5px 9px;
     border-radius: 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-place-card .badge-top {
@@ -456,6 +461,15 @@ body {
 
 .fc-theme-standard .fc-scrollgrid {
     border: none;
+}
+
+.fc-theme-standard td:last-child,
+.fc-theme-standard th:last-child {
+    border-right: none;
+}
+
+.fc-theme-standard tr:last-child td {
+    border-bottom: none;
 }
 
 .fc-theme-standard td,
@@ -725,6 +739,9 @@ body {
         font-size: 10px;
         padding: 4px 8px;
         border-radius: 8px;
+        white-space: nowrap;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
     }
 
     .sidebar-place-card .badge-bottom {
@@ -873,6 +890,8 @@ body {
         font-size: 9.5px;
         padding: 4px 7px;
         border-radius: 7px;
+        overflow: hidden;
+    	text-overflow: ellipsis;
     }
 
     .sidebar-place-card .badge-top {
