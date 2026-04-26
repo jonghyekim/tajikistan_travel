@@ -56,6 +56,35 @@
                         <h3 class="results-count" id="favorites-side-count">0 Favorites</h3>
                     </div>
 
+                    <section class="calendar-filter-panel" aria-label="Favorite search filters">
+                        <form class="calendar-filter-form" id="calendar-filter-form">
+                            <div class="calendar-filter-input">
+                                <span class="material-icons" aria-hidden="true">search</span>
+                                <input
+                                    id="filter-query"
+                                    type="text"
+                                    placeholder="Where do you want to go?"
+                                    aria-label="Search favorite places" />
+                            </div>
+
+                            <div class="calendar-filter-select-wrap" aria-label="Select category">
+                                <select id="filter-category" class="calendar-filter-select">
+                                    <option value="">All Categories</option>
+                                </select>
+                                <span class="material-icons calendar-select-icon" aria-hidden="true">expand_more</span>
+                            </div>
+
+                            <div class="calendar-filter-select-wrap" aria-label="Select region">
+                                <select id="filter-region" class="calendar-filter-select">
+                                    <option value="">All Regions</option>
+                                </select>
+                                <span class="material-icons calendar-select-icon" aria-hidden="true">expand_more</span>
+                            </div>
+
+                            <!-- <button type="submit" class="calendar-filter-submit">Search</button> -->
+                        </form>
+                    </section>
+
                     <div id="external-events" class="saved-card-list">
                         <!-- JS로 실제 favorites 카드 렌더링 -->
                     </div>
@@ -90,7 +119,6 @@
             </div>
 
             <div class="note-modal-body">
-                <!-- Date Picker -->
                 <div class="note-form-group">
                     <label class="note-label">SELECT DATE</label>
                     <button id="date-display-btn" class="date-display-btn" type="button">
@@ -101,7 +129,6 @@
                     <input type="hidden" id="note-date" />
                 </div>
 
-                <!-- Note Textarea -->
                 <div class="note-form-group">
                     <label for="note-textarea" class="note-label">NOTE CONTENT</label>
                     <textarea id="note-textarea" class="note-textarea" placeholder="Write your note here..." maxlength="500"></textarea>
@@ -111,7 +138,6 @@
                 </div>
             </div>
 
-            <!-- Calendar Picker Floating Modal (hidden by default) -->
             <div class="calendar-picker-backdrop" id="calendar-picker-backdrop" style="display: none;"></div>
             <div class="calendar-picker-floating" id="calendar-picker" style="display: none;">
                 <div class="calendar-picker-header">
@@ -154,6 +180,9 @@
         let calendarInstance = null;
         let draggableInstance = null;
 
+        let originalFavorites = [];
+        let currentLang = 'en';
+
         document.addEventListener('DOMContentLoaded', async function () {
             if (!Auth || !Auth.isLoggedIn()) {
                 Auth.goToLogin();
@@ -162,6 +191,7 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const lang = urlParams.get('lang') || document.documentElement.lang || 'en';
+            currentLang = lang;
 
             initCalendar(lang);
             await loadFavoriteCardsForCalendar(lang);
@@ -224,13 +254,11 @@
                     const memoId = info.event.extendedProps.memoId;
                     const calendarId = info.event.extendedProps.calendarId;
 
-                    // 메모 클릭
                     if (memoId) {
                         await loadEditMemoModal(memoId);
                         return;
                     }
 
-                    // 관광지 클릭
                     const shouldDelete = confirm('Remove "' + info.event.title + '" from the calendar?');
 
                     if (!shouldDelete) return;
@@ -266,23 +294,122 @@
                 const listResponse = await Auth.authFetch(`/me/favorite/list?lang=${lang}`);
 
                 if (!listResponse.ok) {
-                    showCalendarEmpty();
+                    showCalendarEmpty('No favorite destinations yet.');
                     return;
                 }
 
                 const places = await listResponse.json();
 
                 if (!places || places.length === 0) {
-                    showCalendarEmpty();
+                    originalFavorites = [];
+                    initFavoriteFilterOptions([]);
+                    bindFavoriteFilterEvents();
+                    showCalendarEmpty('No favorite destinations yet.');
                     return;
                 }
+
+                originalFavorites = places;
+
+                initFavoriteFilterOptions(places);
+                bindFavoriteFilterEvents();
 
                 renderCalendarFavoriteCards(places, lang);
                 enableExternalDragging();
             } catch (error) {
                 console.error('Failed to load calendar favorites:', error);
-                showCalendarEmpty();
+                showCalendarEmpty('No favorite destinations yet.');
             }
+        }
+
+        function initFavoriteFilterOptions(places) {
+            const categorySelect = document.getElementById('filter-category');
+            const regionSelect = document.getElementById('filter-region');
+
+            if (!categorySelect || !regionSelect) return;
+
+            categorySelect.innerHTML = '<option value="">All Categories</option>';
+            regionSelect.innerHTML = '<option value="">All Regions</option>';
+
+            const categories = [...new Set(
+                places
+                    .map(place => place.categoryName)
+                    .filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b));
+
+            const regions = [...new Set(
+                places
+                    .map(place => place.regionName)
+                    .filter(Boolean)
+            )].sort((a, b) => a.localeCompare(b));
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+
+            regions.forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                regionSelect.appendChild(option);
+            });
+        }
+
+        function bindFavoriteFilterEvents() {
+            const form = document.getElementById('calendar-filter-form');
+            const queryInput = document.getElementById('filter-query');
+            const categorySelect = document.getElementById('filter-category');
+            const regionSelect = document.getElementById('filter-region');
+
+            if (!form || !queryInput || !categorySelect || !regionSelect) return;
+            if (form.dataset.bound === 'true') return;
+
+            form.dataset.bound = 'true';
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                applyFavoriteFilter();
+            });
+
+            queryInput.addEventListener('input', applyFavoriteFilter);
+            categorySelect.addEventListener('change', applyFavoriteFilter);
+            regionSelect.addEventListener('change', applyFavoriteFilter);
+        }
+
+        function applyFavoriteFilter() {
+            const queryInput = document.getElementById('filter-query');
+            const categorySelect = document.getElementById('filter-category');
+            const regionSelect = document.getElementById('filter-region');
+
+            if (!queryInput || !categorySelect || !regionSelect) return;
+
+            const query = queryInput.value.trim().toLowerCase();
+            const category = categorySelect.value;
+            const region = regionSelect.value;
+
+            const filtered = originalFavorites.filter(place => {
+                const title = (place.title || '').toLowerCase();
+                const content = (place.content || '').toLowerCase();
+                const categoryName = place.categoryName || '';
+                const regionName = place.regionName || '';
+
+                const matchesQuery =
+                    !query ||
+                    title.includes(query) ||
+                    content.includes(query) ||
+                    categoryName.toLowerCase().includes(query) ||
+                    regionName.toLowerCase().includes(query);
+
+                const matchesCategory = !category || categoryName === category;
+                const matchesRegion = !region || regionName === region;
+
+                return matchesQuery && matchesCategory && matchesRegion;
+            });
+
+            renderCalendarFavoriteCards(filtered, currentLang);
+            enableExternalDragging();
         }
 
         async function loadSavedCalendars(lang) {
@@ -333,16 +460,13 @@
 
                 if (!calendarInstance) return;
 
-                // 기존 메모 이벤트 제거 (memoId가 있는 것들)
                 calendarInstance.getEvents().forEach(event => {
                     if (event.extendedProps && event.extendedProps.memoId) {
                         event.remove();
                     }
                 });
 
-                // 메모를 캘린더에 추가
                 memos.forEach(memo => {
-                    // 메모 내용을 적절히 자르기 (캘린더 칸에 맞게)
                     const displayMemo = memo.memo.length > 25 
                         ? '📝 ' + memo.memo.substring(0, 25) + '...' 
                         : '📝 ' + memo.memo;
@@ -371,9 +495,22 @@
             const countEl = document.getElementById('favorites-side-count');
             const emptyEl = document.getElementById('calendar-empty');
 
+            if (!container || !countEl || !emptyEl) return;
+
             container.innerHTML = '';
+
+            const count = places ? places.length : 0;
+            countEl.textContent = `${count} Favorites`;
+
+            if (!places || places.length === 0) {
+                emptyEl.style.display = 'block';
+                emptyEl.textContent = originalFavorites.length === 0
+                    ? 'No favorite destinations yet.'
+                    : 'No matching favorite places.';
+                return;
+            }
+
             emptyEl.style.display = 'none';
-            countEl.textContent = `${places.length} Favorites`;
 
             places.forEach(place => {
                 const card = createSidebarPlaceCard(place, lang);
@@ -464,6 +601,8 @@
         function enableExternalDragging() {
             const externalEventsEl = document.getElementById('external-events');
 
+            if (!externalEventsEl) return;
+
             if (draggableInstance && typeof draggableInstance.destroy === 'function') {
                 draggableInstance.destroy();
             }
@@ -483,13 +622,16 @@
             });
         }
 
-        function showCalendarEmpty() {
+        function showCalendarEmpty(message) {
             const container = document.getElementById('external-events');
             const countEl = document.getElementById('favorites-side-count');
             const emptyEl = document.getElementById('calendar-empty');
 
+            if (!container || !countEl || !emptyEl) return;
+
             container.innerHTML = '';
             countEl.textContent = '0 Favorites';
+            emptyEl.textContent = message || 'No favorite destinations yet.';
             emptyEl.style.display = 'block';
         }
 
@@ -503,7 +645,6 @@
             return `${year}-${month}-${day}`;
         }
 
-        // 다운로드 및 복사 버튼 이벤트
         document.getElementById('download-image-btn').addEventListener('click', downloadCalendarAsImage);
         document.getElementById('copy-image-btn').addEventListener('click', copyCalendarToClipboard);
 
@@ -563,11 +704,10 @@
             }
         }
 
-        // Note Modal with Calendar Picker
         let calendarMonth = new Date().getMonth();
         let calendarYear = new Date().getFullYear();
         let selectedDate = new Date();
-        let currentMemoId = null;  // 메모 수정 시 사용
+        let currentMemoId = null;
 
         const noteModal = document.getElementById('note-modal');
         const addNoteBtn = document.getElementById('add-note-btn');
@@ -587,7 +727,6 @@
         const calPrevBtn = document.getElementById('cal-prev-btn');
         const calNextBtn = document.getElementById('cal-next-btn');
 
-        // Event Listeners
         addNoteBtn.addEventListener('click', openNoteModal);
         noteModalClose.addEventListener('click', closeNoteModal);
         noteCancelBtn.addEventListener('click', closeNoteModal);
@@ -611,8 +750,7 @@
             const dateRect = dateBtn.getBoundingClientRect();
             const modalRect = modal.getBoundingClientRect();
             
-            // Calendar를 date 버튼 바로 아래, modal 내에서 정렬
-            const top = dateRect.bottom - modalRect.top + 8; // 8px gap
+            const top = dateRect.bottom - modalRect.top + 8;
             const left = dateRect.left - modalRect.left;
             
             calendarPickerDiv.style.position = 'absolute';
@@ -669,7 +807,6 @@
             const calDays = document.getElementById('cal-days');
             calDays.innerHTML = '';
 
-            // Previous month's days
             for (let i = firstDay - 1; i >= 0; i--) {
                 const day = document.createElement('button');
                 day.className = 'cal-day other-month';
@@ -678,14 +815,12 @@
                 calDays.appendChild(day);
             }
 
-            // Current month's days
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayBtn = document.createElement('button');
                 dayBtn.className = 'cal-day';
                 dayBtn.textContent = day;
                 dayBtn.type = 'button';
 
-                // Highlight today
                 const today = new Date();
                 if (day === today.getDate() && 
                     calendarMonth === today.getMonth() && 
@@ -693,7 +828,6 @@
                     dayBtn.classList.add('today');
                 }
 
-                // Highlight selected date
                 if (day === selectedDate.getDate() && 
                     calendarMonth === selectedDate.getMonth() && 
                     calendarYear === selectedDate.getFullYear()) {
@@ -708,7 +842,6 @@
                 calDays.appendChild(dayBtn);
             }
 
-            // Next month's days
             const totalCells = calDays.children.length;
             const remainingCells = 42 - totalCells;
             for (let day = 1; day <= remainingCells; day++) {
@@ -725,18 +858,17 @@
             calendarMonth = today.getMonth();
             calendarYear = today.getFullYear();
             selectedDate = new Date(today);
-            currentMemoId = null;  // 새 메모 생성 모드
+            currentMemoId = null;
             
             updateDateDisplay();
             closeCalendar();
             noteTextarea.value = '';
             noteCharUsed.textContent = '0';
             
-            // 버튼 상태 초기화
             const noteSaveBtn = document.getElementById('note-save-btn');
             noteSaveBtn.disabled = false;
             noteSaveBtn.textContent = 'Save Note';
-            noteDeleteBtn.style.display = 'none';  // Delete 버튼 숨기기
+            noteDeleteBtn.style.display = 'none';
             
             noteModal.style.display = 'flex';
             setTimeout(() => noteTextarea.focus(), 100);
@@ -758,7 +890,6 @@
 
                 const memo = await response.json();
                 
-                // 모달에 메모 정보 로드
                 currentMemoId = memo.memoId;
                 selectedDate = new Date(memo.startDate + 'T00:00:00');
                 calendarMonth = selectedDate.getMonth();
@@ -769,11 +900,10 @@
                 noteTextarea.value = memo.memo;
                 noteCharUsed.textContent = memo.memo.length;
                 
-                // 버튼 상태 설정
                 const noteSaveBtn = document.getElementById('note-save-btn');
                 noteSaveBtn.disabled = false;
                 noteSaveBtn.textContent = 'Update Note';
-                noteDeleteBtn.style.display = 'block';  // Delete 버튼 보이기
+                noteDeleteBtn.style.display = 'block';
                 
                 noteModal.style.display = 'flex';
                 setTimeout(() => noteTextarea.focus(), 100);
@@ -797,7 +927,6 @@
                 return;
             }
 
-            // API 호출
             const noteSaveBtn = document.getElementById('note-save-btn');
             const originalText = noteSaveBtn.textContent;
             noteSaveBtn.disabled = true;
@@ -807,11 +936,9 @@
                 let url, method;
                 
                 if (currentMemoId) {
-                    // 메모 수정 (PUT)
                     url = `/me/calendar-memo/${currentMemoId}`;
                     method = 'PUT';
                 } else {
-                    // 메모 생성 (POST) - 같은 날짜에 여러 개 가능
                     url = '/me/calendar-memo/save';
                     method = 'POST';
                 }
@@ -838,7 +965,6 @@
                 noteSaveBtn.textContent = originalText;
                 closeNoteModal();
                 
-                // 캘린더에 메모 반영
                 await loadMemos();
             } catch (error) {
                 console.error('Failed to save note:', error);
