@@ -28,6 +28,24 @@ public class TourPlace {
     @JoinColumn(name = "region_code", referencedColumnName = "code")
     private RegionCode region;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "open_time")
+    private String openTime;
+
+    @Column(name = "close_time")
+    private String closeTime;
+
+    @Column(name = "is_free")
+    private Boolean isFree;
+
+    @Column(name = "currency_code")
+    private String currencyCode;
+
+    @Column(name = "admission_fee")
+    private String admissionFee;
+
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
@@ -43,6 +61,9 @@ public class TourPlace {
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
+    @Transient
+    private TourPlaceI18n displayI18n;
+
     @PrePersist
     void prePersist() {
         LocalDateTime now = LocalDateTime.now();
@@ -55,7 +76,6 @@ public class TourPlace {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // --- Convenience methods (optional) ---
     public void addI18n(TourPlaceI18n i18n) {
         i18ns.add(i18n);
         i18n.setPlace(this);
@@ -65,22 +85,80 @@ public class TourPlace {
         images.add(image);
         image.setPlace(this);
     }
-    
-    @Transient
-	private TourPlaceI18n displayI18n;
 
-    // getters/setters ...
-    public Long getPlaceId() { return placeId; }
-    public CategoryCode getCategory() { return category; }
-    public void setCategory(CategoryCode category) { this.category = category; }
-    public RegionCode getRegion() { return region; }
-    public void setRegion(RegionCode region) { this.region = region; }
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean active) { isActive = active; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public List<TourPlaceI18n> getI18ns() { return i18ns; }
-    public List<Image> getImages() { return images; }
-	public TourPlaceI18n getDisplayI18n() { return displayI18n; }
-	public void setDisplayI18n(TourPlaceI18n displayI18n) { this.displayI18n = displayI18n; }
+    public Long getPlaceId() {
+        return placeId;
+    }
+
+    public CategoryCode getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryCode category) {
+        this.category = category;
+    }
+
+    public RegionCode getRegion() {
+        return region;
+    }
+
+    public void setRegion(RegionCode region) {
+        this.region = region;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getOpenTime() {
+        return openTime;
+    }
+
+    public String getCloseTime() {
+        return closeTime;
+    }
+
+    public Boolean getIsFree() {
+        return isFree;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public String getAdmissionFee() {
+        return admissionFee;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean active) {
+        isActive = active;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public List<TourPlaceI18n> getI18ns() {
+        return i18ns;
+    }
+
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public TourPlaceI18n getDisplayI18n() {
+        return displayI18n;
+    }
+
+    public void setDisplayI18n(TourPlaceI18n displayI18n) {
+        this.displayI18n = displayI18n;
+    }
 }

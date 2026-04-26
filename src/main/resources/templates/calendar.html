@@ -14,868 +14,161 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.css">
     <link rel="icon" th:href="@{/assets/logo/favicon.png}">
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
 <body>
-    <div th:replace="components/header :: header"></div>
+<div th:replace="components/header :: header"></div>
 
-    <main class="calendar-page">
-        <div class="calendar-container">
-            <header class="calendar-header">
-                <h1 class="dashboard-title">My Travel Dashboard</h1>
+<main class="calendar-page">
+    <div class="calendar-container">
+        <header class="calendar-header">
+            <h1 class="dashboard-title">My Travel Dashboard</h1>
 
-                <div class="dashboard-tabs" aria-label="Dashboard menu">
-                    <a th:href="@{/me/favorites(lang=${lang})}" class="dashboard-tab">Favorites</a>
-                    <a th:href="@{/me/calendar(lang=${lang})}" class="dashboard-tab active" aria-current="page">Calendar</a>
-                </div>
+            <div class="dashboard-tabs" aria-label="Dashboard menu">
+                <a th:href="@{/me/favorites(lang=${lang})}" class="dashboard-tab">Favorites</a>
+                <a th:href="@{/me/calendar(lang=${lang})}" class="dashboard-tab active" aria-current="page">Calendar</a>
+            </div>
 
-                <div class="dashboard-section-header">
-                    <h2 class="dashboard-section-title">Calendar</h2>
-                    <p class="dashboard-section-subtitle">
-                        Drag and drop your saved places into the calendar to create your itinerary,
-                        and easily save your travel plans as an image with date-based notes.
-                    </p>
-                    <div class="download-buttons">
-                        <button id="download-image-btn" class="download-btn download-btn-image" title="Download calendar as PNG image">
-                            <span class="material-icons">image</span>
-                            <span>Download as Image</span>
-                        </button>
-                        <button id="copy-image-btn" class="download-btn download-btn-copy" title="Copy calendar to clipboard">
-                            <span class="material-icons">content_copy</span>
-                            <span>Copy to Clipboard</span>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <section class="calendar-content">
-                <aside class="saved-panel">
-                    <div class="saved-panel-header">
-                        <h3 class="results-count" id="favorites-side-count">0 Favorites</h3>
-                    </div>
-
-                    <div id="external-events" class="saved-card-list">
-                        <!-- JS로 실제 favorites 카드 렌더링 -->
-                    </div>
-
-                    <div id="calendar-empty" class="calendar-empty" style="display:none;">
-                        No favorite destinations yet.
-                    </div>
-                </aside>
-
-                <div class="calendar-section-wrapper">
-                    <section class="calendar-board">
-                        <div id="calendar"></div>
-                    </section>
-
-                    <button id="add-note-btn" class="add-note-btn" title="Add note to calendar">
-                        <span class="material-icons">add</span>
+            <div class="dashboard-section-header">
+                <h2 class="dashboard-section-title">Calendar</h2>
+                <p class="dashboard-section-subtitle">
+                    Drag and drop your saved places into the calendar to create your itinerary,
+                    and easily save your travel plans as an image with date-based notes.
+                </p>
+                <div class="download-buttons">
+                    <button id="download-image-btn" class="download-btn download-btn-image" title="Download calendar as PNG image">
+                        <span class="material-icons">image</span>
+                        <span>Download as Image</span>
+                    </button>
+                    <button id="copy-image-btn" class="download-btn download-btn-copy" title="Copy calendar to clipboard">
+                        <span class="material-icons">content_copy</span>
+                        <span>Copy to Clipboard</span>
                     </button>
                 </div>
-            </section>
-        </div>
-    </main>
+            </div>
+        </header>
 
-    <!-- Note Modal -->
-    <div id="note-modal" class="note-modal" style="display: none;">
-        <div class="note-modal-overlay"></div>
-        <div class="note-modal-content">
-            <div class="note-modal-header">
-                <h2>Add Note to Calendar</h2>
-                <button id="note-modal-close" class="note-modal-close" type="button">
-                    <span class="material-icons">close</span>
+        <section class="calendar-content">
+            <aside class="saved-panel">
+                <div class="saved-panel-header">
+                    <h3 class="results-count" id="favorites-side-count">0 Favorites</h3>
+                </div>
+
+                <section class="calendar-filter-panel" aria-label="Favorite search filters">
+                    <form class="calendar-filter-form" id="calendar-filter-form">
+                        <div class="calendar-filter-input">
+                            <span class="material-icons" aria-hidden="true">search</span>
+                            <input
+                                id="filter-query"
+                                type="text"
+                                placeholder="Where do you want to go?"
+                                aria-label="Search favorite places" />
+                        </div>
+
+                        <div class="calendar-filter-select-wrap" aria-label="Select category">
+                            <select id="filter-category" class="calendar-filter-select">
+                                <option value="">All Categories</option>
+                            </select>
+                            <span class="material-icons calendar-select-icon" aria-hidden="true">expand_more</span>
+                        </div>
+
+                        <div class="calendar-filter-select-wrap" aria-label="Select region">
+                            <select id="filter-region" class="calendar-filter-select">
+                                <option value="">All Regions</option>
+                            </select>
+                            <span class="material-icons calendar-select-icon" aria-hidden="true">expand_more</span>
+                        </div>
+                    </form>
+                </section>
+
+                <div id="external-events" class="saved-card-list"></div>
+
+                <div id="calendar-empty" class="calendar-empty" style="display:none;">
+                    No favorite destinations yet.
+                </div>
+            </aside>
+
+            <div class="calendar-section-wrapper">
+                <section class="calendar-board">
+                    <div id="calendar"></div>
+                </section>
+
+                <button id="add-note-btn" class="add-note-btn" title="Add note to calendar">
+                    <span class="material-icons">add</span>
                 </button>
             </div>
+        </section>
+    </div>
+</main>
 
-            <div class="note-modal-body">
-                <!-- Date Picker -->
-                <div class="note-form-group">
-                    <label class="note-label">SELECT DATE</label>
-                    <button id="date-display-btn" class="date-display-btn" type="button">
-                        <span class="material-icons">event</span>
-                        <span id="date-display-text">April 13, 2026</span>
-                    </button>
+<div id="note-modal" class="note-modal" style="display: none;">
+    <div class="note-modal-overlay"></div>
+    <div class="note-modal-content">
+        <div class="note-modal-header">
+            <h2>Add Note to Calendar</h2>
+            <button id="note-modal-close" class="note-modal-close" type="button">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
 
-                    <input type="hidden" id="note-date" />
-                </div>
-
-                <!-- Note Textarea -->
-                <div class="note-form-group">
-                    <label for="note-textarea" class="note-label">NOTE CONTENT</label>
-                    <textarea id="note-textarea" class="note-textarea" placeholder="Write your note here..." maxlength="500"></textarea>
-                    <div class="note-char-count">
-                        <span id="note-char-used">0</span> / 500
-                    </div>
-                </div>
+        <div class="note-modal-body">
+            <div class="note-form-group">
+                <label class="note-label">SELECT DATE</label>
+                <button id="date-display-btn" class="date-display-btn" type="button">
+                    <span class="material-icons">event</span>
+                    <span id="date-display-text">April 13, 2026</span>
+                </button>
+                <input type="hidden" id="note-date" />
             </div>
 
-            <!-- Calendar Picker Floating Modal (hidden by default) -->
-            <div class="calendar-picker-backdrop" id="calendar-picker-backdrop" style="display: none;"></div>
-            <div class="calendar-picker-floating" id="calendar-picker" style="display: none;">
-                <div class="calendar-picker-header">
-                    <button id="cal-prev-btn" class="cal-nav-btn" type="button">
-                        <span class="material-icons">chevron_left</span>
-                    </button>
-                    <div id="cal-month-year" class="cal-month-year">April 2026</div>
-                    <button id="cal-next-btn" class="cal-nav-btn" type="button">
-                        <span class="material-icons">chevron_right</span>
-                    </button>
+            <div class="note-form-group">
+                <label for="note-textarea" class="note-label">NOTE CONTENT</label>
+                <textarea id="note-textarea" class="note-textarea" placeholder="Write your note here..." maxlength="500"></textarea>
+                <div class="note-char-count">
+                    <span id="note-char-used">0</span> / 500
                 </div>
-                <div class="calendar-weekdays">
-                    <div class="weekday">Sun</div>
-                    <div class="weekday">Mon</div>
-                    <div class="weekday">Tue</div>
-                    <div class="weekday">Wed</div>
-                    <div class="weekday">Thu</div>
-                    <div class="weekday">Fri</div>
-                    <div class="weekday">Sat</div>
-                </div>
-                <div class="calendar-days" id="cal-days"></div>
             </div>
+        </div>
 
-            <div class="note-modal-footer">
-                <button id="note-delete-btn" class="note-btn note-btn-delete" type="button" style="display: none;">Delete</button>
-                <div class="note-modal-footer-buttons">
-                    <button id="note-cancel-btn" class="note-btn note-btn-cancel" type="button">Cancel</button>
-                    <button id="note-save-btn" class="note-btn note-btn-save" type="button">Save Note</button>
-                </div>
+        <div class="calendar-picker-backdrop" id="calendar-picker-backdrop" style="display: none;"></div>
+        <div class="calendar-picker-floating" id="calendar-picker" style="display: none;">
+            <div class="calendar-picker-header">
+                <button id="cal-prev-btn" class="cal-nav-btn" type="button">
+                    <span class="material-icons">chevron_left</span>
+                </button>
+                <div id="cal-month-year" class="cal-month-year">April 2026</div>
+                <button id="cal-next-btn" class="cal-nav-btn" type="button">
+                    <span class="material-icons">chevron_right</span>
+                </button>
+            </div>
+            <div class="calendar-weekdays">
+                <div class="weekday">Sun</div>
+                <div class="weekday">Mon</div>
+                <div class="weekday">Tue</div>
+                <div class="weekday">Wed</div>
+                <div class="weekday">Thu</div>
+                <div class="weekday">Fri</div>
+                <div class="weekday">Sat</div>
+            </div>
+            <div class="calendar-days" id="cal-days"></div>
+        </div>
+
+        <div class="note-modal-footer">
+            <button id="note-delete-btn" class="note-btn note-btn-delete" type="button" style="display: none;">Delete</button>
+            <div class="note-modal-footer-buttons">
+                <button id="note-cancel-btn" class="note-btn note-btn-cancel" type="button">Cancel</button>
+                <button id="note-save-btn" class="note-btn note-btn-save" type="button">Save Note</button>
             </div>
         </div>
     </div>
+</div>
 
-    <div th:replace="components/footer :: footer"></div>
+<div th:replace="components/footer :: footer"></div>
 
-    <script th:src="@{/js/auth.js}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
-
-    <script>
-        let calendarInstance = null;
-        let draggableInstance = null;
-
-        document.addEventListener('DOMContentLoaded', async function () {
-            if (!Auth || !Auth.isLoggedIn()) {
-                Auth.goToLogin();
-                return;
-            }
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const lang = urlParams.get('lang') || document.documentElement.lang || 'en';
-
-            initCalendar(lang);
-            await loadFavoriteCardsForCalendar(lang);
-            await loadSavedCalendars(lang);
-            await loadMemos();
-        });
-
-        function initCalendar(lang) {
-            const calendarEl = document.getElementById('calendar');
-
-            calendarInstance = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                initialDate: new Date(),
-                locale: 'en',
-                height: 'auto',
-                expandRows: true,
-
-                headerToolbar: {
-                    left: 'prev',
-                    center: 'title',
-                    right: 'next'
-                },
-
-                droppable: true,
-                editable: true,
-                dayMaxEvents: 2,
-                fixedWeekCount: false,
-
-                eventReceive: async function (info) {
-                    const placeId = Number(info.event.extendedProps.placeId);
-                    const startDate = formatDate(info.event.start);
-
-                    try {
-                        const response = await Auth.authFetch('/me/calendar/add', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                placeId: placeId,
-                                startDate: startDate
-                            })
-                        });
-
-                        if (!response.ok) {
-                            info.event.remove();
-                            alert('Failed to save calendar event.');
-                            return;
-                        }
-
-                        await loadSavedCalendars(lang);
-                    } catch (error) {
-                        console.error('Failed to save calendar event:', error);
-                        info.event.remove();
-                        alert('Failed to save calendar event.');
-                    }
-                },
-
-                eventClick: async function (info) {
-                    const memoId = info.event.extendedProps.memoId;
-                    const calendarId = info.event.extendedProps.calendarId;
-
-                    // 메모 클릭
-                    if (memoId) {
-                        await loadEditMemoModal(memoId);
-                        return;
-                    }
-
-                    // 관광지 클릭
-                    const shouldDelete = confirm('Remove "' + info.event.title + '" from the calendar?');
-
-                    if (!shouldDelete) return;
-
-                    if (!calendarId) {
-                        info.event.remove();
-                        return;
-                    }
-
-                    try {
-                        const response = await Auth.authFetch(`/me/calendar/delete/${calendarId}`, {
-                            method: 'DELETE'
-                        });
-
-                        if (!response.ok) {
-                            alert('Failed to delete calendar event.');
-                            return;
-                        }
-
-                        info.event.remove();
-                    } catch (error) {
-                        console.error('Failed to delete calendar event:', error);
-                        alert('Failed to delete calendar event.');
-                    }
-                }
-            });
-
-            calendarInstance.render();
-        }
-
-        async function loadFavoriteCardsForCalendar(lang) {
-            try {
-                const listResponse = await Auth.authFetch(`/me/favorite/list?lang=${lang}`);
-
-                if (!listResponse.ok) {
-                    showCalendarEmpty();
-                    return;
-                }
-
-                const places = await listResponse.json();
-
-                if (!places || places.length === 0) {
-                    showCalendarEmpty();
-                    return;
-                }
-
-                renderCalendarFavoriteCards(places, lang);
-                enableExternalDragging();
-            } catch (error) {
-                console.error('Failed to load calendar favorites:', error);
-                showCalendarEmpty();
-            }
-        }
-
-        async function loadSavedCalendars(lang) {
-            try {
-                const response = await Auth.authFetch(`/me/calendar/list?lang=${lang}`);
-
-                if (!response.ok) {
-                    console.error('Failed to load saved calendars');
-                    return;
-                }
-
-                const calendars = await response.json();
-
-                if (!calendarInstance) return;
-
-                calendarInstance.getEvents().forEach(event => event.remove());
-
-                calendars.forEach(item => {
-                    calendarInstance.addEvent({
-                        title: item.title || 'No Title',
-                        start: item.startDate,
-                        allDay: true,
-                        extendedProps: {
-                            calendarId: item.calendarId,
-                            placeId: item.placeId,
-                            region: item.regionName || '',
-                            content: item.content || '',
-                            imageUrl: item.imageUrl || '',
-                            categoryName: item.categoryName || ''
-                        }
-                    });
-                });
-            } catch (error) {
-                console.error('Failed to load saved calendars:', error);
-            }
-        }
-
-        async function loadMemos() {
-            try {
-                const response = await Auth.authFetch('/me/calendar-memo/list');
-
-                if (!response.ok) {
-                    console.error('Failed to load memos');
-                    return;
-                }
-
-                const memos = await response.json();
-
-                if (!calendarInstance) return;
-
-                // 기존 메모 이벤트 제거 (memoId가 있는 것들)
-                calendarInstance.getEvents().forEach(event => {
-                    if (event.extendedProps && event.extendedProps.memoId) {
-                        event.remove();
-                    }
-                });
-
-                // 메모를 캘린더에 추가
-                memos.forEach(memo => {
-                    // 메모 내용을 적절히 자르기 (캘린더 칸에 맞게)
-                    const displayMemo = memo.memo.length > 25 
-                        ? '📝 ' + memo.memo.substring(0, 25) + '...' 
-                        : '📝 ' + memo.memo;
-                    
-                    calendarInstance.addEvent({
-                        title: displayMemo,
-                        start: memo.startDate,
-                        allDay: true,
-                        backgroundColor: '#3b82f6',
-                        borderColor: '#1e40af',
-                        textColor: '#ffffff',
-                        extendedProps: {
-                            memoId: memo.memoId,
-                            memo: memo.memo,
-                            isNote: true
-                        }
-                    });
-                });
-            } catch (error) {
-                console.error('Failed to load memos:', error);
-            }
-        }
-
-        function renderCalendarFavoriteCards(places, lang) {
-            const container = document.getElementById('external-events');
-            const countEl = document.getElementById('favorites-side-count');
-            const emptyEl = document.getElementById('calendar-empty');
-
-            container.innerHTML = '';
-            emptyEl.style.display = 'none';
-            countEl.textContent = `${places.length} Favorites`;
-
-            places.forEach(place => {
-                const card = createSidebarPlaceCard(place, lang);
-                if (card) {
-                    container.appendChild(card);
-                }
-            });
-        }
-
-        function createSidebarPlaceCard(place, lang) {
-            if (!place || !place.placeId) return null;
-
-            const imageUrl = place.imageUrl || '/assets/images/home_reg_2.png';
-            const title = place.title || 'No Title';
-            const category = place.categoryName || 'Category';
-            const region = place.regionName || 'Region';
-            const content = place.content || '';
-            const placeId = place.placeId;
-
-            const wrapper = document.createElement('div');
-            wrapper.className = 'place-card-wrapper sidebar-place-card fc-draggable-event';
-            wrapper.setAttribute('data-title', title);
-            wrapper.setAttribute('data-region', region);
-            wrapper.setAttribute('data-place-id', placeId);
-
-            const thumbDiv = document.createElement('div');
-            wrapper.appendChild(thumbDiv);
-            thumbDiv.className = 'place-thumb sidebar-place-thumb';
-
-            const img = document.createElement('img');
-            img.src = imageUrl;
-            img.alt = title;
-            thumbDiv.appendChild(img);
-
-            const categoryBadge = document.createElement('span');
-            categoryBadge.className = 'badge badge-top';
-            categoryBadge.textContent = category;
-            thumbDiv.appendChild(categoryBadge);
-
-            const bodyDiv = document.createElement('div');
-            bodyDiv.className = 'place-body sidebar-place-body';
-
-            const headerDiv = document.createElement('div');
-            headerDiv.className = 'place-header sidebar-place-header';
-
-            const titleElem = document.createElement('h3');
-            titleElem.className = 'place-title sidebar-place-title';
-            titleElem.textContent = title;
-            headerDiv.appendChild(titleElem);
-
-            bodyDiv.appendChild(headerDiv);
-
-            if (content) {
-                const descElem = document.createElement('p');
-                descElem.className = 'place-desc sidebar-place-desc';
-                descElem.textContent = content;
-                bodyDiv.appendChild(descElem);
-            }
-
-            const tagsDiv = document.createElement('div');
-            tagsDiv.className = 'place-tags';
-
-            const regionBadge = document.createElement('span');
-            regionBadge.className = 'badge badge-bottom';
-
-            const locationIcon = document.createElement('span');
-            locationIcon.className = 'material-icons';
-            locationIcon.setAttribute('aria-hidden', 'true');
-            locationIcon.textContent = 'location_on';
-            regionBadge.appendChild(locationIcon);
-
-            const regionText = document.createElement('span');
-            regionText.textContent = region;
-            regionBadge.appendChild(regionText);
-
-            tagsDiv.appendChild(regionBadge);
-            bodyDiv.appendChild(tagsDiv);
-
-            wrapper.appendChild(bodyDiv);
-
-            wrapper.addEventListener('dblclick', function () {
-                window.location.href = `/detail/${placeId}?lang=${lang}&back=/me/calendar?lang=${lang}`;
-            });
-
-            return wrapper;
-        }
-
-        function enableExternalDragging() {
-            const externalEventsEl = document.getElementById('external-events');
-
-            if (draggableInstance && typeof draggableInstance.destroy === 'function') {
-                draggableInstance.destroy();
-            }
-
-            draggableInstance = new FullCalendar.Draggable(externalEventsEl, {
-                itemSelector: '.fc-draggable-event',
-                eventData: function (eventEl) {
-                    return {
-                        title: eventEl.dataset.title,
-                        allDay: true,
-                        extendedProps: {
-                            region: eventEl.dataset.region || '',
-                            placeId: eventEl.dataset.placeId || ''
-                        }
-                    };
-                }
-            });
-        }
-
-        function showCalendarEmpty() {
-            const container = document.getElementById('external-events');
-            const countEl = document.getElementById('favorites-side-count');
-            const emptyEl = document.getElementById('calendar-empty');
-
-            container.innerHTML = '';
-            countEl.textContent = '0 Favorites';
-            emptyEl.style.display = 'block';
-        }
-
-        function formatDate(date) {
-            if (!date) return '';
-
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-
-            return `${year}-${month}-${day}`;
-        }
-
-        // 다운로드 및 복사 버튼 이벤트
-        document.getElementById('download-image-btn').addEventListener('click', downloadCalendarAsImage);
-        document.getElementById('copy-image-btn').addEventListener('click', copyCalendarToClipboard);
-
-        async function downloadCalendarAsImage() {
-            const calendarBoard = document.querySelector('.calendar-board');
-            const timestamp = new Date().toISOString().slice(0, 10);
-            
-            try {
-                const canvas = await html2canvas(calendarBoard, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff'
-                });
-                
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL('image/png');
-                link.download = `travel-calendar-${timestamp}.png`;
-                link.click();
-            } catch (error) {
-                console.error('Failed to download calendar as image:', error);
-                alert('Failed to download calendar as image. Please try again.');
-            }
-        }
-
-        async function copyCalendarToClipboard() {
-            const calendarBoard = document.querySelector('.calendar-board');
-            const copyBtn = document.getElementById('copy-image-btn');
-            const originalText = copyBtn.querySelector('span:last-child').textContent;
-            
-            try {
-                const canvas = await html2canvas(calendarBoard, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff'
-                });
-                
-                canvas.toBlob(async function (blob) {
-                    try {
-                        await navigator.clipboard.write([
-                            new ClipboardItem({ 'image/png': blob })
-                        ]);
-                        
-                        copyBtn.querySelector('span:last-child').textContent = 'Copied!';
-                        setTimeout(() => {
-                            copyBtn.querySelector('span:last-child').textContent = originalText;
-                        }, 2000);
-                    } catch (error) {
-                        console.error('Failed to copy to clipboard:', error);
-                        alert('Failed to copy to clipboard. Please try again.');
-                    }
-                });
-            } catch (error) {
-                console.error('Failed to copy calendar to clipboard:', error);
-                alert('Failed to copy calendar to clipboard. Please try again.');
-            }
-        }
-
-        // Note Modal with Calendar Picker
-        let calendarMonth = new Date().getMonth();
-        let calendarYear = new Date().getFullYear();
-        let selectedDate = new Date();
-        let currentMemoId = null;  // 메모 수정 시 사용
-
-        const noteModal = document.getElementById('note-modal');
-        const addNoteBtn = document.getElementById('add-note-btn');
-        const noteModalClose = document.getElementById('note-modal-close');
-        const noteCancelBtn = document.getElementById('note-cancel-btn');
-        const noteSaveBtn = document.getElementById('note-save-btn');
-        const noteDeleteBtn = document.getElementById('note-delete-btn');
-        const noteModalOverlay = document.querySelector('.note-modal-overlay');
-        const noteTextarea = document.getElementById('note-textarea');
-        const noteCharUsed = document.getElementById('note-char-used');
-        const noteDateInput = document.getElementById('note-date');
-
-        const dateDisplayBtn = document.getElementById('date-display-btn');
-        const dateDisplayText = document.getElementById('date-display-text');
-        const calendarPickerDiv = document.getElementById('calendar-picker');
-        const calendarBackdropDiv = document.getElementById('calendar-picker-backdrop');
-        const calPrevBtn = document.getElementById('cal-prev-btn');
-        const calNextBtn = document.getElementById('cal-next-btn');
-
-        // Event Listeners
-        addNoteBtn.addEventListener('click', openNoteModal);
-        noteModalClose.addEventListener('click', closeNoteModal);
-        noteCancelBtn.addEventListener('click', closeNoteModal);
-        noteDeleteBtn.addEventListener('click', deleteMemoConfirm);
-        noteModalOverlay.addEventListener('click', closeNoteModal);
-        dateDisplayBtn.addEventListener('click', toggleCalendar);
-        calendarBackdropDiv.addEventListener('click', closeCalendar);
-        calPrevBtn.addEventListener('click', () => changeMonth(-1));
-        calNextBtn.addEventListener('click', () => changeMonth(1));
-        noteTextarea.addEventListener('input', () => {
-            noteCharUsed.textContent = noteTextarea.value.length;
-        });
-        noteSaveBtn.addEventListener('click', saveNote);
-
-        function positionCalendar() {
-            const dateBtn = document.getElementById('date-display-btn');
-            const modal = document.querySelector('.note-modal-content');
-            
-            if (!dateBtn || !modal) return;
-            
-            const dateRect = dateBtn.getBoundingClientRect();
-            const modalRect = modal.getBoundingClientRect();
-            
-            // Calendar를 date 버튼 바로 아래, modal 내에서 정렬
-            const top = dateRect.bottom - modalRect.top + 8; // 8px gap
-            const left = dateRect.left - modalRect.left;
-            
-            calendarPickerDiv.style.position = 'absolute';
-            calendarPickerDiv.style.top = top + 'px';
-            calendarPickerDiv.style.left = left + 'px';
-            calendarPickerDiv.style.minWidth = dateRect.width + 'px';
-        }
-
-        function toggleCalendar() {
-            if (calendarPickerDiv.style.display === 'none') {
-                positionCalendar();
-                calendarPickerDiv.style.display = 'block';
-                calendarBackdropDiv.style.display = 'block';
-                renderCalendar();
-            } else {
-                closeCalendar();
-            }
-        }
-
-        function closeCalendar() {
-            calendarPickerDiv.style.display = 'none';
-            calendarBackdropDiv.style.display = 'none';
-        }
-
-        function changeMonth(offset) {
-            calendarMonth += offset;
-            if (calendarMonth > 11) {
-                calendarMonth = 0;
-                calendarYear++;
-            } else if (calendarMonth < 0) {
-                calendarMonth = 11;
-                calendarYear--;
-            }
-            renderCalendar();
-        }
-
-        function updateDateDisplay() {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const dateStr = selectedDate.toLocaleDateString('en-US', options);
-            dateDisplayText.textContent = dateStr;
-            noteDateInput.value = formatDate(selectedDate);
-            closeCalendar();
-        }
-
-        function renderCalendar() {
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                                'July', 'August', 'September', 'October', 'November', 'December'];
-            document.getElementById('cal-month-year').textContent = `${monthNames[calendarMonth]} ${calendarYear}`;
-
-            const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
-            const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-            const daysInPrevMonth = new Date(calendarYear, calendarMonth, 0).getDate();
-
-            const calDays = document.getElementById('cal-days');
-            calDays.innerHTML = '';
-
-            // Previous month's days
-            for (let i = firstDay - 1; i >= 0; i--) {
-                const day = document.createElement('button');
-                day.className = 'cal-day other-month';
-                day.textContent = daysInPrevMonth - i;
-                day.type = 'button';
-                calDays.appendChild(day);
-            }
-
-            // Current month's days
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dayBtn = document.createElement('button');
-                dayBtn.className = 'cal-day';
-                dayBtn.textContent = day;
-                dayBtn.type = 'button';
-
-                // Highlight today
-                const today = new Date();
-                if (day === today.getDate() && 
-                    calendarMonth === today.getMonth() && 
-                    calendarYear === today.getFullYear()) {
-                    dayBtn.classList.add('today');
-                }
-
-                // Highlight selected date
-                if (day === selectedDate.getDate() && 
-                    calendarMonth === selectedDate.getMonth() && 
-                    calendarYear === selectedDate.getFullYear()) {
-                    dayBtn.classList.add('selected');
-                }
-
-                dayBtn.addEventListener('click', () => {
-                    selectedDate = new Date(calendarYear, calendarMonth, day);
-                    updateDateDisplay();
-                });
-
-                calDays.appendChild(dayBtn);
-            }
-
-            // Next month's days
-            const totalCells = calDays.children.length;
-            const remainingCells = 42 - totalCells;
-            for (let day = 1; day <= remainingCells; day++) {
-                const dayBtn = document.createElement('button');
-                dayBtn.className = 'cal-day other-month';
-                dayBtn.textContent = day;
-                dayBtn.type = 'button';
-                calDays.appendChild(dayBtn);
-            }
-        }
-
-        function openNoteModal() {
-            const today = new Date();
-            calendarMonth = today.getMonth();
-            calendarYear = today.getFullYear();
-            selectedDate = new Date(today);
-            currentMemoId = null;  // 새 메모 생성 모드
-            
-            updateDateDisplay();
-            closeCalendar();
-            noteTextarea.value = '';
-            noteCharUsed.textContent = '0';
-            
-            // 버튼 상태 초기화
-            const noteSaveBtn = document.getElementById('note-save-btn');
-            noteSaveBtn.disabled = false;
-            noteSaveBtn.textContent = 'Save Note';
-            noteDeleteBtn.style.display = 'none';  // Delete 버튼 숨기기
-            
-            noteModal.style.display = 'flex';
-            setTimeout(() => noteTextarea.focus(), 100);
-        }
-
-        function closeNoteModal() {
-            noteModal.style.display = 'none';
-            closeCalendar();
-        }
-
-        async function loadEditMemoModal(memoId) {
-            try {
-                const response = await Auth.authFetch(`/me/calendar-memo/${memoId}`);
-
-                if (!response.ok) {
-                    alert('Failed to load memo');
-                    return;
-                }
-
-                const memo = await response.json();
-                
-                // 모달에 메모 정보 로드
-                currentMemoId = memo.memoId;
-                selectedDate = new Date(memo.startDate + 'T00:00:00');
-                calendarMonth = selectedDate.getMonth();
-                calendarYear = selectedDate.getFullYear();
-                
-                updateDateDisplay();
-                closeCalendar();
-                noteTextarea.value = memo.memo;
-                noteCharUsed.textContent = memo.memo.length;
-                
-                // 버튼 상태 설정
-                const noteSaveBtn = document.getElementById('note-save-btn');
-                noteSaveBtn.disabled = false;
-                noteSaveBtn.textContent = 'Update Note';
-                noteDeleteBtn.style.display = 'block';  // Delete 버튼 보이기
-                
-                noteModal.style.display = 'flex';
-                setTimeout(() => noteTextarea.focus(), 100);
-            } catch (error) {
-                console.error('Failed to load memo:', error);
-                alert('Failed to load memo. Please try again.');
-            }
-        }
-
-        async function saveNote() {
-            const date = noteDateInput.value;
-            const content = noteTextarea.value.trim();
-
-            if (!date) {
-                alert('Please select a date');
-                return;
-            }
-
-            if (!content) {
-                alert('Please write a note');
-                return;
-            }
-
-            // API 호출
-            const noteSaveBtn = document.getElementById('note-save-btn');
-            const originalText = noteSaveBtn.textContent;
-            noteSaveBtn.disabled = true;
-            noteSaveBtn.textContent = 'Saving...';
-
-            try {
-                let url, method;
-                
-                if (currentMemoId) {
-                    // 메모 수정 (PUT)
-                    url = `/me/calendar-memo/${currentMemoId}`;
-                    method = 'PUT';
-                } else {
-                    // 메모 생성 (POST) - 같은 날짜에 여러 개 가능
-                    url = '/me/calendar-memo/save';
-                    method = 'POST';
-                }
-
-                const response = await Auth.authFetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        startDate: date,
-                        memo: content
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json();
-                console.log('Note saved successfully:', result);
-                
-                noteSaveBtn.disabled = false;
-                noteSaveBtn.textContent = originalText;
-                closeNoteModal();
-                
-                // 캘린더에 메모 반영
-                await loadMemos();
-            } catch (error) {
-                console.error('Failed to save note:', error);
-                noteSaveBtn.disabled = false;
-                noteSaveBtn.textContent = originalText;
-                alert('Failed to save note. Please try again.');
-            }
-        }
-
-        function deleteMemoConfirm() {
-            if (!currentMemoId) return;
-
-            const shouldDelete = confirm('Are you sure you want to delete this memo?');
-            if (!shouldDelete) return;
-
-            deleteMemo();
-        }
-
-        async function deleteMemo() {
-            if (!currentMemoId) return;
-
-            try {
-                const response = await Auth.authFetch(`/me/calendar-memo/${currentMemoId}`, {
-                    method: 'DELETE'
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                closeNoteModal();
-                await loadMemos();
-            } catch (error) {
-                console.error('Failed to delete memo:', error);
-                alert('Failed to delete memo. Please try again.');
-            }
-        }
-    </script>
+<script th:src="@{/js/auth.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+<script th:src="@{/js/calendar.js}"></script>
 </body>
 </html>

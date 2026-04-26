@@ -9,25 +9,29 @@
         Detail | Welcome Tajikistan
     </title>
 
-    <!-- for google material icon -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
     <link rel="stylesheet" href="../css/header.css" />
     <link rel="stylesheet" href="../css/detail.css" />
     <link rel="stylesheet" href="../css/footer.css" />
     <link rel="stylesheet" th:href="@{/css/skeleton.css}">
+
     <style>
         html, body { background: #f5f5f5; }
     </style>
+
     <script defer th:src="@{/js/skeleton.js}"></script>
+
     <meta name="place-id" th:content="${place != null ? place.placeId : ''}" />
     <meta name="place-title" th:content="${place != null && place.displayI18n != null ? place.displayI18n.title : ''}" />
+
     <noscript>
         <style>
             #loading-skeleton { display: none !important; }
             #main-content { visibility: visible !important; opacity: 1 !important; }
         </style>
     </noscript>
+
     <link rel="icon" th:href="@{/assets/logo/favicon.png}">
 </head>
 
@@ -77,136 +81,147 @@
     </div>
 
     <div id="main-content">
-    <!-- header -->
-    <div th:replace="components/header :: header"></div>
+        <div th:replace="components/header :: header"></div>
 
-    <main class="detail-page">
-        <div class="detail-container">
+        <main class="detail-page">
+            <div class="detail-container">
 
-            <div class="detail-meta" th:if="${place != null}">
-                <span class="chip chip-region"
-                      th:text="${place.region != null && place.region.displayName != null ? place.region.displayName : (place.region != null ? place.region.code : #messages.msg('detail.region.fallback'))}">
-                    Region
-                </span>
+                <div class="detail-meta" th:if="${place != null}">
+                    <span class="chip chip-region"
+                          th:text="${place.region != null && place.region.displayName != null ? place.region.displayName : (place.region != null ? place.region.code : #messages.msg('detail.region.fallback'))}">
+                        Region
+                    </span>
 
-                <span class="chip chip-category"
-                      th:text="${place.category != null && place.category.displayName != null ? place.category.displayName : (place.category != null ? place.category.code : #messages.msg('detail.category.fallback'))}">
-                    Category
-                </span>
-            </div>
+                    <span class="chip chip-category"
+                          th:text="${place.category != null && place.category.displayName != null ? place.category.displayName : (place.category != null ? place.category.code : #messages.msg('detail.category.fallback'))}">
+                        Category
+                    </span>
+                </div>
 
-            <!-- title row -->
-            <div class="detail-title-row">
-                <a class="back-btn" th:if="${backUrl != null}"
-                   th:href="${backUrl}"
-                   aria-label="Go back"
-                   th:attr="aria-label=#{detail.back.aria}">
-                    <span class="material-icons back-icon" aria-hidden="true">arrow_back</span>
-                </a>
+                <div class="detail-title-row">
+                    <a class="back-btn" th:if="${backUrl != null}"
+                       th:href="${backUrl}"
+                       aria-label="Go back"
+                       th:attr="aria-label=#{detail.back.aria}">
+                        <span class="material-icons back-icon" aria-hidden="true">arrow_back</span>
+                    </a>
 
-                <a class="back-btn" th:if="${backUrl == null}"
-                   href="javascript:history.back()" aria-label="Go back"
-                   th:attr="aria-label=#{detail.back.aria}">
-                    <span class="material-icons back-icon" aria-hidden="true">arrow_back</span>
-                </a>
+                    <a class="back-btn" th:if="${backUrl == null}"
+                       href="javascript:history.back()"
+                       aria-label="Go back"
+                       th:attr="aria-label=#{detail.back.aria}">
+                        <span class="material-icons back-icon" aria-hidden="true">arrow_back</span>
+                    </a>
 
-                <h1 class="detail-title"
-                    th:text="${place != null && place.displayI18n != null && place.displayI18n.title != null ? place.displayI18n.title : #messages.msg('place.no_title')}">
-                    Place Title
-                </h1>
+                    <h1 class="detail-title"
+                        th:text="${place != null && place.displayI18n != null && place.displayI18n.title != null ? place.displayI18n.title : #messages.msg('place.no_title')}">
+                        Place Title
+                    </h1>
 
-                <!-- Rating and Favorite Button -->
-                <div class="detail-title-right">
-                    <div class="detail-rating" id="detail-rating" style="display:none;">
-                        <span class="material-icons rating-icon">star</span>
-                        <span class="rating-value"></span>
-                        <span class="rating-count"></span>
+                    <div class="detail-title-right">
+                        <div class="detail-rating" id="detail-rating" style="display:none;">
+                            <span class="material-icons rating-icon">star</span>
+                            <span class="rating-value"></span>
+                            <span class="rating-count"></span>
+                        </div>
+
+                        <button type="button" class="btn-favorite" id="btn-favorite"
+                                aria-label="Add to favorites"
+                                th:attr="aria-label=#{detail.favorite.aria}">
+                            <span class="material-icons favorite-icon">favorite</span>
+                        </button>
                     </div>
-                    <button type="button" class="btn-favorite" id="btn-favorite" 
-                            aria-label="Add to favorites"
-                            th:attr="aria-label=#{detail.favorite.aria}">
-                        <span class="material-icons favorite-icon">favorite</span>
-                    </button>
                 </div>
             </div>
 
-        </div>
-
-        <!-- hero image -->
-        <section class="detail-hero" aria-label="Place image" th:if="${place != null}"
-                 th:with="heroUrl=${(place.images != null and place.images.size() > 0 and place.images[0] != null) ? place.images[0].fileUrl : null}">
-            <img class="detail-hero-img"
-                 th:src="${heroUrl != null ? heroUrl : '../assets/images/home_reg_2.png'}"
-                 alt="Place image"
-                 th:attr="alt=#{detail.image.alt}" />
-        </section>
-
-        <div class="detail-container">
-            <!-- content -->
-            <section class="detail-content" aria-label="Place description">
-                <div class="detail-text"
-                     th:if="${place != null and place.displayI18n != null and place.displayI18n.content != null}"
-                     th:utext="${#strings.replace(place.displayI18n.content, '\n', '<br><br>')}">
-                </div>
-
-                <p class="detail-empty"
-                   th:if="${place == null or place.displayI18n == null or place.displayI18n.content == null}">
-                    <span th:text="#{detail.no_description}">No description available.</span>
-                </p>
+            <section class="detail-hero" aria-label="Place image" th:if="${place != null}"
+                     th:with="heroUrl=${(place.images != null and place.images.size() > 0 and place.images[0] != null) ? place.images[0].fileUrl : null}">
+                <img class="detail-hero-img"
+                     th:src="${heroUrl != null ? heroUrl : '../assets/images/home_reg_2.png'}"
+                     alt="Place image"
+                     th:attr="alt=#{detail.image.alt}" />
             </section>
 
-            <!-- reviews section -->
-            <section class="detail-reviews" aria-label="Reviews and experiences">
-                <header class="reviews-header">
-                    <span class="material-icons reviews-icon">rate_review</span>
-                    <h2 class="reviews-title" th:text="#{review.section.title}">Reviews & Experiences</h2>
-                </header>
+            <div class="detail-container">
+                <section class="detail-info-box"
+                         th:if="${place != null}"
+                         th:attr="data-open-time=${place.openTime != null ? place.openTime : ''},
+                                  data-close-time=${place.closeTime != null ? place.closeTime : ''},
+                                  data-is-free=${place.isFree != null ? place.isFree : ''},
+                                  data-currency-code=${place.currencyCode != null ? place.currencyCode : ''},
+                                  data-admission-fee=${place.admissionFee != null ? place.admissionFee : ''}">
+                    <div class="detail-info-row">
+                        <span class="detail-info-label">Opening hours</span>
+                        <span class="detail-info-value" id="detail-opening-hours">-</span>
+                    </div>
 
-                <!-- review form (only for logged-in) -->
-                <div id="reviews-form-container" class="reviews-form-section" style="display:none;">
-                    <h3 class="reviews-form-title" th:text="#{review.form.title}">Leave a Review</h3>
-                    
-                    <div class="review-form">
-                        <div class="form-group">
-                            <label th:text="#{review.form.rating}">Rating</label>
-                            <div class="star-rating" id="star-rating">
-                                <button type="button" class="star-btn" data-rating="1" aria-label="1 star"><span class="material-icons">star</span></button>
-                                <button type="button" class="star-btn" data-rating="2" aria-label="2 stars"><span class="material-icons">star</span></button>
-                                <button type="button" class="star-btn" data-rating="3" aria-label="3 stars"><span class="material-icons">star</span></button>
-                                <button type="button" class="star-btn" data-rating="4" aria-label="4 stars"><span class="material-icons">star</span></button>
-                                <button type="button" class="star-btn" data-rating="5" aria-label="5 stars"><span class="material-icons">star</span></button>
-                                <span class="star-display"></span>
+                    <div class="detail-info-row">
+                        <span class="detail-info-label">Admission Fee</span>
+                        <span class="detail-info-value" id="detail-admission-fee">-</span>
+                    </div>
+                </section>
+
+                <section class="detail-content" aria-label="Place description">
+                    <div class="detail-text"
+                         th:if="${place != null and place.displayI18n != null and place.displayI18n.content != null}"
+                         th:utext="${#strings.replace(place.displayI18n.content, '\n', '<br><br>')}">
+                    </div>
+
+                    <p class="detail-empty"
+                       th:if="${place == null or place.displayI18n == null or place.displayI18n.content == null}">
+                        <span th:text="#{detail.no_description}">No description available.</span>
+                    </p>
+                </section>
+
+                <section class="detail-reviews" aria-label="Reviews and experiences">
+                    <header class="reviews-header">
+                        <span class="material-icons reviews-icon">rate_review</span>
+                        <h2 class="reviews-title" th:text="#{review.section.title}">Reviews & Experiences</h2>
+                    </header>
+
+                    <div id="reviews-form-container" class="reviews-form-section" style="display:none;">
+                        <h3 class="reviews-form-title" th:text="#{review.form.title}">Leave a Review</h3>
+
+                        <div class="review-form">
+                            <div class="form-group">
+                                <label th:text="#{review.form.rating}">Rating</label>
+                                <div class="star-rating" id="star-rating">
+                                    <button type="button" class="star-btn" data-rating="1" aria-label="1 star"><span class="material-icons">star</span></button>
+                                    <button type="button" class="star-btn" data-rating="2" aria-label="2 stars"><span class="material-icons">star</span></button>
+                                    <button type="button" class="star-btn" data-rating="3" aria-label="3 stars"><span class="material-icons">star</span></button>
+                                    <button type="button" class="star-btn" data-rating="4" aria-label="4 stars"><span class="material-icons">star</span></button>
+                                    <button type="button" class="star-btn" data-rating="5" aria-label="5 stars"><span class="material-icons">star</span></button>
+                                    <span class="star-display"></span>
+                                </div>
                             </div>
+
+                            <div class="form-group">
+                                <label for="review-content" th:text="#{review.form.comment}">Your Comment</label>
+                                <textarea id="review-content" class="review-textarea"
+                                          th:placeholder="#{review.form.placeholder}"
+                                          placeholder="Share your experience..."></textarea>
+                            </div>
+
+                            <button type="button" id="submit-review-btn" class="btn-submit-review"
+                                    th:text="#{review.form.submit}">Submit Review</button>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="review-content" th:text="#{review.form.comment}">Your Comment</label>
-                            <textarea id="review-content" class="review-textarea" 
-                                      th:placeholder="#{review.form.placeholder}"
-                                      placeholder="Share your experience..."></textarea>
+                    <div id="reviews-list-container" class="reviews-list-section">
+                        <div id="reviews-list" class="reviews-list"></div>
+                        <div id="reviews-empty" class="reviews-empty" style="display:none;">
+                            <span th:text="#{review.empty}">No reviews yet.</span>
                         </div>
-
-                        <button type="button" id="submit-review-btn" class="btn-submit-review" 
-                                th:text="#{review.form.submit}">Submit Review</button>
                     </div>
-                </div>
+                </section>
+            </div>
+        </main>
 
-                <!-- reviews list -->
-                <div id="reviews-list-container" class="reviews-list-section">
-                    <div id="reviews-list" class="reviews-list"></div>
-                    <div id="reviews-empty" class="reviews-empty" style="display:none;">
-                        <span th:text="#{review.empty}">No reviews yet.</span>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
+        <div th:replace="components/footer :: footer"></div>
 
-    <!-- footer -->
-    <div th:replace="components/footer :: footer"></div>
-    <script th:src="@{/js/auth.js}"></script>
-    <script th:src="@{/js/detail.js}"></script>
-    <script th:src="@{/js/reviews.js}"></script>
+        <script th:src="@{/js/auth.js}"></script>
+        <script th:src="@{/js/detail.js}"></script>
+        <script th:src="@{/js/reviews.js}"></script>
     </div>
 </body>
 
