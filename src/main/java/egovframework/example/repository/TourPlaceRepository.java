@@ -23,8 +23,7 @@ public interface TourPlaceRepository extends JpaRepository<TourPlace, Long> {
 
     @EntityGraph(attributePaths = {"i18ns", "images", "category", "region"})
     List<TourPlace> findAllByIsActiveTrue();
-    
-    // Query to search by tourist place title or region code
+
     @Query(
             value =
             "select distinct p\n" +

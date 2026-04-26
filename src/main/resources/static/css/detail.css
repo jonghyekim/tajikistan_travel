@@ -50,17 +50,14 @@ body {
     justify-content: center;
     padding: 7px 12px;
     border-radius: 12px;
-
     font-size: 13px;
     font-weight: 600;
     line-height: 1;
     white-space: nowrap;
-
     background: #e9ffeb;
     color: #134928;
     border: 1px solid rgba(19, 73, 40, 0.12);
 }
-
 
 .detail-title-row {
     display: flex;
@@ -144,15 +141,14 @@ body {
     color: #ff6b5b;
 }
 
-
 .back-btn {
     display: inline-flex;
     align-items: baseline;
     justify-content: center;
     text-decoration: none;
     color: inherit;
-    padding: 0;     
-    border: none;   
+    padding: 0;
+    border: none;
     background: transparent;
     cursor: pointer;
 }
@@ -164,7 +160,7 @@ body {
 }
 
 /* =========================
-   Hero image 
+   Hero image
 ========================= */
 
 .detail-hero {
@@ -181,12 +177,50 @@ body {
 }
 
 /* =========================
-   Content 
+   Opening hours / Admission fee
+========================= */
+
+.detail-info-box {
+    max-width: 860px;
+    margin: 26px auto 0;
+    padding: 24px 28px;
+    background: #ECF8F1;
+    border: 1px solid #9EB8A9;
+    border-radius: 20px;
+}
+
+.detail-info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.detail-info-row + .detail-info-row {
+    margin-top: 8px;
+}
+
+.detail-info-label {
+    width: 124px;
+    flex: 0 0 124px;
+    color: #134928;
+    font-weight: 700;
+}
+
+.detail-info-value {
+    color: #000000;
+    font-weight: 400;
+    word-break: break-word;
+}
+
+/* =========================
+   Content
 ========================= */
 
 .detail-content {
     margin-top: 26px;
-    padding: 0;        
+    padding: 0;
 }
 
 .detail-text {
@@ -234,6 +268,7 @@ body {
 }
 
 /* Review Form */
+
 .reviews-form-section {
     background: #fff;
     border-radius: 18px;
@@ -261,6 +296,7 @@ body {
 }
 
 /* Star Rating */
+
 .star-rating {
     display: flex;
     gap: 8px;
@@ -335,6 +371,7 @@ body {
 }
 
 /* Reviews List */
+
 .reviews-list-section {
     margin-top: 32px;
 }
@@ -458,8 +495,28 @@ body {
         font-size: 30px;
     }
 
+    .detail-title-right {
+        margin-left: 0;
+    }
+
     .detail-hero-img {
         height: clamp(260px, 42vh, 420px);
+    }
+
+    .detail-info-box {
+        max-width: 100%;
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .detail-info-row {
+        font-size: 14px;
+        gap: 12px;
+    }
+
+    .detail-info-label {
+        width: 112px;
+        flex-basis: 112px;
     }
 
     .detail-text,
@@ -479,5 +536,15 @@ body {
 
     .chip {
         font-size: 12px;
+    }
+
+    .detail-info-row {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .detail-info-label {
+        width: auto;
+        flex-basis: auto;
     }
 }
