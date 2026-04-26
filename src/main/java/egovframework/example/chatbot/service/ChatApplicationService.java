@@ -61,7 +61,10 @@ public class ChatApplicationService {
             case OPERATING_HOURS -> answerOperatingHours(intent);
             case EMERGENCY_CONTACT, PHONE_NUMBER -> answerEmergencyContacts(intent);
             case TOUR_PLACE_SEARCH -> answerTourPlaces(request.message(), intent);
-            case GENERAL_TOURISM, UNKNOWN -> ChatResponse.noData(intent.intent().name(), intent.locale());
+//            case GENERAL_TOURISM, UNKNOWN -> ChatResponse.noData(intent.intent().name(), intent.locale());
+            case GENERAL_TOURISM -> answerTourPlaces(request.message(), intent);
+            case UNKNOWN -> ChatResponse.noData(intent.intent().name(), intent.locale());
+
         };
     }
 

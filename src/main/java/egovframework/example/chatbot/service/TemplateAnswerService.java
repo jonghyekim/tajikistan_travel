@@ -53,7 +53,9 @@ public class TemplateAnswerService {
     private String summary(TourPlaceFact place) {
         String content = place.content();
         if (content == null || content.isBlank()) {
-            return " (" + place.categoryCode() + ", " + place.regionCode() + ")";
+//            return " (" + place.categoryCode() + ", " + place.regionCode() + ")";
+            return "";
+
         }
         String normalized = content.replaceAll("\\s+", " ").trim();
         if (normalized.length() > 180) {

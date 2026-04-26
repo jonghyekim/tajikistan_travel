@@ -279,7 +279,12 @@
             </div>
         </div>
     </div>
-    <link rel="stylesheet" th:href="@{/css/chat-widget.css}">
+        <link rel="stylesheet" th:href="@{/css/chatbot.css}">
+    <div class="cb-widget" data-chatbot th:attr="data-lang=${lang}"></div>
+    <script th:src="@{/js/chatbot.js}"></script>
+</footer>
+    
+   <!--  <link rel="stylesheet" th:href="@{/css/chat-widget.css}">
     <div class="chat-test-widget" data-chat-widget th:attr="data-lang=${lang}">
         <button type="button" class="chat-test-toggle" data-chat-toggle>Chat Test</button>
         <section class="chat-test-panel" data-chat-panel hidden>
@@ -300,4 +305,4 @@
         </section>
     </div>
     <script th:src="@{/js/chat-widget.js}"></script>
-</footer>
+</footer> -->

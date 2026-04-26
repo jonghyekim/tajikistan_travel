@@ -20,7 +20,9 @@ public class RagContextBuilder {
                 place.sourceId(),
                 SourceType.TOUR_PLACE,
                 place.title(),
-                compact(join(place.title(), place.address(), place.content(), place.categoryCode(), place.regionCode()))
+//                compact(join(place.title(), place.address(), place.content(), place.categoryCode(), place.regionCode()))
+                compact(join(place.title(), place.address(), place.content()))
+
             ))
             .toList();
         return new RagContext(sources, render(sources));
