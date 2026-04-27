@@ -4,6 +4,20 @@ let draggableInstance = null;
 let originalFavorites = [];
 let currentLang = 'en';
 
+function showLoading() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.classList.remove('hidden');
+    }
+}
+
+function hideLoading() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.classList.add('hidden');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async function () {
     if (!Auth || !Auth.isLoggedIn()) {
         Auth.goToLogin();
@@ -14,10 +28,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     const lang = urlParams.get('lang') || document.documentElement.lang || 'en';
     currentLang = lang;
 
+    // Show loading spinner
+    showLoading();
+
     initCalendar(lang);
     await loadFavoriteCardsForCalendar(lang);
     await loadSavedCalendars(lang);
     await loadMemos();
+
+    // Hide loading spinner
+    hideLoading();
 });
 
 function getCategoryIcon(category) {

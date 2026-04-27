@@ -1,5 +1,19 @@
 // mypage-favorites.js - Handle My Favorites page (using filter.html design)
 
+function showLoading() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.classList.remove('hidden');
+    }
+}
+
+function hideLoading() {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+        spinner.classList.add('hidden');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('mypage-favorites.js loaded');
 
@@ -15,8 +29,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     const lang = urlParams.get('lang') || document.documentElement.lang || 'en';
     console.log('Current language:', lang);
 
+    // Show loading spinner
+    showLoading();
+
     // Load favorites
     await loadFavorites(lang);
+    
+    // Hide loading spinner
+    hideLoading();
     
     // Attach favorite button listeners
     attachFavoriteButtonListeners();
