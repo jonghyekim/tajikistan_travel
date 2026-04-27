@@ -786,6 +786,81 @@ body {
     }
 }
 
+/* =========================
+   Loading Spinner
+========================= */
+
+#loading-spinner {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+    backdrop-filter: blur(2px);
+}
+
+#loading-spinner.show {
+    display: flex;
+}
+
+#loading-spinner.hidden {
+    display: none !important;
+}
+
+.spinner-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner-logo {
+    width: 90px;
+    height: 90px;
+    animation: spin-logo 2s linear infinite;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.spinner-ring {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border: 3px solid transparent;
+    border-top-color: #008eff;
+    border-right-color: #008eff;
+    border-radius: 50%;
+    animation: spin-ring 1.5s linear infinite;
+}
+
+@keyframes spin-logo {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-ring {
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+.loading-text {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 15px;
+    color: #ffffff;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
 @media (max-width: 768px) {
     .calendar-page {
         padding: 88px 0;

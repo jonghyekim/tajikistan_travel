@@ -35,6 +35,8 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/jakarta/validation/jakarta.validation-api/2.0.2/jakarta.validation-api-2.0.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/jboss/logging/jboss-logging/3.4.3.Final/jboss-logging-3.4.3.Final.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/boot/spring-boot-starter-cache/2.7.18/spring-boot-starter-cache-2.7.18.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-context-support/5.3.37/spring-context-support-5.3.37.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/boot/spring-boot-devtools/2.7.18/spring-boot-devtools-2.7.18.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/boot/spring-boot/2.7.18/spring-boot-2.7.18.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/boot/spring-boot-autoconfigure/2.7.18/spring-boot-autoconfigure-2.7.18.jar" enabled="true" runInBatchMode="false"/>
@@ -53,7 +55,6 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/egovframe/rte/org.egovframe.rte.ptl.mvc/4.3.0/org.egovframe.rte.ptl.mvc-4.3.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/egovframe/rte/org.egovframe.rte.fdl.cmmn/4.3.0/org.egovframe.rte.fdl.cmmn-4.3.0.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-context-support/5.3.37/spring-context-support-5.3.37.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-tx/5.3.37/spring-tx-5.3.37.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/aspectj/aspectjweaver/1.9.7/aspectjweaver-1.9.7.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/aspectj/aspectjrt/1.9.7/aspectjrt-1.9.7.jar" enabled="true" runInBatchMode="false"/>
