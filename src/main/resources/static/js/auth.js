@@ -84,7 +84,7 @@
 
     let res = await fetch(url, opts);
 
-    if (res.status === 401 && getRefreshToken()) {
+    if ((res.status === 401 || res.status === 403) && getRefreshToken()) {
       try {
         const newAccess = await refreshAccessToken();
         opts.headers["Authorization"] = "Bearer " + newAccess;
