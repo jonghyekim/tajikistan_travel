@@ -3,6 +3,7 @@ let draggableInstance = null;
 
 let originalFavorites = [];
 let currentLang = 'en';
+let currentViewMode = 'compact'; // 'compact' or 'full'
 
 function showLoading() {
     const spinner = document.getElementById('loading-spinner');
@@ -28,10 +29,21 @@ document.addEventListener('DOMContentLoaded', async function () {
     const lang = urlParams.get('lang') || document.documentElement.lang || 'en';
     currentLang = lang;
 
+    // Load saved view mode
+    currentViewMode = localStorage.getItem('calendarViewMode') || 'compact';
+
+    // Apply initial view mode class
+    const calendarBoard = document.querySelector('.calendar-board');
+    if (calendarBoard) {
+        calendarBoard.classList.toggle('full-view-mode', currentViewMode === 'full');
+        calendarBoard.classList.toggle('compact-view-mode', currentViewMode === 'compact');
+    }
+
     // Show loading spinner
     showLoading();
 
     initCalendar(lang);
+    updateViewModeButton();
     await loadFavoriteCardsForCalendar(lang);
     await loadSavedCalendars(lang);
     await loadMemos();
@@ -65,6 +77,8 @@ function buildCalendarEventTitle(title, category) {
 function initCalendar(lang) {
     const calendarEl = document.getElementById('calendar');
 
+    const dayMaxEventsValue = currentViewMode === 'full' ? false : 2;
+
     calendarInstance = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         initialDate: new Date(),
@@ -80,7 +94,7 @@ function initCalendar(lang) {
 
         droppable: true,
         editable: true,
-        dayMaxEvents: 2,
+        dayMaxEvents: dayMaxEventsValue,
         fixedWeekCount: false,
 
         eventReceive: async function (info) {
@@ -335,9 +349,14 @@ async function loadMemos() {
         });
 
         memos.forEach(memo => {
-            const displayMemo = memo.memo.length > 25
-                ? '📝 ' + memo.memo.substring(0, 25) + '...'
-                : '📝 ' + memo.memo;
+            let displayMemo;
+            if (currentViewMode === 'full') {
+                displayMemo = '📝 ' + memo.memo;
+            } else {
+                displayMemo = memo.memo.length > 25
+                    ? '📝 ' + memo.memo.substring(0, 25) + '...'
+                    : '📝 ' + memo.memo;
+            }
 
             calendarInstance.addEvent({
                 title: displayMemo,
@@ -519,8 +538,40 @@ function formatDate(date) {
     return `${year}-${month}-${day}`;
 }
 
+document.getElementById('toggle-view-btn').addEventListener('click', toggleCalendarViewMode);
 document.getElementById('download-image-btn').addEventListener('click', downloadCalendarAsImage);
 document.getElementById('copy-image-btn').addEventListener('click', copyCalendarToClipboard);
+
+function updateViewModeButton() {
+    const toggleBtn = document.getElementById('toggle-view-btn');
+    if (!toggleBtn) return;
+
+    if (currentViewMode === 'compact') {
+        toggleBtn.querySelector('span:last-child').textContent = 'Full View';
+        toggleBtn.title = 'Switch to full view (show all events)';
+    } else {
+        toggleBtn.querySelector('span:last-child').textContent = 'Compact View';
+        toggleBtn.title = 'Switch to compact view (limited events)';
+    }
+}
+
+function toggleCalendarViewMode() {
+    currentViewMode = currentViewMode === 'compact' ? 'full' : 'compact';
+    localStorage.setItem('calendarViewMode', currentViewMode);
+    updateViewModeButton();
+
+    const dayMaxEventsValue = currentViewMode === 'full' ? false : 2;
+    calendarInstance.setOption('dayMaxEvents', dayMaxEventsValue);
+    
+    // Update calendar view with current mode
+    document.querySelector('.calendar-board').classList.toggle('full-view-mode', currentViewMode === 'full');
+    document.querySelector('.calendar-board').classList.toggle('compact-view-mode', currentViewMode === 'compact');
+    
+    // Reload events to update display based on view mode
+    const lang = currentLang;
+    loadSavedCalendars(lang);
+    loadMemos();
+}
 
 async function downloadCalendarAsImage() {
     const calendarBoard = document.querySelector('.calendar-board');

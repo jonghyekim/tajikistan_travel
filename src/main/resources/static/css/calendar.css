@@ -94,10 +94,17 @@ body {
     color: #8f8f8f;
 }
 
+.calendar-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+
 .download-buttons {
     display: flex;
     gap: 12px;
-    margin-top: 20px;
 }
 
 .download-btn {
@@ -139,6 +146,37 @@ body {
     background: #e0e0e0;
 }
 
+.toggle-view-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.toggle-view-btn .material-icons {
+    font-size: 20px;
+}
+
+.toggle-view-btn:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #673a93 100%);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+}
+
+.toggle-view-btn:active {
+    transform: scale(0.98);
+}
+
 .download-btn:active {
     transform: scale(0.98);
 }
@@ -156,6 +194,14 @@ body {
     align-items: start;
 }
 
+.calendar-column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-self: start;
+    padding-top: 0;
+}
+
 /* =========================
    Left panel
 ========================= */
@@ -165,13 +211,15 @@ body {
     border-radius: 28px;
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
     padding: 20px;
-    height: 760px;
+    height: auto;
+    max-height: 800px;
     display: flex;
     flex-direction: column;
     min-height: 0;
     min-width: 0;
     width: 100%;
     max-width: 100%;
+    align-self: start;
 }
 
 .saved-panel-header {
@@ -1623,4 +1671,49 @@ body {
     .note-textarea {
         height: 120px;
     }
+}
+
+/* Full View Mode Styles */
+.calendar-board.full-view-mode .fc-event-title {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    text-overflow: clip;
+}
+
+.calendar-board.full-view-mode .place-title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    display: block;
+    max-height: none;
+}
+
+.calendar-board.full-view-mode .place-desc {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    display: block;
+    max-height: none;
+    -webkit-line-clamp: unset;
+}
+
+/* Compact View Mode Styles */
+.calendar-board.compact-view-mode .fc-event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-board.compact-view-mode .place-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-board.compact-view-mode .place-desc {
+    -webkit-line-clamp: 3;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
