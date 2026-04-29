@@ -218,9 +218,7 @@
         if (pathname.startsWith('/detail/')) {
             return 'detail';
         }
-        if (pathname === '/emergency_contacts') {
-            return 'emergency';
-        }
+        
         if (pathname === '/') {
             return 'home';
         }
@@ -237,9 +235,7 @@
             skeleton.innerHTML = filterSkeletonMarkup();
         } else if (kind === 'detail') {
             skeleton.innerHTML = detailSkeletonMarkup();
-        } else if (kind === 'emergency') {
-            skeleton.innerHTML = emergencySkeletonMarkup();
-        }
+        } 
 
         skeleton.dataset.kind = kind;
     }
@@ -308,8 +304,15 @@
                 return;
             }
 
-            event.preventDefault();
-            navigateWithSkeleton(url, resolveKind(url));
+			const nextKind = resolveKind(url);
+
+			if (!nextKind) {
+			    return;
+			}
+
+			event.preventDefault();
+			navigateWithSkeleton(url, nextKind);
+			
         }, true);
 
         document.addEventListener('submit', function(event) {
