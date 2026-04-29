@@ -172,7 +172,11 @@
 
                 <section class="detail-content" aria-label="Place description">
                     <div class="detail-text"
-                         th:if="${place != null and place.displayI18n != null and place.displayI18n.content != null}"
+                         th:if="${place != null 
+					             and place.displayI18n != null 
+					             and place.displayI18n.content != null
+					             and place.category != null
+					             and place.category.code != 'DINING'}"
                          th:utext="${#strings.replace(place.displayI18n.content, '\n', '<br><br>')}">
                     </div>
 
