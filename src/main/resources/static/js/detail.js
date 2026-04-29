@@ -24,16 +24,45 @@ function renderPlaceDetailInfo() {
     const isFree = normalizeValue(infoBox.dataset.isFree);
     const currencyCode = normalizeValue(infoBox.dataset.currencyCode);
     const admissionFee = normalizeValue(infoBox.dataset.admissionFee);
+    const address = normalizeValue(infoBox.dataset.address);
+    const categoryCode = normalizeValue(infoBox.dataset.categoryCode).toLowerCase();
 
     const openingHoursEl = document.getElementById('detail-opening-hours');
     const admissionFeeEl = document.getElementById('detail-admission-fee');
+    const admissionRow = document.getElementById('detail-admission-row');
+    const addressEl = document.getElementById('detail-address');
+    const timeLabelEl = document.getElementById('detail-time-label');
+
+	const isHotel = categoryCode === 'stay';
+	const isRestaurant = categoryCode === 'dining';
 
     if (openingHoursEl) {
-        openingHoursEl.textContent = formatOpeningHours(openTime, closeTime);
+        if (isHotel) {
+            openingHoursEl.textContent =
+                `${formatTime(openTime)} / ${formatTime(closeTime)}`;
+
+            if (timeLabelEl) {
+                timeLabelEl.textContent = 'Check-in / Check-out';
+            }
+        } else {
+            openingHoursEl.textContent = formatOpeningHours(openTime, closeTime);
+
+            if (timeLabelEl) {
+                timeLabelEl.textContent = 'Opening hours';
+            }
+        }
     }
 
     if (admissionFeeEl) {
         admissionFeeEl.textContent = formatAdmissionFee(isFree, currencyCode, admissionFee);
+    }
+
+    if (admissionRow && (isHotel || isRestaurant)) {
+        admissionRow.style.display = 'none';
+    }
+
+    if (addressEl) {
+        addressEl.textContent = address || '-';
     }
 }
 

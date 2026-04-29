@@ -144,21 +144,30 @@
 
             <div class="detail-container">
                 <section class="detail-info-box"
-                         th:if="${place != null}"
-                         th:attr="data-open-time=${place.openTime != null ? place.openTime : ''},
-                                  data-close-time=${place.closeTime != null ? place.closeTime : ''},
-                                  data-is-free=${place.isFree != null ? place.isFree : ''},
-                                  data-currency-code=${place.currencyCode != null ? place.currencyCode : ''},
-                                  data-admission-fee=${place.admissionFee != null ? place.admissionFee : ''}">
+                 th:if="${place != null}"
+                 th:attr="data-open-time=${place.openTime != null ? place.openTime : ''},
+            		     data-close-time=${place.closeTime != null ? place.closeTime : ''},
+                  		 data-is-free=${place.isFree != null ? place.isFree : ''},
+            		     data-currency-code=${place.currencyCode != null ? place.currencyCode : ''},
+                  		 data-admission-fee=${place.admissionFee != null ? place.admissionFee : ''},
+                  		 data-address=${place.address != null ? place.address : ''},
+                  		 data-category-code=${place.category != null ? place.category.code : ''}">
+
+                        
                     <div class="detail-info-row">
-                        <span class="detail-info-label">Opening hours</span>
+                        <span class="detail-info-label" id="detail-time-label">Opening hours</span>
                         <span class="detail-info-value" id="detail-opening-hours">-</span>
                     </div>
 
-                    <div class="detail-info-row">
+                    <div class="detail-info-row" id="detail-admission-row">
                         <span class="detail-info-label">Admission Fee</span>
                         <span class="detail-info-value" id="detail-admission-fee">-</span>
                     </div>
+                    
+                    <div class="detail-info-row">
+					    <span class="detail-info-label">Address</span>
+					    <span class="detail-info-value" id="detail-address">-</span>
+					</div>
                 </section>
 
                 <section class="detail-content" aria-label="Place description">

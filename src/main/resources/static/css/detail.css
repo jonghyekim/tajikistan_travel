@@ -202,10 +202,11 @@ body {
 }
 
 .detail-info-label {
-    width: 124px;
-    flex: 0 0 124px;
+    width: 180px;
+    flex: 0 0 180px;
     color: #134928;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .detail-info-value {
@@ -515,9 +516,10 @@ body {
     }
 
     .detail-info-label {
-        width: 112px;
-        flex-basis: 112px;
-    }
+	    width: 180px;
+	    flex-basis: 180px;
+	    white-space: nowrap;
+}
 
     .detail-text,
     .detail-empty {
