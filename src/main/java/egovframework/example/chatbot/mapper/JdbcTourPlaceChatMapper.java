@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +22,13 @@ import java.util.stream.Collectors;
 
 @Repository
 public class JdbcTourPlaceChatMapper implements TourPlaceChatMapper {
+
+    private static final List<DateTimeFormatter> TIME_FORMATS = List.of(
+        DateTimeFormatter.ofPattern("H:mm"),
+        DateTimeFormatter.ofPattern("HH:mm"),
+        DateTimeFormatter.ofPattern("H:mm:ss"),
+        DateTimeFormatter.ofPattern("HH:mm:ss")
+    );
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -72,7 +81,11 @@ public class JdbcTourPlaceChatMapper implements TourPlaceChatMapper {
             }
         }
 
-        sql.append(" order by ");
+        sql.append("""
+             order by
+               case when lower(i.title) = lower(:keyword) then 100 else 0 end desc,
+               case when lower(i.title) like lower(concat('%%', :keyword, '%%')) then 50 else 0 end desc,
+            """);
         for (int i = 0; i < terms.textTokens().size(); i++) {
             if (i > 0) {
                 sql.append(" + ");
@@ -110,24 +123,19 @@ public class JdbcTourPlaceChatMapper implements TourPlaceChatMapper {
     public List<OperatingHourFact> findOperatingHours(String keyword, String locale) {
         List<String> tokens = searchTokens(keyword);
         StringBuilder sql = new StringBuilder("""
-            select h.operating_hour_id,
+            select p.place_id as operating_hour_id,
                    p.place_id,
-                   concat('operating_hour:', h.operating_hour_id) as source_id,
+                   concat('operating_hour:', p.place_id) as source_id,
                    i.title as place_title,
-                   h.day_of_week,
-                   h.season_code,
-                   h.opens_at,
-                   h.closes_at,
-                   h.is_closed,
-                   h.last_admission_at,
-                   h.note,
+                   p.open_time,
+                   p.close_time,
                    i.locale
-              from tour_place_operating_hour h
-              join tour_place p on p.place_id = h.place_id
+              from tour_place p
               join tour_place_i18n i on i.place_id = p.place_id
              where p.is_active = true
-               and h.is_active = true
                and i.locale = :locale
+               and (nullif(trim(p.open_time), '') is not null
+                    or nullif(trim(p.close_time), '') is not null)
             """);
         MapSqlParameterSource params = params(keyword, locale);
         for (int i = 0; i < tokens.size(); i++) {
@@ -136,7 +144,11 @@ public class JdbcTourPlaceChatMapper implements TourPlaceChatMapper {
             params.addValue(paramName, tokens.get(i));
         }
         sql.append("""
-             order by p.place_id, h.season_code, h.day_of_week
+             order by
+               case when lower(i.title) = lower(:keyword) then 100 else 0 end desc,
+               case when lower(i.title) like lower(concat('%%', :keyword, '%%')) then 50 else 0 end desc,
+               p.updated_at desc
+             limit 5
             """);
         return jdbcTemplate.query(sql.toString(), params, operatingHourMapper());
     }
@@ -231,22 +243,29 @@ public class JdbcTourPlaceChatMapper implements TourPlaceChatMapper {
             rs.getLong("place_id"),
             rs.getString("source_id"),
             rs.getString("place_title"),
-            parseDayOfWeek(rs.getString("day_of_week")),
-            rs.getString("season_code"),
-            rs.getTime("opens_at") == null ? null : rs.getTime("opens_at").toLocalTime(),
-            rs.getTime("closes_at") == null ? null : rs.getTime("closes_at").toLocalTime(),
-            rs.getBoolean("is_closed"),
-            rs.getTime("last_admission_at") == null ? null : rs.getTime("last_admission_at").toLocalTime(),
-            rs.getString("note"),
+            null,
+            "ALL",
+            parseTime(rs.getString("open_time")),
+            parseTime(rs.getString("close_time")),
+            false,
+            null,
+            null,
             rs.getString("locale")
         );
     }
 
-    private DayOfWeek parseDayOfWeek(String value) throws SQLException {
-        try {
-            return DayOfWeek.valueOf(value);
-        } catch (RuntimeException ex) {
-            throw new SQLException("Invalid day_of_week: " + value, ex);
+    private LocalTime parseTime(String value) throws SQLException {
+        if (value == null || value.isBlank()) {
+            return null;
         }
+        String trimmed = value.trim();
+        for (DateTimeFormatter formatter : TIME_FORMATS) {
+            try {
+                return LocalTime.parse(trimmed, formatter);
+            } catch (DateTimeParseException ignored) {
+                // Try the next supported database text format.
+            }
+        }
+        throw new SQLException("Invalid tour_place operating time: " + value);
     }
 }

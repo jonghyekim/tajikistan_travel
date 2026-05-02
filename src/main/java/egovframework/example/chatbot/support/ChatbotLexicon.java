@@ -100,9 +100,9 @@ public final class ChatbotLexicon {
         return switch (normalized) {
             case "좋은", "괜찮은", "가볼만한", "갈만한", "추천", "추천해줘", "알려줘", "보여줘",
                  "위주로", "가볍게", "둘러볼", "둘러보기", "만한", "곳", "뭐", "있음", "있어", "있나요",
-                 "조용한", "산책", "산책하기", "근처", "어디가", "뭐야", "야", "아이랑", "ㅊㅊ", "ᄎᄎ", "pls", "plz",
+                 "조용한", "산책", "산책하기", "근처", "어디가", "어디", "위치", "주소", "뭐야", "야", "아이랑", "ㅊㅊ", "ᄎᄎ", "pls", "plz",
                  "best", "good", "top", "nice", "recommended", "recommendation", "quiet", "walking", "walk", "stroll",
-                 "can", "i", "any", "does", "hrs", "рекоменд", "посоветуйте", "хороший", "тихий", "прогулка",
+                 "can", "i", "any", "does", "hrs", "where", "address", "location", "located", "рекоменд", "посоветуйте", "хороший", "тихий", "прогулка",
                  "где", "во", "сколько", "в", "на", "дар", "аст", "ҳаст", "тавсия", "диҳед", "чанд" -> true;
             default -> false;
         };
@@ -123,7 +123,8 @@ public final class ChatbotLexicon {
         }
         return switch (normalized) {
             case "타지키스탄", "타지키스탄에서", "뭐", "뭐야", "야", "번호", "번호좀",
-                 "tajikistan", "in", "the", "a", "an", "number", "numbr",
+                 "긴급", "긴급상황", "상황", "연락처", "필요", "필요해", "필요합니다",
+                 "tajikistan", "in", "the", "a", "an", "number", "numbr", "contact", "emergency", "need",
                  "в", "на", "и", "дар", "тоҷикистон", "таджикистане",
                  "телефон", "номер", "рақами", "рақам", "тамос" -> true;
             default -> false;

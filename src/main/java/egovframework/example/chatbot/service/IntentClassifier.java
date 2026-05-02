@@ -43,8 +43,8 @@ public class IntentClassifier {
             || containsWord(message, "tel")) {
             return ChatIntent.PHONE_NUMBER;
         }
-        if (containsAny(message, "place", "tour", "visit", "attraction", "park", "parks", "zoo", "hotel", "restaurant", "restarant", "restraunt", "food", "cafe", "where",
-            "관광", "여행", "명소", "추천", "공원", "공언", "동물원", "호텔", "숙소", "식당", "맛집", "밥집", "가볼만한", "갈만한", "둘러볼", "곳",
+        if (containsAny(message, "place", "tour", "visit", "attraction", "park", "parks", "zoo", "hotel", "restaurant", "restarant", "restraunt", "food", "cafe", "where", "address", "location",
+            "관광", "여행", "명소", "추천", "공원", "공언", "동물원", "호텔", "숙소", "식당", "맛집", "밥집", "가볼만한", "갈만한", "둘러볼", "곳", "위치", "주소", "어디",
             "мест", "тур", "достопримеч", "посет", "парк", "отель", "гостиниц", "ресторан", "останов", "кафе", "поесть",
             "саёҳ", "ҷой", "тамошобоб", "боғ", "меҳмонхона", "тарабхона", "хӯрок")) {
             return ChatIntent.TOUR_PLACE_SEARCH;
@@ -86,9 +86,9 @@ public class IntentClassifier {
         String keyword = message
             .replaceAll("\\b(what|where|when|which|who|how|are|is|the|a|an|to|me|please|tell|show|find|give|list|about|for|of|in|near|nearby|can|any|does)\\b", " ")
             .replaceAll("\\b(open|opening|close|closing|closed|hour|hours|time|phone|number|tel|contact|emergency|police|ambulance|fire|query|sql|prompt)\\b", " ")
-            .replaceAll("\\b(recommend|recommendation|recommended|tour|tourist|travel|place|places|visit|attraction|attractions|destination|destinations|good|nice|best|top|quiet|walking|walk|stroll|pls|plz)\\b", " ")
+            .replaceAll("\\b(recommend|recommendation|recommended|tour|tourist|travel|place|places|visit|attraction|attractions|destination|destinations|address|location|located|good|nice|best|top|quiet|walking|walk|stroll|pls|plz)\\b", " ")
             .replaceAll("(알려줘|보여줘|찾아줘|추천해줘|추천|운영|영업|시간|전화번호|전화|연락처|긴급|응급|경찰|구급차|소방|관광|여행|명소|근처|어디가|뭐야|야)", " ")
-            .replaceAll("(위주로|가볍게|둘러볼|둘러보기|만한|가볼만한|갈만한|좋은|괜찮은|조용한|산책하기|산책|뭐|있음|있어|있나요|곳)", " ")
+            .replaceAll("(위치가|위치는|위치|주소가|주소는|주소|어디야|어딨어|어디있어|어디인가요|어디|위주로|가볍게|둘러볼|둘러보기|만한|가볼만한|갈만한|좋은|괜찮은|조용한|산책하기|산책|뭐|있음|있어|있나요|곳)", " ")
             .replaceAll("(^|\\s)(где|во|сколько|в|на|дар|аст|ҳаст|тавсия|диҳед)(?=\\s|$)", " ")
             .replaceAll("(открыт|открыта|открыто|открытие|закрыт|закрыта|закрыто|часы|час|время|телефон|номер|контакт|экстренный|экстренная|туристические|туризм|места|место|достопримечательности|достопримечательность)", " ")
             .replaceAll("(рекоменд|посоветуйте|хорош|тих|прогул|кушода|баста|соат|вақт|телефон|рақам|тамос|изтирорӣ|изтирор|саёҳӣ|саёҳат|ҷой|ҷойҳо|тамошобоб)", " ")
@@ -102,7 +102,7 @@ public class IntentClassifier {
         String keyword = message
             .replaceAll("\\b(what|where|when|which|who|how|are|is|the|a|an|to|me|please|tell|show|find|give|list|about|for|of|in|near|nearby|can|any|does)\\b", " ")
             .replaceAll("\\b(phone|number|numbr|tel|contact|emergency)\\b", " ")
-            .replaceAll("(알려줘|보여줘|찾아줘|전화번호|전화|연락처|번호|번호좀|긴급|좀|뭐야|야)", " ")
+            .replaceAll("(알려줘|보여줘|찾아줘|전화번호|전화|연락처|번호|번호좀|긴급상황|긴급|상황|필요|필요해|필요합니다|좀|뭐야|야)", " ")
             .replaceAll("(^|\\s)(в|на|дар|аст|ҳаст|и)(?=\\s|$)", " ")
             .replaceAll("(телефон|номер|контакт|экстренный|экстренная|рақами|рақам|тамос|изтирорӣ|изтирор)", " ")
             .replaceAll("[\\p{Punct}؟،。！？]+", " ")

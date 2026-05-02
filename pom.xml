@@ -30,6 +30,7 @@
 		<java.version>17</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<chatbot.live-eval>false</chatbot.live-eval>
 	</properties>
 	<repositories>
 		<repository>
@@ -116,7 +117,6 @@
 		 	<groupId>com.mysql</groupId>
   			<artifactId>mysql-connector-j</artifactId>
   			<version>8.0.33</version>
-  			<scope>runtime</scope>
 		</dependency>
 
 		<!-- eGovFramework runtime environment -->
@@ -193,6 +193,23 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<chatbot.live-eval>${chatbot.live-eval}</chatbot.live-eval>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>chatbot-live-eval</id>
+			<properties>
+				<chatbot.live-eval>true</chatbot.live-eval>
+			</properties>
+		</profile>
+	</profiles>
 </project>

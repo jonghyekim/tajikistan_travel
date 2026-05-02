@@ -45,23 +45,18 @@ public class TemplateAnswerService {
 
     public GroundedAnswer tourPlaces(List<TourPlaceFact> places) {
         String answer = places.stream()
-            .map(place -> "- " + place.title() + summary(place))
+            .map(place -> "- " + place.title() + " " + detailPageGuide(place.locale()))
             .collect(Collectors.joining("\n"));
         return GroundedAnswer.template(answer, places.stream().map(TourPlaceFact::sourceId).toList());
     }
 
-    private String summary(TourPlaceFact place) {
-        String content = place.content();
-        if (content == null || content.isBlank()) {
-//            return " (" + place.categoryCode() + ", " + place.regionCode() + ")";
-            return "";
-
-        }
-        String normalized = content.replaceAll("\\s+", " ").trim();
-        if (normalized.length() > 180) {
-            normalized = normalized.substring(0, 180) + "...";
-        }
-        return "\n  " + normalized;
+    private String detailPageGuide(String locale) {
+        return switch (locale == null ? "en" : locale) {
+            case "ko" -> "상세 페이지에서 위치와 상세 정보를 확인해 주세요.";
+            case "ru" -> "Откройте страницу деталей, чтобы проверить расположение и подробную информацию.";
+            case "tg" -> "Барои дидани ҷойгиршавӣ ва маълумоти муфассал саҳифаи тафсилотро кушоед.";
+            default -> "Open the detail page to check the location and details.";
+        };
     }
 
     private String formatOperatingHour(OperatingHourFact hour) {
@@ -82,6 +77,14 @@ public class TemplateAnswerService {
     }
 
     private String dayName(OperatingHourFact hour) {
+        if (hour.dayOfWeek() == null) {
+            return switch (hour.locale() == null ? "en" : hour.locale()) {
+                case "ko" -> "매일";
+                case "ru" -> "Ежедневно";
+                case "tg" -> "Ҳар рӯз";
+                default -> "Daily";
+            };
+        }
         return switch (hour.locale() == null ? "en" : hour.locale()) {
             case "ko" -> switch (hour.dayOfWeek()) {
                 case MONDAY -> "월요일";

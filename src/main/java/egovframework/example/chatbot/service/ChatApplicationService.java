@@ -1,7 +1,11 @@
 package egovframework.example.chatbot.service;
 
+import egovframework.example.chatbot.domain.AnswerType;
 import egovframework.example.chatbot.domain.ChatIntent;
+import egovframework.example.chatbot.domain.SearchPlan;
+import egovframework.example.chatbot.domain.SourceType;
 import egovframework.example.chatbot.dto.ChatRequest;
+import egovframework.example.chatbot.dto.ChatRoute;
 import egovframework.example.chatbot.dto.ChatResponse;
 import egovframework.example.chatbot.dto.EmergencyContactFact;
 import egovframework.example.chatbot.dto.GroundedAnswer;
@@ -14,10 +18,15 @@ import egovframework.example.chatbot.rag.RagContext;
 import egovframework.example.chatbot.rag.RagContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatApplicationService {
@@ -26,77 +35,317 @@ public class ChatApplicationService {
 
     private final MessageNormalizer messageNormalizer;
     private final IntentClassifier intentClassifier;
+    private final ChatRouterService chatRouterService;
     private final TourPlaceQueryService tourPlaceQueryService;
     private final EmergencyContactQueryService emergencyContactQueryService;
     private final RagContextBuilder ragContextBuilder;
     private final TemplateAnswerService templateAnswerService;
     private final LlmAnswerService llmAnswerService;
     private final LlmAnswerValidator llmAnswerValidator;
+    private final ChatbotConversationLogService conversationLogService;
 
+    @Autowired
     public ChatApplicationService(MessageNormalizer messageNormalizer,
                                   IntentClassifier intentClassifier,
+                                  ChatRouterService chatRouterService,
                                   TourPlaceQueryService tourPlaceQueryService,
                                   EmergencyContactQueryService emergencyContactQueryService,
                                   RagContextBuilder ragContextBuilder,
                                   TemplateAnswerService templateAnswerService,
                                   LlmAnswerService llmAnswerService,
-                                  LlmAnswerValidator llmAnswerValidator) {
+                                  LlmAnswerValidator llmAnswerValidator,
+                                  ChatbotConversationLogService conversationLogService) {
         this.messageNormalizer = messageNormalizer;
         this.intentClassifier = intentClassifier;
+        this.chatRouterService = chatRouterService;
         this.tourPlaceQueryService = tourPlaceQueryService;
         this.emergencyContactQueryService = emergencyContactQueryService;
         this.ragContextBuilder = ragContextBuilder;
         this.templateAnswerService = templateAnswerService;
         this.llmAnswerService = llmAnswerService;
         this.llmAnswerValidator = llmAnswerValidator;
+        this.conversationLogService = conversationLogService;
     }
 
-    @Cacheable(cacheNames = "chatbot:responses", key = "#request.message() + ':' + #request.locale()", unless = "#result.noData()")
+    public ChatApplicationService(MessageNormalizer messageNormalizer,
+                                  IntentClassifier intentClassifier,
+                                  ChatRouterService chatRouterService,
+                                  TourPlaceQueryService tourPlaceQueryService,
+                                  EmergencyContactQueryService emergencyContactQueryService,
+                                  RagContextBuilder ragContextBuilder,
+                                  TemplateAnswerService templateAnswerService,
+                                  LlmAnswerService llmAnswerService,
+                                  LlmAnswerValidator llmAnswerValidator) {
+        this(
+            messageNormalizer,
+            intentClassifier,
+            chatRouterService,
+            tourPlaceQueryService,
+            emergencyContactQueryService,
+            ragContextBuilder,
+            templateAnswerService,
+            llmAnswerService,
+            llmAnswerValidator,
+            null
+        );
+    }
+
     public ChatResponse chat(ChatRequest request) {
+        long startedAt = System.nanoTime();
         String normalizedMessage = messageNormalizer.normalize(request.message());
         String locale = messageNormalizer.normalizeLocale(request.locale());
+        ChatRoute route = routeQuestion(request.message(), normalizedMessage, locale);
+        IntentResult intent = toIntentResult(normalizedMessage, locale, route);
+
+        ChatResponse response;
+        AnswerType answerType;
+        if (intent.intent() == ChatIntent.UNKNOWN || route.searchPlan() == SearchPlan.NONE) {
+            response = ChatResponse.noData(intent.intent().name(), intent.locale());
+            answerType = AnswerType.NO_DATA;
+        } else {
+            response = answerWithAiChoice(request.message(), normalizedMessage, intent, route);
+            answerType = response.noData()
+                ? AnswerType.NO_DATA
+                : inferAnswerType(parseIntent(response.intent(), intent.intent()));
+        }
+        recordConversation(request, normalizedMessage, locale, route, answerType, response, startedAt);
+        return response;
+    }
+
+    private ChatIntent parseIntent(String value, ChatIntent fallback) {
+        try {
+            return ChatIntent.valueOf(value);
+        } catch (RuntimeException ex) {
+            return fallback;
+        }
+    }
+
+    private void recordConversation(ChatRequest request,
+                                    String normalizedMessage,
+                                    String locale,
+                                    ChatRoute route,
+                                    AnswerType answerType,
+                                    ChatResponse response,
+                                    long startedAt) {
+        if (conversationLogService == null) {
+            return;
+        }
+        long responseMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
+        conversationLogService.record(
+            request.message(),
+            normalizedMessage,
+            locale,
+            route,
+            answerType,
+            response,
+            responseMs
+        );
+    }
+
+    private ChatRoute routeQuestion(String question, String normalizedMessage, String locale) {
+        try {
+            return normalizeRoute(chatRouterService.route(question, normalizedMessage, locale));
+        } catch (RuntimeException ex) {
+            log.warn("AI chat routing failed. Falling back to rule-based classifier.", ex);
+            return normalizeRoute(ruleBasedRoute(normalizedMessage, locale));
+        }
+    }
+
+    private ChatRoute ruleBasedRoute(String normalizedMessage, String locale) {
         IntentResult intent = intentClassifier.classify(normalizedMessage, locale);
+        return new ChatRoute(
+            intent.intent(),
+            fallbackSearchPlan(intent),
+            intent.keyword(),
+            null,
+            intent.confidence()
+        );
+    }
 
+    private SearchPlan fallbackSearchPlan(IntentResult intent) {
+        if (intent.intent() == ChatIntent.UNKNOWN) {
+            return SearchPlan.NONE;
+        }
+        if (intent.keyword() == null || intent.keyword().isBlank()) {
+            return switch (intent.intent()) {
+                case EMERGENCY_CONTACT, PHONE_NUMBER -> SearchPlan.ALL_EMERGENCY_CONTACTS;
+                default -> SearchPlan.NONE;
+            };
+        }
         return switch (intent.intent()) {
-            case OPERATING_HOURS -> answerOperatingHours(intent);
-            case EMERGENCY_CONTACT, PHONE_NUMBER -> answerEmergencyContacts(intent);
-            case TOUR_PLACE_SEARCH -> answerTourPlaces(request.message(), intent);
-//            case GENERAL_TOURISM, UNKNOWN -> ChatResponse.noData(intent.intent().name(), intent.locale());
-            case GENERAL_TOURISM -> answerTourPlaces(request.message(), intent);
-            case UNKNOWN -> ChatResponse.noData(intent.intent().name(), intent.locale());
-
+            case OPERATING_HOURS -> SearchPlan.OPERATING_HOURS_BY_PLACE;
+            case EMERGENCY_CONTACT, PHONE_NUMBER -> SearchPlan.EMERGENCY_CONTACT_BY_TYPE;
+            case TOUR_PLACE_SEARCH, GENERAL_TOURISM -> SearchPlan.PLACE_RECOMMENDATION;
+            case UNKNOWN -> SearchPlan.NONE;
         };
     }
 
-    private ChatResponse answerOperatingHours(IntentResult intent) {
-        if (intent.keyword() == null || intent.keyword().isBlank()) {
-            return ChatResponse.noData(intent.intent().name(), intent.locale());
+    private ChatRoute normalizeRoute(ChatRoute route) {
+        if (route == null) {
+            return ChatRoute.unknown();
         }
-        List<OperatingHourFact> hours = tourPlaceQueryService.findOperatingHours(intent.keyword(), intent.locale());
-        if (hours.isEmpty()) {
-            return ChatResponse.noData(intent.intent().name(), intent.locale());
-        }
-        GroundedAnswer answer = templateAnswerService.operatingHours(hours);
-        RagContext context = ragContextBuilder.fromOperatingHours(hours);
-        return toResponse(intent, answer, context);
+        ChatIntent intent = route.intent() == null ? ChatIntent.UNKNOWN : route.intent();
+        SearchPlan searchPlan = route.searchPlan() == null ? SearchPlan.NONE : route.searchPlan();
+        String keyword = route.keyword() == null || route.keyword().isBlank() ? null : route.keyword().trim();
+        String contactType = route.contactType() == null || route.contactType().isBlank() ? null : route.contactType().trim();
+        return new ChatRoute(intent, searchPlan, keyword, contactType, route.confidence());
     }
 
-    private ChatResponse answerEmergencyContacts(IntentResult intent) {
-        List<EmergencyContactFact> contacts;
-        try {
-            contacts = emergencyContactQueryService.findActiveContacts(intent.keyword(), intent.locale());
-        } catch (RuntimeException ex) {
-            log.warn("Emergency contact lookup failed. keyword={}, locale={}", intent.keyword(), intent.locale(), ex);
-            contacts = fallbackEmergencyContacts(intent);
-        }
-        if (contacts.isEmpty()) {
+    private IntentResult toIntentResult(String normalizedMessage, String locale, ChatRoute route) {
+        return new IntentResult(
+            route.intent(),
+            route.confidence(),
+            normalizedMessage,
+            route.keyword(),
+            locale,
+            java.util.Map.of("searchPlan", route.searchPlan().name()),
+            route.intent() == ChatIntent.OPERATING_HOURS
+                || route.intent() == ChatIntent.PHONE_NUMBER
+                || route.intent() == ChatIntent.EMERGENCY_CONTACT
+        );
+    }
+
+    private ChatResponse answerWithAiChoice(String question, String normalizedMessage, IntentResult intent, ChatRoute route) {
+        CandidateAnswers candidates = collectCandidates(normalizedMessage, intent, route);
+        if (candidates.context().isEmpty()) {
             return ChatResponse.noData(intent.intent().name(), intent.locale());
         }
-        GroundedAnswer answer = intent.intent() == ChatIntent.PHONE_NUMBER
+
+        GroundedAnswer fallback = candidates.fallback();
+        GroundedAnswer selectedAnswer = generateValidatedLlmAnswer(question, intent, candidates.context(), fallback);
+        ChatIntent responseIntent = inferResponseIntent(intent, selectedAnswer, candidates.context());
+        AnswerType answerType = inferAnswerType(responseIntent);
+        GroundedAnswer answer = renderTemplateAnswer(answerType, selectedAnswer, candidates);
+        return toResponse(responseIntent, intent.locale(), answer, candidates.context());
+    }
+
+    private CandidateAnswers collectCandidates(String normalizedMessage, IntentResult intent, ChatRoute route) {
+        List<TourPlaceFact> places = List.of();
+        List<OperatingHourFact> hours = List.of();
+        List<EmergencyContactFact> contacts = List.of();
+        String keyword = intent.keyword();
+
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+        if (hasKeyword && shouldSearchTourPlaces(route.searchPlan())) {
+            places = tourPlaceQueryService.searchPlaces(keyword, intent.locale());
+        }
+
+        if (hasKeyword && shouldSearchOperatingHours(route.searchPlan())) {
+            hours = tourPlaceQueryService.findOperatingHours(keyword, intent.locale());
+        }
+
+        if (shouldSearchEmergencyContacts(normalizedMessage, intent, route.searchPlan())) {
+            contacts = findEmergencyContactsWithFallback(intent, route);
+        }
+
+        RagContext context = mergeContexts(
+            ragContextBuilder.fromTourPlaces(places),
+            ragContextBuilder.fromOperatingHours(hours),
+            ragContextBuilder.fromEmergencyContacts(contacts)
+        );
+        return new CandidateAnswers(
+            places,
+            hours,
+            contacts,
+            context,
+            fallbackFor(intent, places, hours, contacts)
+        );
+    }
+
+    private boolean shouldSearchTourPlaces(SearchPlan searchPlan) {
+        return searchPlan == SearchPlan.PLACE_BY_NAME
+            || searchPlan == SearchPlan.PLACE_RECOMMENDATION;
+    }
+
+    private boolean shouldSearchOperatingHours(SearchPlan searchPlan) {
+        return searchPlan == SearchPlan.OPERATING_HOURS_BY_PLACE;
+    }
+
+    private boolean shouldSearchEmergencyContacts(String normalizedMessage, IntentResult intent, SearchPlan searchPlan) {
+        return searchPlan == SearchPlan.ALL_EMERGENCY_CONTACTS
+            || searchPlan == SearchPlan.EMERGENCY_CONTACT_BY_TYPE
+            || intent.intent() == ChatIntent.EMERGENCY_CONTACT
+            || intent.intent() == ChatIntent.PHONE_NUMBER
+            || normalizedMessage.contains("emergency")
+            || normalizedMessage.contains("긴급")
+            || normalizedMessage.contains("응급")
+            || normalizedMessage.contains("경찰")
+            || normalizedMessage.contains("полиц")
+            || normalizedMessage.contains("изтирор")
+            || normalizedMessage.contains("пулис");
+    }
+
+    private List<EmergencyContactFact> findEmergencyContactsWithFallback(IntentResult intent, ChatRoute route) {
+        String keyword = route.searchPlan() == SearchPlan.ALL_EMERGENCY_CONTACTS
+            ? null
+            : firstNonBlank(route.contactType(), route.keyword(), intent.keyword());
+        IntentResult lookupIntent = new IntentResult(
+            intent.intent(),
+            intent.confidence(),
+            intent.normalizedMessage(),
+            keyword,
+            intent.locale(),
+            intent.slots(),
+            intent.exactInformationIntent()
+        );
+        try {
+            return emergencyContactQueryService.findActiveContacts(keyword, intent.locale());
+        } catch (RuntimeException ex) {
+            log.warn("Emergency contact lookup failed. keyword={}, locale={}", keyword, intent.locale(), ex);
+            return fallbackEmergencyContacts(lookupIntent);
+        }
+    }
+
+    private String firstNonBlank(String... values) {
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value.trim();
+            }
+        }
+        return null;
+    }
+
+    private GroundedAnswer fallbackFor(IntentResult intent,
+                                       List<TourPlaceFact> places,
+                                       List<OperatingHourFact> hours,
+                                       List<EmergencyContactFact> contacts) {
+        if (prefersEmergencyFallback(intent) && !contacts.isEmpty()) {
+            return intent.intent() == ChatIntent.PHONE_NUMBER
+                ? templateAnswerService.phoneNumbers(contacts)
+                : templateAnswerService.emergencyContacts(contacts);
+        }
+        if (intent.intent() == ChatIntent.OPERATING_HOURS && !hours.isEmpty()) {
+            return templateAnswerService.operatingHours(hours);
+        }
+        if (!places.isEmpty()) {
+            return templateAnswerService.tourPlaces(places);
+        }
+        if (!hours.isEmpty()) {
+            return templateAnswerService.operatingHours(hours);
+        }
+        if (contacts.isEmpty()) {
+            return GroundedAnswer.template("", List.of());
+        }
+        return intent.intent() == ChatIntent.PHONE_NUMBER
             ? templateAnswerService.phoneNumbers(contacts)
             : templateAnswerService.emergencyContacts(contacts);
-        RagContext context = ragContextBuilder.fromEmergencyContacts(contacts);
-        return toResponse(intent, answer, context);
+    }
+
+    private boolean prefersEmergencyFallback(IntentResult intent) {
+        return intent.intent() == ChatIntent.EMERGENCY_CONTACT || intent.intent() == ChatIntent.PHONE_NUMBER;
+    }
+
+    private RagContext mergeContexts(RagContext... contexts) {
+        List<RagContext.SourceDocument> sources = new ArrayList<>();
+        for (RagContext context : contexts) {
+            if (context != null && context.sources() != null) {
+                sources.addAll(context.sources());
+            }
+        }
+        String text = sources.stream()
+            .map(source -> "[" + source.sourceId() + "] " + source.text())
+            .collect(java.util.stream.Collectors.joining("\n"));
+        return new RagContext(sources, text);
     }
 
     private List<EmergencyContactFact> fallbackEmergencyContacts(IntentResult intent) {
@@ -162,21 +411,6 @@ public class ChatApplicationService {
         );
     }
 
-    private ChatResponse answerTourPlaces(String question, IntentResult intent) {
-        if (intent.keyword() == null || intent.keyword().isBlank()) {
-            return ChatResponse.noData(intent.intent().name(), intent.locale());
-        }
-        List<TourPlaceFact> places = tourPlaceQueryService.searchPlaces(intent.keyword(), intent.locale());
-        if (places.isEmpty()) {
-            return ChatResponse.noData(intent.intent().name(), intent.locale());
-        }
-
-        RagContext context = ragContextBuilder.fromTourPlaces(places);
-        GroundedAnswer fallback = templateAnswerService.tourPlaces(places);
-        GroundedAnswer answer = generateValidatedLlmAnswer(question, intent, context, fallback);
-        return toResponse(intent, answer, context);
-    }
-
     private GroundedAnswer generateValidatedLlmAnswer(String question,
                                                       IntentResult intent,
                                                       RagContext context,
@@ -193,10 +427,87 @@ public class ChatApplicationService {
         return fallback;
     }
 
-    private ChatResponse toResponse(IntentResult intent, GroundedAnswer answer, RagContext context) {
+    private ChatIntent inferResponseIntent(IntentResult originalIntent, GroundedAnswer answer, RagContext context) {
+        if (answer == null || answer.sourceIds() == null || answer.sourceIds().isEmpty()) {
+            return originalIntent.intent();
+        }
+        Set<SourceType> selectedTypes = context.sources().stream()
+            .filter(source -> answer.sourceIds().contains(source.sourceId()))
+            .map(RagContext.SourceDocument::sourceType)
+            .collect(java.util.stream.Collectors.toSet());
+        if (selectedTypes.contains(SourceType.EMERGENCY_CONTACT)) {
+            return originalIntent.intent() == ChatIntent.PHONE_NUMBER ? ChatIntent.PHONE_NUMBER : ChatIntent.EMERGENCY_CONTACT;
+        }
+        if (selectedTypes.contains(SourceType.OPERATING_HOUR)) {
+            return ChatIntent.OPERATING_HOURS;
+        }
+        if (selectedTypes.contains(SourceType.TOUR_PLACE)) {
+            return ChatIntent.TOUR_PLACE_SEARCH;
+        }
+        return originalIntent.intent();
+    }
+
+    private AnswerType inferAnswerType(ChatIntent intent) {
+        return switch (intent) {
+            case OPERATING_HOURS -> AnswerType.OPERATING_HOURS;
+            case PHONE_NUMBER -> AnswerType.PHONE_NUMBERS;
+            case EMERGENCY_CONTACT -> AnswerType.EMERGENCY_CONTACTS;
+            case TOUR_PLACE_SEARCH, GENERAL_TOURISM -> AnswerType.OPEN_DETAIL_PAGE;
+            case UNKNOWN -> AnswerType.NO_DATA;
+        };
+    }
+
+    private GroundedAnswer renderTemplateAnswer(AnswerType answerType, GroundedAnswer selectedAnswer, CandidateAnswers candidates) {
+        if (selectedAnswer == null || selectedAnswer.sourceIds() == null || selectedAnswer.sourceIds().isEmpty()) {
+            return selectedAnswer;
+        }
+
+        GroundedAnswer templated = switch (answerType) {
+            case OPERATING_HOURS -> templateAnswerService.operatingHours(filterBySourceIds(
+                candidates.hours(),
+                selectedAnswer.sourceIds(),
+                OperatingHourFact::sourceId
+            ));
+            case EMERGENCY_CONTACTS -> templateAnswerService.emergencyContacts(filterBySourceIds(
+                candidates.contacts(),
+                selectedAnswer.sourceIds(),
+                EmergencyContactFact::sourceId
+            ));
+            case PHONE_NUMBERS -> templateAnswerService.phoneNumbers(filterBySourceIds(
+                candidates.contacts(),
+                selectedAnswer.sourceIds(),
+                EmergencyContactFact::sourceId
+            ));
+            case OPEN_DETAIL_PAGE -> templateAnswerService.tourPlaces(filterBySourceIds(
+                candidates.places(),
+                selectedAnswer.sourceIds(),
+                TourPlaceFact::sourceId
+            ));
+            case NO_DATA -> selectedAnswer;
+        };
+
+        if (templated == null || templated.answer() == null || templated.answer().isBlank()) {
+            return selectedAnswer;
+        }
+        return new GroundedAnswer(
+            templated.answer(),
+            templated.sourceIds(),
+            templated.grounded(),
+            selectedAnswer.llmUsed()
+        );
+    }
+
+    private <T> List<T> filterBySourceIds(List<T> values, List<String> sourceIds, Function<T, String> sourceIdAccessor) {
+        Set<String> selected = Set.copyOf(sourceIds);
+        return values.stream()
+            .filter(value -> selected.contains(sourceIdAccessor.apply(value)))
+            .collect(Collectors.toList());
+    }
+
+    private ChatResponse toResponse(ChatIntent intent, String locale, GroundedAnswer answer, RagContext context) {
         return new ChatResponse(
             answer.answer(),
-            intent.intent().name(),
+            intent.name(),
             answer.grounded(),
             answer.llmUsed(),
             false,
@@ -206,5 +517,14 @@ public class ChatApplicationService {
                 .map(source -> new ChatResponse.Citation(source.sourceId(), source.sourceType().name(), source.title()))
                 .toList()
         );
+    }
+
+    private record CandidateAnswers(
+        List<TourPlaceFact> places,
+        List<OperatingHourFact> hours,
+        List<EmergencyContactFact> contacts,
+        RagContext context,
+        GroundedAnswer fallback
+    ) {
     }
 }
