@@ -31,4 +31,19 @@ class JdbcEmergencyContactChatMapperTest {
         assertThat(sql.getValue()).contains("token0");
         assertThat(sql.getValue()).contains("phone_display");
     }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void genericEmergencyContactRequestDoesNotFilterByNoiseTokens() {
+        NamedParameterJdbcTemplate jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
+        when(jdbcTemplate.query(anyString(), any(SqlParameterSource.class), any(RowMapper.class))).thenReturn(List.of());
+        JdbcEmergencyContactChatMapper mapper = new JdbcEmergencyContactChatMapper(jdbcTemplate);
+
+        mapper.findActiveContacts("상황 필요", "ko");
+
+        ArgumentCaptor<String> sql = ArgumentCaptor.forClass(String.class);
+        verify(jdbcTemplate).query(sql.capture(), any(SqlParameterSource.class), any(RowMapper.class));
+        assertThat(sql.getValue()).doesNotContain("token0");
+        assertThat(sql.getValue()).contains("order by c.sort_order asc");
+    }
 }

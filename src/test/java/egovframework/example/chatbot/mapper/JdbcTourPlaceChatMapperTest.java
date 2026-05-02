@@ -47,7 +47,8 @@ class JdbcTourPlaceChatMapperTest {
         assertThat(sql.getValue()).contains("p.category_code = :categoryCode");
         assertThat(sql.getValue()).contains("p.region_code = :regionCode");
         assertThat(sql.getValue()).doesNotContain("and exists");
-        assertThat(sql.getValue()).contains("order by case when");
+        assertThat(sql.getValue()).contains("order by");
+        assertThat(sql.getValue()).contains("lower(i.title) = lower(:keyword)");
     }
 
     @Test
@@ -65,5 +66,22 @@ class JdbcTourPlaceChatMapperTest {
         assertThat(sql.getValue()).contains("and (");
         assertThat(sql.getValue()).contains("token0");
         assertThat(sql.getValue()).contains("token1");
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void operatingHoursUseTourPlaceOpenAndCloseTime() {
+        NamedParameterJdbcTemplate jdbcTemplate = mock(NamedParameterJdbcTemplate.class);
+        when(jdbcTemplate.query(anyString(), any(SqlParameterSource.class), any(RowMapper.class))).thenReturn(List.of());
+        JdbcTourPlaceChatMapper mapper = new JdbcTourPlaceChatMapper(jdbcTemplate);
+
+        mapper.findOperatingHours("Rudaki Park", "en");
+
+        ArgumentCaptor<String> sql = ArgumentCaptor.forClass(String.class);
+        org.mockito.Mockito.verify(jdbcTemplate).query(sql.capture(), any(SqlParameterSource.class), any(RowMapper.class));
+
+        assertThat(sql.getValue()).contains("p.open_time");
+        assertThat(sql.getValue()).contains("p.close_time");
+        assertThat(sql.getValue()).doesNotContain("tour_place_operating_hour");
     }
 }

@@ -56,6 +56,8 @@ class TemplateAnswerServiceTest {
 
         assertThat(answer.llmUsed()).isFalse();
         assertThat(answer.answer()).contains("- Atlas Hotel 4*");
+        assertThat(answer.answer()).contains("detail page");
+        assertThat(answer.answer()).doesNotContain("Hotel Atlas is located");
         assertThat(answer.answer()).doesNotContain("[tour_place:80]");
         assertThat(answer.sourceIds()).containsExactly("tour_place:80");
     }
