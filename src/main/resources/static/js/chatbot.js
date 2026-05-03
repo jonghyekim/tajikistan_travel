@@ -251,6 +251,57 @@
     return row;
   }
 
+  /* ── Emergency contact icon by title keyword ── */
+  function ecIcon(title) {
+    var t = title.toLowerCase();
+    if (t.includes('police') || t.includes('полиц') || t.includes('пулис') || t.includes('경찰')) return '🚔';
+    if (t.includes('ambulance') || t.includes('скор') || t.includes('тез') || t.includes('구급') || t.includes('응급')) return '🚑';
+    if (t.includes('fire') || t.includes('пожар') || t.includes('оташнш') || t.includes('소방')) return '🚒';
+    if (t.includes('hospital') || t.includes('clinic') || t.includes('больниц') || t.includes('клиник') || t.includes('шифохо') || t.includes('병원')) return '🏥';
+    if (t.includes('embassy') || t.includes('посольств') || t.includes('сафорат') || t.includes('대사관')) return '🏛️';
+    return '🆘';
+  }
+
+  /* ── Emergency contact card list ── */
+  function renderEmergencyCards(answer) {
+    var list = makeEl('div', 'cb-emergency-list');
+    (answer || '').split('\n').forEach(function (line) {
+      line = line.trim();
+      if (!line) return;
+      var m = line.match(/^(.+?):\s+(.+?)\s+\((.+)\)$/);
+      var title = m ? m[1] : line;
+      var phone = m ? m[2] : '';
+      var desc  = m ? m[3] : '';
+
+      var titleEl = makeEl('div', 'cb-ec-title');
+      titleEl.textContent = title;
+
+      var infoEl = makeEl('div', 'cb-ec-info');
+      infoEl.appendChild(titleEl);
+      if (desc) {
+        var descEl = makeEl('div', 'cb-ec-desc');
+        descEl.textContent = desc;
+        infoEl.appendChild(descEl);
+      }
+      if (phone) {
+        var phoneEl = document.createElement('a');
+        phoneEl.className = 'cb-ec-phone';
+        phoneEl.href = 'tel:' + phone.replace(/\s/g, '');
+        phoneEl.textContent = phone;
+        infoEl.appendChild(phoneEl);
+      }
+
+      var iconEl = makeEl('div', 'cb-ec-icon');
+      iconEl.textContent = ecIcon(title);
+
+      var card = makeEl('div', 'cb-ec-card');
+      appendAll(card, iconEl, infoEl);
+
+      list.appendChild(card);
+    });
+    return list;
+  }
+
   /* ── Bot message ── */
   function renderBotMsg(widget, data) {
     var msgs = widget.querySelector('[data-cb-messages]');
@@ -273,7 +324,12 @@
       body.appendChild(ndBubble);
     } else {
       var bubble = makeEl('div', 'cb-bubble');
-      bubble.textContent = data.answer || '';
+      var isEmergency = data.intent === 'EMERGENCY_CONTACT' || data.intent === 'PHONE_NUMBER';
+      if (isEmergency) {
+        bubble.appendChild(renderEmergencyCards(data.answer));
+      } else {
+        bubble.textContent = data.answer || '';
+      }
       body.appendChild(bubble);
     }
 

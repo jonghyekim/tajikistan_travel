@@ -542,6 +542,59 @@
 }
 
 
+/* ── Emergency contact cards ── */
+.cb-emergency-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 2px 0;
+}
+
+.cb-ec-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  background: var(--cb-blue-light);
+  border: 1px solid var(--cb-blue-pale);
+  border-radius: 11px;
+}
+
+.cb-ec-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.cb-ec-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cb-ec-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--cb-text);
+}
+
+.cb-ec-desc {
+  font-size: 11px;
+  color: var(--cb-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.cb-ec-phone {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--cb-blue);
+  text-decoration: none;
+  margin-top: 4px;
+}
+
+.cb-ec-phone:hover { text-decoration: underline; }
+
 /* ── Mobile ── */
 @media (max-width: 440px) {
   .cb-widget { right: 12px; bottom: 12px; }
