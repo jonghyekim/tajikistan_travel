@@ -304,6 +304,208 @@ class ChatApplicationServiceTest {
     }
 
     @Test
+    void operatingHourFactsStayStableAcrossLocalesEvenWhenLlmWordingDiffers() {
+        for (String locale : List.of("ko", "en", "ru", "tg")) {
+            TourPlaceQueryService places = mock(TourPlaceQueryService.class);
+            EmergencyContactQueryService contacts = mock(EmergencyContactQueryService.class);
+            LlmAnswerService llm = mock(LlmAnswerService.class);
+            ChatApplicationService service = new ChatApplicationService(
+                messageNormalizer,
+                intentClassifier,
+                (question, normalizedMessage, requestLocale) -> new ChatRoute(
+                    ChatIntent.OPERATING_HOURS,
+                    SearchPlan.OPERATING_HOURS_BY_PLACE,
+                    placeTitle(locale),
+                    null,
+                    0.95
+                ),
+                places,
+                contacts,
+                new RagContextBuilder(),
+                new TemplateAnswerService(),
+                llm,
+                new LlmAnswerValidator()
+            );
+            when(places.findOperatingHours(any(), any())).thenReturn(List.of(
+                new OperatingHourFact(
+                    26L,
+                    26L,
+                    "operating_hour:26",
+                    placeTitle(locale),
+                    null,
+                    "ALL",
+                    LocalTime.MIDNIGHT,
+                    LocalTime.of(23, 59),
+                    false,
+                    null,
+                    null,
+                    locale
+                )
+            ));
+            when(llm.generate(any(), any(), any()))
+                .thenReturn(GroundedAnswer.llm("LLM wording for " + locale + " should not be used.", List.of("operating_hour:26")));
+
+            ChatResponse response = service.chat(new ChatRequest(hoursQuestion(locale), locale, null, Map.of()));
+
+            assertThat(response.noData()).isFalse();
+            assertThat(response.intent()).isEqualTo(ChatIntent.OPERATING_HOURS.name());
+            assertThat(response.answer()).contains(placeTitle(locale));
+            assertThat(response.answer()).contains("00:00-23:59");
+            assertThat(response.answer()).doesNotContain("LLM wording");
+            assertThat(response.sourceIds()).containsExactly("operating_hour:26");
+            assertThat(response.citations()).extracting(ChatResponse.Citation::sourceId).containsExactly("operating_hour:26");
+        }
+    }
+
+    @Test
+    void tourPlaceSourcesStayStableAcrossLocalesEvenWhenLlmWordingDiffers() {
+        for (String locale : List.of("ko", "en", "ru", "tg")) {
+            TourPlaceQueryService places = mock(TourPlaceQueryService.class);
+            EmergencyContactQueryService contacts = mock(EmergencyContactQueryService.class);
+            LlmAnswerService llm = mock(LlmAnswerService.class);
+            ChatApplicationService service = new ChatApplicationService(
+                messageNormalizer,
+                intentClassifier,
+                (question, normalizedMessage, requestLocale) -> new ChatRoute(
+                    ChatIntent.TOUR_PLACE_SEARCH,
+                    SearchPlan.PLACE_RECOMMENDATION,
+                    placeTitle(locale),
+                    null,
+                    0.95
+                ),
+                places,
+                contacts,
+                new RagContextBuilder(),
+                new TemplateAnswerService(),
+                llm,
+                new LlmAnswerValidator()
+            );
+            when(places.searchPlaces(any(), any())).thenReturn(List.of(tourPlace(locale)));
+            when(llm.generate(any(), any(), any()))
+                .thenReturn(GroundedAnswer.llm("LLM says this place has free tickets, airport shuttle, and VIP access.", List.of("tour_place:26")));
+
+            ChatResponse response = service.chat(new ChatRequest(placeQuestion(locale), locale, null, Map.of()));
+
+            assertThat(response.noData()).isFalse();
+            assertThat(response.intent()).isEqualTo(ChatIntent.TOUR_PLACE_SEARCH.name());
+            assertThat(response.answer()).contains(placeTitle(locale));
+            assertThat(response.answer()).doesNotContain("free tickets", "airport shuttle", "VIP access");
+            assertThat(response.sourceIds()).containsExactly("tour_place:26");
+            assertThat(response.citations()).extracting(ChatResponse.Citation::sourceId).containsExactly("tour_place:26");
+            assertThat(response.citations()).extracting(ChatResponse.Citation::sourceType).containsExactly("TOUR_PLACE");
+        }
+    }
+
+    @Test
+    void emergencyPhoneFactsStayStableAcrossLocalesEvenWhenLlmWordingDiffers() {
+        for (String locale : List.of("ko", "en", "ru", "tg")) {
+            TourPlaceQueryService places = mock(TourPlaceQueryService.class);
+            EmergencyContactQueryService contacts = mock(EmergencyContactQueryService.class);
+            LlmAnswerService llm = mock(LlmAnswerService.class);
+            ChatApplicationService service = new ChatApplicationService(
+                messageNormalizer,
+                intentClassifier,
+                (question, normalizedMessage, requestLocale) -> new ChatRoute(
+                    ChatIntent.PHONE_NUMBER,
+                    SearchPlan.EMERGENCY_CONTACT_BY_TYPE,
+                    "police",
+                    "police",
+                    0.95
+                ),
+                places,
+                contacts,
+                new RagContextBuilder(),
+                new TemplateAnswerService(),
+                llm,
+                new LlmAnswerValidator()
+            );
+            when(contacts.findActiveContacts(any(), any())).thenReturn(List.of(policeContact(locale)));
+            when(llm.generate(any(), any(), any()))
+                .thenReturn(GroundedAnswer.llm("LLM tries to add 911 and 999, but selected the right source.", List.of("emergency_contact:2")));
+
+            ChatResponse response = service.chat(new ChatRequest(policeQuestion(locale), locale, null, Map.of()));
+
+            assertThat(response.noData()).isFalse();
+            assertThat(response.intent()).isEqualTo(ChatIntent.PHONE_NUMBER.name());
+            assertThat(response.answer()).contains(policeTitle(locale), "102");
+            assertThat(response.answer()).doesNotContain("911", "999");
+            assertThat(response.sourceIds()).containsExactly("emergency_contact:2");
+            assertThat(response.citations()).extracting(ChatResponse.Citation::sourceId).containsExactly("emergency_contact:2");
+            assertThat(response.citations()).extracting(ChatResponse.Citation::sourceType).containsExactly("EMERGENCY_CONTACT");
+        }
+    }
+
+    @Test
+    void noDataContractStaysStableAcrossLocales() {
+        for (String locale : List.of("ko", "en", "ru", "tg")) {
+            ChatApplicationService service = new ChatApplicationService(
+                messageNormalizer,
+                intentClassifier,
+                (question, normalizedMessage, requestLocale) -> new ChatRoute(
+                    ChatIntent.TOUR_PLACE_SEARCH,
+                    SearchPlan.PLACE_BY_NAME,
+                    "missing place",
+                    null,
+                    0.8
+                ),
+                mock(TourPlaceQueryService.class),
+                mock(EmergencyContactQueryService.class),
+                new RagContextBuilder(),
+                new TemplateAnswerService(),
+                mock(LlmAnswerService.class),
+                new LlmAnswerValidator()
+            );
+
+            ChatResponse response = service.chat(new ChatRequest(missingPlaceQuestion(locale), locale, null, Map.of()));
+
+            assertThat(response.noData()).isTrue();
+            assertThat(response.grounded()).isTrue();
+            assertThat(response.llmUsed()).isFalse();
+            assertThat(response.intent()).isEqualTo(ChatIntent.TOUR_PLACE_SEARCH.name());
+            assertThat(response.answer()).isEqualTo(noDataMessage(locale));
+            assertThat(response.sourceIds()).isEmpty();
+            assertThat(response.citations()).isEmpty();
+        }
+    }
+
+    @Test
+    void invalidLlmSourceIdFallsBackToVerifiedTemplateAcrossLocales() {
+        for (String locale : List.of("ko", "en", "ru", "tg")) {
+            TourPlaceQueryService places = mock(TourPlaceQueryService.class);
+            EmergencyContactQueryService contacts = mock(EmergencyContactQueryService.class);
+            LlmAnswerService llm = mock(LlmAnswerService.class);
+            ChatApplicationService service = new ChatApplicationService(
+                messageNormalizer,
+                intentClassifier,
+                (question, normalizedMessage, requestLocale) -> new ChatRoute(
+                    ChatIntent.TOUR_PLACE_SEARCH,
+                    SearchPlan.PLACE_BY_NAME,
+                    placeTitle(locale),
+                    null,
+                    0.95
+                ),
+                places,
+                contacts,
+                new RagContextBuilder(),
+                new TemplateAnswerService(),
+                llm,
+                new LlmAnswerValidator()
+            );
+            when(places.searchPlaces(any(), any())).thenReturn(List.of(tourPlace(locale)));
+            when(llm.generate(any(), any(), any()))
+                .thenReturn(GroundedAnswer.llm("Unsupported answer from invalid source.", List.of("tour_place:999")));
+
+            ChatResponse response = service.chat(new ChatRequest(placeQuestion(locale), locale, null, Map.of()));
+
+            assertThat(response.noData()).isFalse();
+            assertThat(response.answer()).contains(placeTitle(locale));
+            assertThat(response.answer()).doesNotContain("Unsupported answer");
+            assertThat(response.sourceIds()).containsExactly("tour_place:26");
+            assertThat(response.citations()).extracting(ChatResponse.Citation::sourceId).containsExactly("tour_place:26");
+        }
+    }
+
+    @Test
     void recordsConversationLogForNoDataResponse() {
         ChatbotConversationLogService conversationLogService = mock(ChatbotConversationLogService.class);
         ChatApplicationService loggingChatService = new ChatApplicationService(
@@ -336,5 +538,105 @@ class ChatApplicationServiceTest {
             eq(response),
             anyLong()
         );
+    }
+
+    private String placeTitle(String locale) {
+        return switch (locale) {
+            case "ko" -> "아부압둘로 루다키 공원";
+            case "ru" -> "Парк Абуабдулло Рудаки";
+            case "tg" -> "Боғи Абуабдулло Рудакӣ";
+            default -> "Abuabdullo Rudaki Park";
+        };
+    }
+
+    private String hoursQuestion(String locale) {
+        return switch (locale) {
+            case "ko" -> "루다키 공원 운영 시간";
+            case "ru" -> "часы работы парка Рудаки";
+            case "tg" -> "Боғи Рӯдакӣ соатҳои кор";
+            default -> "Rudaki Park opening hours";
+        };
+    }
+
+    private TourPlaceFact tourPlace(String locale) {
+        return new TourPlaceFact(
+            26L,
+            "tour_place:26",
+            placeTitle(locale),
+            "Verified database description that must not be exposed by the template.",
+            "Dushanbe",
+            "PARK",
+            "DUSHANBE",
+            locale
+        );
+    }
+
+    private EmergencyContactFact policeContact(String locale) {
+        return new EmergencyContactFact(
+            2L,
+            "emergency_contact:2",
+            "police",
+            policeTitle(locale),
+            policeDescription(locale),
+            "102",
+            "102",
+            "police",
+            policeTitle(locale),
+            locale
+        );
+    }
+
+    private String policeTitle(String locale) {
+        return switch (locale) {
+            case "ko" -> "경찰";
+            case "ru" -> "Полиция";
+            case "tg" -> "Пулис";
+            default -> "Police";
+        };
+    }
+
+    private String policeDescription(String locale) {
+        return switch (locale) {
+            case "ko" -> "경찰 긴급 지원";
+            case "ru" -> "Экстренная помощь полиции";
+            case "tg" -> "Кумаки изтирории пулис";
+            default -> "Emergency police assistance";
+        };
+    }
+
+    private String placeQuestion(String locale) {
+        return switch (locale) {
+            case "ko" -> "루다키 공원 위치";
+            case "ru" -> "где парк Рудаки";
+            case "tg" -> "Боғи Рӯдакӣ дар куҷост";
+            default -> "Rudaki Park location";
+        };
+    }
+
+    private String policeQuestion(String locale) {
+        return switch (locale) {
+            case "ko" -> "경찰 번호 알려줘";
+            case "ru" -> "номер полиции";
+            case "tg" -> "рақами пулис";
+            default -> "police phone number";
+        };
+    }
+
+    private String missingPlaceQuestion(String locale) {
+        return switch (locale) {
+            case "ko" -> "없는장소 위치 알려줘";
+            case "ru" -> "где неизвестное место";
+            case "tg" -> "ҷойи номаълум дар куҷост";
+            default -> "missing place location";
+        };
+    }
+
+    private String noDataMessage(String locale) {
+        return switch (locale) {
+            case "ko" -> "DB에서 확인된 정보가 없습니다.";
+            case "ru" -> "В базе данных нет подтвержденной информации.";
+            case "tg" -> "Дар пойгоҳи додаҳо маълумоти тасдиқшуда ёфт нашуд.";
+            default -> "No verified information was found in the database.";
+        };
     }
 }

@@ -8,8 +8,6 @@ import egovframework.example.chatbot.repository.ChatbotConversationLogRepository
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +23,6 @@ public class ChatbotConversationLogService {
         this.repository = repository;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void record(String message,
                        String normalizedMessage,
                        String locale,

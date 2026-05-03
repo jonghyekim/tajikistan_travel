@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-    name = "CHATBOT_CONVERSATION_LOG",
+    name = "chatbot_conversation_log",
     indexes = {
         @Index(name = "idx_chatbot_log_created_at", columnList = "created_at"),
         @Index(name = "idx_chatbot_log_intent", columnList = "intent"),

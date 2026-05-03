@@ -44,9 +44,11 @@ public class TemplateAnswerService {
     }
 
     public GroundedAnswer tourPlaces(List<TourPlaceFact> places) {
-        String answer = places.stream()
-            .map(place -> "- " + place.title() + " " + detailPageGuide(place.locale()))
+        String list = places.stream()
+            .map(place -> "- " + place.title())
             .collect(Collectors.joining("\n"));
+        String locale = places.isEmpty() ? "en" : places.get(0).locale();
+        String answer = list.isBlank() ? "" : list + "\n" + detailPageGuide(locale);
         return GroundedAnswer.template(answer, places.stream().map(TourPlaceFact::sourceId).toList());
     }
 
