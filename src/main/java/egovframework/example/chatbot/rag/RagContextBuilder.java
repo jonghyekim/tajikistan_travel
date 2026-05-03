@@ -36,7 +36,7 @@ public class RagContextBuilder {
                 hour.placeTitle(),
                 compact(join(
                     hour.placeTitle(),
-                    hour.dayOfWeek().name(),
+                    dayLabel(hour),
                     hour.seasonCode(),
                     hour.closed() ? "closed" : hour.opensAt() + "-" + hour.closesAt(),
                     hour.lastAdmissionAt() == null ? null : "last admission " + hour.lastAdmissionAt(),
@@ -63,6 +63,13 @@ public class RagContextBuilder {
         return sources.stream()
             .map(source -> "[" + source.sourceId() + "] " + source.text())
             .collect(Collectors.joining("\n"));
+    }
+
+    private String dayLabel(OperatingHourFact hour) {
+        if (hour.dayOfWeek() != null) {
+            return hour.dayOfWeek().name();
+        }
+        return hour.seasonCode() == null || hour.seasonCode().isBlank() ? "ALL" : hour.seasonCode();
     }
 
     private String join(Object... values) {

@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnMissingBean(ChatRouterService.class)
+@ConditionalOnMissingBean(value = ChatRouterService.class, ignored = RuleBasedChatRouterService.class)
 public class RuleBasedChatRouterService implements ChatRouterService {
 
     private final IntentClassifier intentClassifier;

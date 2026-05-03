@@ -9,6 +9,7 @@ import egovframework.example.chatbot.dto.ChatRoute;
 import egovframework.example.chatbot.repository.ChatbotConversationLogRepository;
 import org.junit.jupiter.api.Test;
 
+import javax.persistence.Table;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -21,6 +22,13 @@ class ChatbotConversationLogServiceTest {
 
     private final ChatbotConversationLogRepository repository = mock(ChatbotConversationLogRepository.class);
     private final ChatbotConversationLogService service = new ChatbotConversationLogService(repository);
+
+    @Test
+    void conversationLogEntityUsesExistingMysqlTableName() {
+        Table table = ChatbotConversationLog.class.getAnnotation(Table.class);
+
+        org.assertj.core.api.Assertions.assertThat(table.name()).isEqualTo("chatbot_conversation_log");
+    }
 
     @Test
     void savesConversationLog() {

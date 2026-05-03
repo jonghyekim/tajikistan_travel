@@ -40,6 +40,31 @@ class TemplateAnswerServiceTest {
     }
 
     @Test
+    void operatingHoursKeepSameFactsAcrossLocales() {
+        for (String locale : List.of("ko", "en", "ru", "tg")) {
+            GroundedAnswer answer = templateAnswerService.operatingHours(List.of(
+                new OperatingHourFact(
+                    26L,
+                    26L,
+                    "operating_hour:26",
+                    placeTitle(locale),
+                    null,
+                    "ALL",
+                    LocalTime.MIDNIGHT,
+                    LocalTime.of(23, 59),
+                    false,
+                    null,
+                    null,
+                    locale
+                )
+            ));
+
+            assertThat(answer.answer()).contains("00:00-23:59");
+            assertThat(answer.sourceIds()).containsExactly("operating_hour:26");
+        }
+    }
+
+    @Test
     void rendersTourPlacesAsReadableFallbackList() {
         GroundedAnswer answer = templateAnswerService.tourPlaces(List.of(
             new TourPlaceFact(
@@ -57,8 +82,47 @@ class TemplateAnswerServiceTest {
         assertThat(answer.llmUsed()).isFalse();
         assertThat(answer.answer()).contains("- Atlas Hotel 4*");
         assertThat(answer.answer()).contains("detail page");
+        assertThat(answer.answer()).endsWith("Open the detail page to check the location and details.");
         assertThat(answer.answer()).doesNotContain("Hotel Atlas is located");
         assertThat(answer.answer()).doesNotContain("[tour_place:80]");
         assertThat(answer.sourceIds()).containsExactly("tour_place:80");
+    }
+
+    @Test
+    void rendersTourPlaceDetailGuideOnceAfterMultiplePlaces() {
+        GroundedAnswer answer = templateAnswerService.tourPlaces(List.of(
+            place(1L, "Hilton Dushanbe 5*", "ko"),
+            place(2L, "세레나 호텔 두샨베 5*", "ko"),
+            place(3L, "하얏트 리젠시 두샨베 5*", "ko")
+        ));
+
+        assertThat(answer.answer()).isEqualTo("""
+            - Hilton Dushanbe 5*
+            - 세레나 호텔 두샨베 5*
+            - 하얏트 리젠시 두샨베 5*
+            상세 페이지에서 위치와 상세 정보를 확인해 주세요.""");
+        assertThat(answer.sourceIds()).containsExactly("tour_place:1", "tour_place:2", "tour_place:3");
+    }
+
+    private TourPlaceFact place(Long id, String title, String locale) {
+        return new TourPlaceFact(
+            id,
+            "tour_place:" + id,
+            title,
+            "Description should not appear in the answer.",
+            null,
+            "STAY",
+            "DUSHANBE",
+            locale
+        );
+    }
+
+    private String placeTitle(String locale) {
+        return switch (locale) {
+            case "ko" -> "아부압둘로 루다키 공원";
+            case "ru" -> "Парк Абуабдулло Рудаки";
+            case "tg" -> "Боғи Абуабдулло Рудакӣ";
+            default -> "Abuabdullo Rudaki Park";
+        };
     }
 }
