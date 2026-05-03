@@ -237,14 +237,20 @@ spring:
 
 deepl:
   api-key: your_deepl_api_key
-
-chatbot:
-  llm:
-    mode: openai
-    api-key: your_openai_api_key
 ```
 
-> 실제 DB 비밀번호, OpenAI API 키, DeepL API 키는 공개 저장소에 커밋하지 않는 것을 권장합니다.
+JWT secret과 챗봇 LLM 설정은 환경변수로 주입할 수 있습니다.
+
+```bash
+export JWT_SECRET="your-secure-jwt-secret"
+export OPENAI_API_KEY="your_openai_api_key"
+export CHATBOT_LLM_MODEL="gpt-5-mini"
+export CHATBOT_LLM_TIMEOUT_SECONDS="30"
+```
+
+`OPENAI_API_KEY` 대신 `CHATBOT_LLM_API_KEY`를 사용할 수도 있습니다. 커스텀 LLM 엔드포인트를 사용할 경우 `CHATBOT_LLM_ENDPOINT`를 함께 설정합니다.
+
+> 실제 DB 비밀번호, JWT secret, OpenAI API 키, DeepL API 키는 공개 저장소에 커밋하지 않는 것을 권장합니다.
 
 ### Run
 
