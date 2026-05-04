@@ -110,14 +110,21 @@
                     Drag and drop your saved places into the calendar to create your itinerary,
                     and easily save your travel plans as an image with date-based notes.
                 </p>
-                <div class="download-buttons">
-                    <button id="download-image-btn" class="download-btn download-btn-image" title="Download calendar as PNG image">
-                        <span class="material-icons">image</span>
-                        <span>Download as Image</span>
-                    </button>
-                    <button id="copy-image-btn" class="download-btn download-btn-copy" title="Copy calendar to clipboard">
-                        <span class="material-icons">content_copy</span>
-                        <span>Copy to Clipboard</span>
+                <div class="calendar-actions">
+                    <div class="download-buttons">
+                        <button id="download-image-btn" class="download-btn download-btn-image" title="Download calendar as PNG image">
+                            <span class="material-icons">image</span>
+                            <span>Download as Image</span>
+                        </button>
+                        <button id="copy-image-btn" class="download-btn download-btn-copy" title="Copy calendar to clipboard">
+                            <span class="material-icons">content_copy</span>
+                            <span>Copy to Clipboard</span>
+                        </button>
+                    </div>
+
+                    <button id="toggle-view-btn" class="toggle-view-btn" title="Toggle between compact and full view">
+                        <span class="material-icons">dashboard_customize</span>
+                        <span>Full View</span>
                     </button>
                 </div>
             </div>
@@ -163,14 +170,16 @@
                 </div>
             </aside>
 
-            <div class="calendar-section-wrapper">
-                <section class="calendar-board">
-                    <div id="calendar"></div>
-                </section>
+            <div class="calendar-column">
+                <div class="calendar-section-wrapper">
+                    <section class="calendar-board">
+                        <div id="calendar"></div>
+                    </section>
 
-                <button id="add-note-btn" class="add-note-btn" title="Add note to calendar">
-                    <span class="material-icons">add</span>
-                </button>
+                    <button id="add-note-btn" class="add-note-btn" title="Add note to calendar">
+                        <span class="material-icons">add</span>
+                    </button>
+                </div>
             </div>
         </section>
     </div>
